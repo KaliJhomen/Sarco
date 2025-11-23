@@ -51,7 +51,7 @@ const AddProductPage = () => {
         );
       } else {
         createProduct(
-          { productData: { ...productoPayload, idTiposProducto: tiposProductoArray } }, // <-- estructura correcta
+          { productData: { ...productoPayload, idTiposProducto: tiposProductoArray } }, 
           {
             onSuccess: (data) => {
               toast.success('Producto creado exitosamente');

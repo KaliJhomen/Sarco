@@ -1,11 +1,14 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { Producto } from './entities/producto.entity';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Producto } from './entities/producto.entity';
-import { DeepPartial, Repository, SelectQueryBuilder } from 'typeorm';
+
 import { ProductoTipoProducto } from 'src/producto-tipo-producto/entities/producto-tipo-producto.entity';
 import { TipoProducto } from 'src/tipo-producto/entities/tipo-producto.entity';
+
+import { DeepPartial, Repository, SelectQueryBuilder } from 'typeorm';
 @Injectable()
 export class ProductoService {
 

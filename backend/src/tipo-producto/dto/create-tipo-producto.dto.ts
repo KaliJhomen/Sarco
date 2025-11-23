@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, IsBoolean, IsDateString} from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsArray, ArrayNotEmpty, IsInt} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTipoProductoDto {
@@ -9,4 +9,10 @@ export class CreateTipoProductoDto {
   @ApiProperty()
   @IsBoolean()
   estado?: boolean; 
+  //Relacion
+  @ApiProperty({ type: [Number] })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsInt({each:true})
+  idSubCategorias: number[];
 }

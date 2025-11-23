@@ -1,5 +1,5 @@
 import { Categoria } from "src/categoria/entities/categoria.entity";
-import { SubCategoriaTipoProducto } from "src/sub-categoria-tipo-producto/entities/sub-categoria-tipo-producto.entity";
+import { TipoProductoSubCategoria } from "src/TipoProductoSubCategoria/entities/tipo-producto-sub-categoria.entity";
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Index("fk_sub_categoria_categoria_1", ["idCategoria"], {})
@@ -25,6 +25,6 @@ export class SubCategoria {
     @JoinColumn([{ name: "id_categoria", referencedColumnName: "idCategoria" }])
     idCategoria2: Categoria;
 
-    @OneToMany(() => SubCategoriaTipoProducto, (subCategoriaTipoProducto) => subCategoriaTipoProducto.idSubCategoria2)
-    sub_categoria_tipo_productos: SubCategoriaTipoProducto[];
+    @OneToMany(() => TipoProductoSubCategoria, (tipoProductoSubCategoria) => tipoProductoSubCategoria.idSubCategoria)
+    tipoProductoSubCategoria: TipoProductoSubCategoria[];
 }

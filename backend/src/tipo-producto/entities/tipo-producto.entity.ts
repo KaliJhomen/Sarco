@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { SubCategoriaTipoProducto } from "src/sub-categoria-tipo-producto/entities/sub-categoria-tipo-producto.entity";
+import { TipoProductoSubCategoria } from "src/TipoProductoSubCategoria/entities/tipo-producto-sub-categoria.entity";
 import { ProductoTipoProducto } from "src/producto-tipo-producto/entities/producto-tipo-producto.entity";
 
 @Entity("tipo_producto", { schema: "sarcos_db" })
@@ -12,11 +12,12 @@ export class TipoProducto {
 
     @Column("boolean", { name: "estado", default: () => "'0'" })
     estado: boolean;
-
-    @OneToMany(() => SubCategoriaTipoProducto, (subCategoriaTipoProducto) => subCategoriaTipoProducto.idTipoProducto2)
-    sub_categoria_tipo_productos: SubCategoriaTipoProducto[];
-
-    @OneToMany(() => ProductoTipoProducto, (productoTipoProducto) => productoTipoProducto.idTipoProducto)
-    productoTipoProducto: ProductoTipoProducto[];
+    
+    @OneToMany(() => TipoProductoSubCategoria, (tipoProductoSubCategoria) => tipoProductoSubCategoria.idTipoProducto)
+    tipoProductoSubCategoria: TipoProductoSubCategoria[];
+    @OneToMany(
+        () => ProductoTipoProducto, (productoTipoProducto) => productoTipoProducto.idTipoProducto,
+    {cascade:true})
+    productoTipoProducto: ProductoTipoProducto[];  
 
 }

@@ -30,6 +30,13 @@ export class ProductoTipoProductoController {
   findByProductId(@Param('id') id: string) {
     return this.productoTipoProductoService.findByProductId(+id);
   }
+  @Get('by-product-type/:id')
+  @ApiOperation({ summary: 'Obtener un producto-tipo-producto por Id tipo producto' })
+  @ApiResponse({ status: 200, description: 'Obtenido correctamente' })
+  @ApiResponse({ status: 404, description: 'No encontrado' })
+  findByProductTypeId(@Param('id') id: string) {
+    return this.productoTipoProductoService.findByProductTypeId(+id);
+  }
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un producto-tipo-producto por ID' })
   @ApiResponse({ status: 200, description: 'Obtenido correctamente' })

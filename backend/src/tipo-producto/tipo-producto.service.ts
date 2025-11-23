@@ -1,30 +1,45 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { TipoProducto } from './entities/tipo-producto.entity';
 import { CreateTipoProductoDto } from './dto/create-tipo-producto.dto';
 import { UpdateTipoProductoDto } from './dto/update-tipo-producto.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { TipoProducto } from './entities/tipo-producto.entity';
-import { Repository } from 'typeorm';
+
+import { TipoProductoSubCategoria } from 'src/TipoProductoSubCategoria/entities/tipo-producto-sub-categoria.entity';
+import {SubCategoria} from 'src/sub-categoria/entities/sub-categoria.entity';
+
+import { DeepPartial, Repository, SelectQueryBuilder} from 'typeorm';
 
 @Injectable()
 export class TipoProductoService {
   constructor(
     @InjectRepository(TipoProducto)
-    private TipoProductoRepository: Repository<TipoProducto>,
+    private tipoProductoRepository: Repository<TipoProducto>,
+    @InjectRepository(TipoProductoSubCategoria)
+    private tipoProductoSubCategoriaRepository: Repository<TipoProductoSubCategoria>,
+    @InjectRepository(SubCategoria)
+    private subCategoriaRepository: Repository<SubCategoria>,
   ) { }
   async create(createTipoProductoDto: CreateTipoProductoDto) {
     try {
-      const tipoProducto = this.TipoProductoRepository.create(createTipoProductoDto);
-      return await this.TipoProductoRepository.save(tipoProducto);
-    } catch (error) {
-      console.log(error);
+      const { idSubCategorias, ...tipoProductoData } = createTipoProductoDto;
+      const tipoProducto = this.tipoProductoRepository.create(tipoProductoData);
+      const tipoProductoGuardado = await this.tipoProductoRepository.save(tipoProducto);
+      if (idSubCategorias && Array.isArray(idSubCategorias)) {
+        const relaciones = idSubCategorias.map(id => ({
+          idTipoProducto: tipoProductoGuardado,
+          idSubCategoria: { idSubCategoria: id }
+        })) as DeepPartial<TipoProductoSubCategoria>[];
+      return await this.tipoProductoSubCategoriaRepository.save(relaciones);
+    }}catch (error) {
       throw new InternalServerErrorException(
         'Ocurrió un error al crear el tipo producto',
       );
-    }  }
-
+    }
+  }
   async findAll() {
     try {
-      return await this.TipoProductoRepository.find();
+      return await this.tipoProductoRepository.find();
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(
@@ -35,7 +50,7 @@ export class TipoProductoService {
 
   async findAllFiltered(idProducto?: number, idSubCategoria?: number) {
     try {
-      const qb = this.TipoProductoRepository.createQueryBuilder('tipoProducto');
+      const qb = this.tipoProductoRepository.createQueryBuilder('tipoProducto');
 
       if (idSubCategoria && Number(idSubCategoria) > 0) {
         qb.innerJoin('tipoProducto.sub_categoria_tipo_productos', 'sctp')

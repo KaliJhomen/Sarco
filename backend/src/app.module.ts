@@ -42,7 +42,7 @@ import { UsersModule } from './users/users.module';
 import { SubCategoriaModule } from './sub-categoria/sub-categoria.module';
 import { TipoProductoModule } from './tipo-producto/tipo-producto.module';
 import { ProductoTipoProductoModule } from './producto-tipo-producto/producto-tipo-producto.module';
-import { SubCategoriaTipoProductoModule } from './sub-categoria-tipo-producto/sub-categoria-tipo-producto.module';
+import { TipoProductoSubCategoriaModule } from './TipoProductoSubCategoria/tipo-producto-sub-categoria.module';
 import { ProductoModule } from './producto/producto.module';
 import { ProductoTiendaProductoModule } from './producto-tienda-producto/producto-tienda-producto.module';
 import { UploadModule } from './upload/upload.module';
@@ -101,7 +101,7 @@ import { ColorModule } from './color/color.module';
     SubCategoriaModule,
     TipoProductoModule,
     ProductoTipoProductoModule,
-    SubCategoriaTipoProductoModule,
+    TipoProductoSubCategoriaModule,
     ProductoModule,
     ProductoTiendaProductoModule,
     UploadModule,

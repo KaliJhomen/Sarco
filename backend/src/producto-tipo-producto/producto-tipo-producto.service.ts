@@ -44,6 +44,7 @@ export class ProductoTipoProductoService {
       );
     }
   }
+  //Por ID Producto
   async findByProductId(idProducto: number) {
     try {
       const entity = await this.productoTipoProductoRepository.find({ where: { idProducto: { idProducto: idProducto } } });
@@ -55,6 +56,21 @@ export class ProductoTipoProductoService {
       console.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al obtener el producto-tipo-producto con Producto ID ${idProducto}`,
+      );
+    }
+  }
+  // Por ID TipoProducto 
+  async findByProductTypeId(idTipoProducto: number) {
+    try {
+      const entity = await this.productoTipoProductoRepository.find({ where: { idTipoProducto: { idTipoProducto: idTipoProducto } } });
+      if (!entity) {
+        throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${idTipoProducto}`);
+      }
+      return entity;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        `Ocurrió un error al obtener el producto-tipo-producto con Producto ID ${idTipoProducto}`,
       );
     }
   }
