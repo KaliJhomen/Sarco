@@ -1,6 +1,7 @@
 "use client"
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService } from '@/services/product.service';
+import { productTypeProductService } from '@/services/productTypeProduct.service';
 
 // ============================================
 // QUERIES (GET - Lectura)

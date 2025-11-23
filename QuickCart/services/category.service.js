@@ -7,5 +7,26 @@ export const categoryService = {
   },
   async getById(id) {
     return client.get(endpoints.categories.byId(id));
-  }
+  },
+  async create(categoryData, token) {
+    const payload = {
+      nombre: categoryData.nombre?.trim() || "",
+    }
+    return client.post(endpoints.categories.base, categoryData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  },
+
+  async update(id, categoryData, token) {
+    return client.put(endpoints.categories.byId(id), categoryData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  },
+
+  async delete(id, token) {
+    return client.delete(endpoints.categories.byId(id), {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  },
+
 }

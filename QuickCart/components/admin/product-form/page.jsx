@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { BasicInfoSection } from './BasicInfoSection';
 import { PricingSection } from './PricingSection';
 import { WarrantySection } from './WarrantySection';
-import { useProductForm } from '@/hooks/local/useProductForm';
 import { calculateFinalPrice/*, calculateMonthlyPayment */} from '@/utils/helpers/calculators';
 
 export const ProductForm = ({
@@ -14,9 +13,14 @@ export const ProductForm = ({
   onSubmit,
   onCancel,
   stockTotal,
+  idProducto,
+  productService,
 }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showColors, setShowColors] = useState(formData.colores && formData.colores.length > 0);
+  const [categoriaId, setCategoriaId] = useState('');
+  const [subcategorias, setSubcategorias] = useState([]);
+  const [subcategoriaId, setSubcategoriaId] = useState('');
 
   const precioFinal = calculateFinalPrice(formData.precioVenta, formData.descuento);
   /*const cuotaMensual = calculateMonthlyPayment(precioFinal, formData.mesesSinInteres);
@@ -25,6 +29,7 @@ export const ProductForm = ({
     e.preventDefault();
     console.log('Intentando guardar producto...');
     const result = await onSubmit(e);
+    const token = localStorage.getItem('token');
     console.log('Resultado de onSubmit:', result);
     if (result === true) {
       setShowSuccessModal(true);
@@ -36,12 +41,44 @@ export const ProductForm = ({
     addColor();
     setShowColors(true);
   };
+  /*
 
+  const handleCategoriaChange = async (e) => {
+    const id = e.target.value;
+    setCategoriaId(id);
+    setSubcategorias([]);
+    setSubcategoriaId('');
+
+    if (id) {
+      const subs = await fetch(`/api/subcategorias?categoriaId=${id}`).then(res => res.json());
+      setSubcategorias(subs);
+    }
+  };
+*/
   useEffect(() => {
     if (formData.colores.length === 0) {
       setShowColors(false);
     }
   }, [formData.colores]);
+
+  useEffect(() => {
+    if (idProducto) {
+      productService.getById(idProducto)
+        .then(data => {
+          setFormData({
+            ...data,
+            colores: Array.isArray(data.colores) ? data.colores : [],
+          });
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [idProducto, productService]);
+  
+  const safeFormData = {
+    ...formData,
+    colores: Array.isArray(formData?.colores) ? formData.colores : [],
+  };
+
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-6">

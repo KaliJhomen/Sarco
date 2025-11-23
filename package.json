@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "lucide-react": "^0.552.0"
+    "lucide-react": "^0.552.0",
+    "react-window": "^2.2.3"
   },
   "packageManager": "yarn@4.11.0"
 }

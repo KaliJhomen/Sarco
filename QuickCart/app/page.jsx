@@ -1,7 +1,5 @@
 'use client'
 import React, { useState, useMemo, useCallback } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import HeroSection from "@/components/sections/HeroSection";
 import FeaturedSection from "@/components/sections/FeaturedSection";
 import CategorySection from "@/components/sections/CategorySection";

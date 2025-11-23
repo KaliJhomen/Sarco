@@ -11,8 +11,15 @@ export class SubCategoriaService {
     @InjectRepository(SubCategoria)
     private subCategoriaRepository: Repository<SubCategoria>,
   ) { }
-  create(createSubCategoriaDto: CreateSubCategoriaDto) {
-    return 'This action adds a new subCategoria';
+  async create(createSubCategoriaDto: CreateSubCategoriaDto) {
+    try {
+      const subCategoria = this.subCategoriaRepository.create(createSubCategoriaDto);
+      return await this.subCategoriaRepository.save(subCategoria);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Ocurrió un error al crear la subcategoría',
+      );
+    }
   }
 
   async findAll(categoriaId?: number) {
@@ -28,15 +35,15 @@ export class SubCategoriaService {
       );
     }
   }
-  findOne(id: number) {
-    return `This action returns a #${id} subCategoria`;
+  async findOne(id: number) {
+    return await this.subCategoriaRepository.findOne({ where: { idSubCategoria: id } });
   }
 
-  update(id: number, updateSubCategoriaDto: UpdateSubCategoriaDto) {
-    return `This action updates a #${id} subCategoria`;
+  async update(id: number, updateSubCategoriaDto: UpdateSubCategoriaDto) {
+    return await this.subCategoriaRepository.update(id, updateSubCategoriaDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} subCategoria`;
+  async remove(id: number) {
+    return await this.subCategoriaRepository.delete(id);
   }
 }

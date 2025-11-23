@@ -53,13 +53,20 @@ export class Producto {
   @Column("date", { name: "fecha_ingreso", nullable: true })
   fechaIngreso: string | null;
 
-  @Column("date", { name: "garantia_fabrica", nullable: true })
-  garantiaFabrica: string | null;
+  @Column("int", { name: "garantia_fabrica", nullable: true })
+  garantiaFabrica: number | null;
 
   @Column("int", { name: "descuento", nullable: true })
   descuento: number | null;
 
-  @ManyToOne(() => Marca, (marca) => marca.productos, {
+  @OneToMany(
+    () => ProductoTipoProducto, (productoTipoProducto) => productoTipoProducto.idProducto,
+  {cascade:true}
+  )
+  productoTipoProducto: ProductoTipoProducto[];  
+
+  @ManyToOne(
+    () => Marca, (marca) => marca.productos, {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",
   })
@@ -88,9 +95,12 @@ export class Producto {
   )
   detalleSeparados: DetalleSeparado[];
 
-  @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.idProducto2)
+  @OneToMany(
+    () => DetalleVenta, (detalleVenta) => detalleVenta.idProducto2)
   detalleVentas: DetalleVenta[];
 
-  @OneToMany(() => ProductoTipoProducto, (productoTipoProducto) => productoTipoProducto.idProducto2)
-  producto_tipo_productos: ProductoTipoProducto[];
+
+  @OneToOne(
+    () => Garantia, (garantia) => garantia.idProducto2)
+  garantia: Garantia;
 }

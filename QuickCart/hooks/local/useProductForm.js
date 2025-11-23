@@ -6,6 +6,7 @@ import {calculateFinalPrice/*, calculateMonthlyPayment, calculateTotalStock */} 
 export const useProductForm = () => {
   const initialFormData = {
     // Campos básicos del producto
+    idTiposProducto:[],
     nombre: '',
     modelo: '',         
     descripcion: '',
@@ -14,13 +15,7 @@ export const useProductForm = () => {
     precioTope: '',
     precioVenta: '',
     descuento: 0,
-    fechaIngreso: new Date().toISOString().split('T')[0], 
-
-    // Relaciones (IDs)
-    idMarca: '',
-    idCategoria: '',
-    idTienda: '',      
-    
+    fechaIngreso: new Date().toISOString().split('T')[0],     
     garantiaFabrica: '',
     colores: [{
       idColor:Date.now(),
@@ -130,9 +125,9 @@ export const useProductForm = () => {
       precioVenta: formData.precioVenta,
       descuento: formData.descuento,
       idCategoria: formData.idCategoria,
+      idSubCategoria: formData.idSubCategoria,
       colores: formData.colores,
       imagen: formData.imagen, 
-      idTienda: formData.idTienda,
       fechaIngreso: formData.fechaIngreso, 
     });
 
@@ -142,6 +137,7 @@ export const useProductForm = () => {
 
   const resetForm = () => {
     setFormData({
+      idTipoProducto:'',
       nombre: '',
       modelo: '',         
       descripcion: '',
@@ -155,6 +151,7 @@ export const useProductForm = () => {
       // Relaciones (IDs)
       idMarca: '',
       idCategoria: '',
+      idSubCategoria: '',
       idTienda: '',      
       
       garantiaFabrica: '',

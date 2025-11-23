@@ -15,13 +15,23 @@ export class TipoProductoController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Obtener tipos de producto (opcionalmente filtrados por subcategoría)' })
-  @ApiQuery({ name: 'subcategoria_id', required: false, type: Number, description: 'ID de la subcategoría para filtrar' })
+  @ApiOperation({ summary: 'Obtener tipos de producto' })
   @ApiResponse({ status: 200, description: 'Lista de tipos de producto devuelta' })
-  findAll(@Query('subcategoria_id') subcategoriaId?: number) {
-    return this.tipoProductoService.findAllFilteredBySubCategoria(subcategoriaId ? Number(subcategoriaId) : undefined);
+  findAll() {
+    return this.tipoProductoService.findAll();
   }
-
+  @Get('filtro')
+  @ApiOperation({ summary: 'Obtener tipos de producto filtrados por producto o subcategoría' })
+  @ApiResponse({ status: 200, description: 'Lista de tipos de producto filtrados correctamente' })
+  @ApiQuery({ name: 'idSubCategoria', required: false, type: Number, description: 'Filtra por subcategoría' })
+  @ApiQuery({ name: 'idProducto', required: false, type: Number, description: 'Filtra por producto' })
+  async findAllFiltered(
+    @Query('idSubCategoria') idSubCategoria?: number,
+    @Query('idProducto') idProducto?: number
+  ) {
+    return this.tipoProductoService.findAllFiltered(idProducto, idSubCategoria);
+  }
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tipoProductoService.findOne(+id);

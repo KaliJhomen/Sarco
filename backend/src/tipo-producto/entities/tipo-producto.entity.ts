@@ -7,16 +7,16 @@ export class TipoProducto {
     @PrimaryGeneratedColumn({ type: "int", name: "id_tipo_producto" })
     idTipoProducto: number;
 
-    @Column("varchar", { name: "nombre", nullable: true, length: 25 })
-    nombre: string | null;
+    @Column("varchar", { name: "nombre", nullable: true, length: 20 })
+    nombre: string;
 
-    @Column("boolean", { name: "estado", default: () => "'1'" })
-    estado: boolean | null;
+    @Column("boolean", { name: "estado", default: () => "'0'" })
+    estado: boolean;
 
     @OneToMany(() => SubCategoriaTipoProducto, (subCategoriaTipoProducto) => subCategoriaTipoProducto.idTipoProducto2)
     sub_categoria_tipo_productos: SubCategoriaTipoProducto[];
 
-    @OneToMany(() => ProductoTipoProducto, (productoTipoProducto) => productoTipoProducto.idTipoProducto2)
-    producto_tipo_productos: ProductoTipoProducto[];
+    @OneToMany(() => ProductoTipoProducto, (productoTipoProducto) => productoTipoProducto.idTipoProducto)
+    productoTipoProducto: ProductoTipoProducto[];
 
 }

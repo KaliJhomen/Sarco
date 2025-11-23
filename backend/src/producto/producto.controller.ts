@@ -17,8 +17,9 @@ export class ProductoController {
   @ApiResponse({ status: 201, description: 'Articulo creada correctamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiBody({ type: CreateProductoDto })
-  create(@Body() createProductoDto: CreateProductoDto) {
-    return this.productoService.create(createProductoDto);
+  async create(@Body() createProductoDto: CreateProductoDto) {
+    console.log('DTO recibido:', createProductoDto);
+    return await this.productoService.create(createProductoDto);
   }
 
   @Get()
@@ -114,7 +115,6 @@ export class ProductoController {
       idMarcaList: brandIds,
       categoriaNombre: normalize(categoria),
       subCategoriaNombre: normalize(subcategoria),
-      tipoProductoNombre: normalize(tipo),
       priceMin: typeof priceMin === 'number' ? Number(priceMin) : undefined,
       priceMax: typeof priceMax === 'number' ? Number(priceMax) : undefined,
       page: page ? Math.max(1, Number(page)) : undefined,
@@ -130,7 +130,6 @@ export class ProductoController {
   @ApiOperation({ summary: 'Obtener un articulo por ID' })
   @ApiResponse({ status: 200, description: 'Articulo obtenido correctamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
-  @ApiBody({ type: CreateProductoDto })
   findOne(@Param('id') id: string) {
     return this.productoService.findOne(+id);
   }

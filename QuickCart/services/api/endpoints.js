@@ -1,6 +1,7 @@
 /*Endpoints centralizados de la API
- * Evita repetir URLs en cada service
  */
+
+import { productTypeProductService } from "../productTypeProduct.service";
 
 const endpoints = {
   // ============================================
@@ -11,12 +12,12 @@ const endpoints = {
     all: '/producto',
     byId: (id) => `/producto/${id}`,
     search: (query) => `/producto/filtro?busqueda?=${encodeURIComponent(query)}`,
-    byBrand: (idMarca) => `/producto/filtro?idMarca=${idMarca}`,
+    byBrandId: (idMarca) => `/producto/filtro?idMarca=${idMarca}`,
     byBrands: (marcas) => `/producto/filtro?marcas=${marcas.join(',')}`,
-    byCategory: (idCategoria) => `/producto/filtro/categoria/${idCategoria}`,
-    bySubCategory: (idSubCategoria) => `/producto/filtro/filtro?idSubCategoria=${idSubCategoria}`,
-    byProductType: (idTipoProducto) => `/producto/filtro?tipoProducto=${idTipoProducto}`,
-    byStore: (tienda_id) => `/producto/filtro?tienda=${tienda_id}`,
+    byCategoryId: (idCategoria) => `/producto/filtro/categoria/${idCategoria}`,
+    bySubCategoryId: (idSubCategoria) => `/producto/filtro/filtro?idSubCategoria=${idSubCategoria}`,
+    byProductTypeId: (idTipoProducto) => `/producto/filtro?tipoProducto=${idTipoProducto}`,
+    byStoreId: (tienda_id) => `/producto/filtro?tienda=${tienda_id}`,
     byStores: (tiendas) => `/producto/filtro?tiendas=${tiendas.join(',')}`,
     /*
     inStock: '/producto/stock',
@@ -26,7 +27,25 @@ const endpoints = {
     byPriceRange: (min, max) => `/producto/precio?min=${min}&max=${max}`,
     */
     },
+///
+/// Tipo Productos 
+////
+  productTypes: {
+    base: '/tipo-producto',
+    all: '/tipo-producto',
+    byId: (id) => `/tipo-producto/${id}`,
+    bySubCategoryId: (idSubCategoria) => `/tipo-producto/filtro?idSubCategoria=${idSubCategoria}`,
+    byProductId: (idProducto) => `/tipo-producto/filtro?idProducto=${idProducto}`,
 
+  },
+
+// Producto Tipo Producto
+///
+  productTypeProducts:{
+    base:'/producto-tipo-producto',
+    all:'/producto-tipo-producto',
+    byProductId:(id) => `/producto-tipo-producto/by-product=${id}`,
+  },
   // ============================================
   // MARCAS
   // ============================================
@@ -34,6 +53,7 @@ const endpoints = {
     base: '/marca',
     all: '/marca',
     byId: (id) => `/marca/${id}`,
+
   },
 
   // ============================================
@@ -43,8 +63,18 @@ const endpoints = {
     base: '/categoria',
     all: '/categoria',
     byId: (id) => `/categoria/${id}`,
-    },
 
+    },
+// ============================================
+// SUB CATEGORIAS
+//  
+  subCategories:{
+    base:'/sub-categoria',
+    all:'/sub-categoria',
+    byId:(id) => `/sub-categoria/${id}`,
+    byCategoryId: (id) => `/sub-categoria?categoria_id=${id}`,
+    
+  },
   // ============================================
   // COLORES
   // ============================================
@@ -52,6 +82,7 @@ const endpoints = {
     base: '/color',
     all: '/color',
     byId: (id) => `/color/${id}`,
+
   },
 
   // ============================================

@@ -58,25 +58,30 @@ export const productService = {
       headers: { Authorization: `Bearer ${token}` }
     });
   },
-
+  
   async create(formData, token) {
     const payload = {
+      //Campos Tabla Producto
       nombre: formData.nombre?.trim() || "",
       modelo: formData.modelo?.trim() || "",
+      idMarca: parseInt(formData.idMarca),
+
       descripcion: formData.descripcion?.trim() || "",
       stock: parseInt(formData.stock) || 0,
       imagen: formData.imagen?.trim() || "",
       precioTope: parseFloat(formData.precioTope),
-      precioVenta: parseFloat(formData.precioVenta),   
-      descuento: parseFloat(formData.descuento) || 0,
+      precioVenta: parseFloat(formData.precioVenta), 
       fechaIngreso: formData.fechaIngreso || "",      
-
-      idMarca: parseInt(formData.idMarca),
-      /*
+      garantiaFabrica: parseInt(formData.garantiaFabrica) || null,
+      descuento: parseFloat(formData.descuento) || 0,
+      idTiposProducto: Array.isArray(formData.idTiposProducto)
+        ? formData.idTiposProducto.map(Number)
+        : [Number(formData.idTiposProducto)],
+/*
+      //Campos Relaciondos
       idCategoria: parseInt(formData.idCategoria),
+      idSubCategoria: parseInt(formData.idSubCategoria),
       idTienda: parseInt(formData.idTienda),
-      */
-      garantiaFabrica: formData.garantiaFabrica?.trim() || null,
 /*
       productoColor: formData.colores.map(color => ({
         idColor: color.idColor, 
@@ -109,19 +114,22 @@ export const productService = {
       precioVenta: data.precioVenta ? parseFloat(data.precioVenta) : undefined,
       descuento: data.descuento !== undefined ? parseFloat(data.descuento) : undefined,
       fechaIngreso: data.fechaIngreso,
-  
+  /*
       idMarca: data.idMarca ? parseInt(data.idMarca) : undefined,
       idCategoria: data.idCategoria ? parseInt(data.idCategoria) : undefined,
+      idSubCategoria: data.idSubCategoria ? parseInt(data.idSubCategoria) : undefined,
       idTienda: data.idTienda ? parseInt(data.idTienda) : undefined,
-
-      garantiaFabrica: data.garantiaFabrica?.trim() || null,
+*/
+      garantiaFabrica: data.garantiaFabrica ? parseInt(data.garantiaFabrica) || null : null,
+      idTiposProducto:[],
+/*
       productoColor: data.colores ? data.colores.map(color => ({
         idColor: color.idColor,
         nombre: color.nombre?.trim() || "",
         codigoHex: color.codigoHex || "#000000",
-      })) : undefined,
+        })) : undefined,
 /*
-      estadio: data.estado !== undefined ? data.estado : undefined,
+      estado: data.estado !== undefined ? data.estado : undefined,
       mesesCredito: data.mesesCredito ? parseInt(data.mesesCredito) : undefined,
 */
       };

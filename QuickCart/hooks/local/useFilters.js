@@ -7,7 +7,6 @@ export function useFilters() {
   const { data: allProducts = [], isLoading, error } = useProducts();
   const searchParams = useSearchParams();
 
-  // 🔍 LOG INMEDIATO
   console.log('🔧 useFilters ejecutado');
   console.log('allProducts desde useProducts:', allProducts);
   console.log('isLoading:', isLoading);

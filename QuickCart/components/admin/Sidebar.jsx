@@ -7,8 +7,10 @@ import { usePathname } from 'next/navigation';
 const SideBar = () => {
     const pathname = usePathname()
     const menuItems = [
-        { name: 'Añadir Producto', path: '/admin/add-product', icon: assets.add_icon },
-        { name: 'Lista de Productos', path: '/admin/product-list', icon: assets.product_list_icon },
+        { name: 'Productos', path: '/admin/storage/products/', icon: assets.product_list_icon },
+        { name: 'Tipo Producto', path: '/admin/storage/products/product-types', icon: assets.add_icon },
+        { name: 'Categoría', path : '/admin/storage/categories/', icon: assets.category_icon },
+        
         { name: 'Pedidos', path: '/admin/orders', icon: assets.order_icon },
         { name: 'Gestionar Anuncios', path: '/admin/ads', icon: assets.heart_icon },
     ];

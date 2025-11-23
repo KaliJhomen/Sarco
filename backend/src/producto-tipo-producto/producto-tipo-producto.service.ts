@@ -13,7 +13,10 @@ export class ProductoTipoProductoService {
   ) { }
   async create(createProductoTipoProductoDto: CreateProductoTipoProductoDto) {
     try {
-      const entity = this.productoTipoProductoRepository.create(createProductoTipoProductoDto);
+      const entity = this.productoTipoProductoRepository.create({
+        idProducto: { idProducto: createProductoTipoProductoDto.idProducto },
+        idTipoProducto: { idTipoProducto: createProductoTipoProductoDto.idTipoProducto },
+      });
       return await this.productoTipoProductoRepository.save(entity);
     } catch (error) {
       if (
@@ -31,7 +34,9 @@ export class ProductoTipoProductoService {
 
   async findAll() {
     try {
-      return await this.productoTipoProductoRepository.find();
+      return await this.productoTipoProductoRepository.find({
+        relations:['idProducto', 'idTipoProducto']
+      });
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(
@@ -39,7 +44,20 @@ export class ProductoTipoProductoService {
       );
     }
   }
-
+  async findByProductId(idProducto: number) {
+    try {
+      const entity = await this.productoTipoProductoRepository.find({ where: { idProducto: { idProducto: idProducto } } });
+      if (!entity) {
+        throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${idProducto}`);
+      }
+      return entity;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        `Ocurrió un error al obtener el producto-tipo-producto con Producto ID ${idProducto}`,
+      );
+    }
+  }
   async findOne(id: number) {
     try {
       const entity = await this.productoTipoProductoRepository.findOne({ where: { idProductoTipoProducto: id } });
@@ -59,7 +77,12 @@ export class ProductoTipoProductoService {
     try {
       const entity = await this.productoTipoProductoRepository.preload({
         idProductoTipoProducto: id,
-        ...updateProductoTipoProductoDto,
+        idProducto: updateProductoTipoProductoDto.idProducto
+          ? { idProducto: updateProductoTipoProductoDto.idProducto }
+          : undefined,
+        idTipoProducto: updateProductoTipoProductoDto.idTipoProducto
+          ? { idTipoProducto: updateProductoTipoProductoDto.idTipoProducto }
+          : undefined,
       });
       if (!entity) {
         throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${id}`);

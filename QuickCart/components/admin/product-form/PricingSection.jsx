@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-
 import { DollarSign } from 'lucide-react';
 
 export const PricingSection = ({
@@ -20,10 +19,10 @@ export const PricingSection = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
 
-        {/* Precio de compra */}
+        {/* Precio Minimo de Venta */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Precio de Compra (S/.) <span className="text-red-500">*</span>
+            Precio Minimo de Venta (S/.) <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -34,7 +33,7 @@ export const PricingSection = ({
               errors?.precioTope ? 'border-red-500' : 'border-gray-300'
             }`}
             value={formData.precioTope || ''}
-            onChange={e => updateField('precioTope', e.target.value)}
+            onChange={e => updateField('precioTope', e.target.value === '' ? '' : Number(e.target.value))}
           />
             {errors?.precioTope && (
             <p className="text-red-500 text-sm mt-1">{errors.precioTope}</p>

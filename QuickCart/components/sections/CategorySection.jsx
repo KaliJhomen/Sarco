@@ -6,7 +6,7 @@ import { useProducts } from '@/hooks/server/useProducts';
 // Componente de sección individual
 const CategorySection = ({ 
   title, 
-  icon: Icon, // ✅ Recibe el componente de icono
+  icon: Icon,
   iconColor = 'text-blue-600',
   iconBgColor = 'bg-blue-100',
   filterFn,
@@ -14,10 +14,8 @@ const CategorySection = ({
   description,
   sortFn
 }) => {
-  // ✅ Obtener productos de la BD
   const { data: allProducts = [], isLoading, error } = useProducts();
 
-  // ✅ Filtrar y ordenar productos
   const products = React.useMemo(() => {
     if (!Array.isArray(allProducts)) {
       return [];

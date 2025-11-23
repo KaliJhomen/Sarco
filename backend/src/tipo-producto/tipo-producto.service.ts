@@ -11,9 +11,16 @@ export class TipoProductoService {
     @InjectRepository(TipoProducto)
     private TipoProductoRepository: Repository<TipoProducto>,
   ) { }
-  create(createTipoProductoDto: CreateTipoProductoDto) {
-    return 'This action adds a new tipoProducto';
-  }
+  async create(createTipoProductoDto: CreateTipoProductoDto) {
+    try {
+      const tipoProducto = this.TipoProductoRepository.create(createTipoProductoDto);
+      return await this.TipoProductoRepository.save(tipoProducto);
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        'Ocurrió un error al crear el tipo producto',
+      );
+    }  }
 
   async findAll() {
     try {
@@ -26,21 +33,31 @@ export class TipoProductoService {
     }
   }
 
-  async findAllFilteredBySubCategoria(subcategoriaId?: number) {
+  async findAllFiltered(idProducto?: number, idSubCategoria?: number) {
     try {
-      if (subcategoriaId && Number(subcategoriaId) > 0) {
-        const qb = this.TipoProductoRepository
-          .createQueryBuilder('tipoProducto')
-          .innerJoin('tipoProducto.sub_categoria_tipo_productos', 'sctp')
-          .where('sctp.idSubCategoria = :subId', { subId: Number(subcategoriaId) });
+      const qb = this.TipoProductoRepository.createQueryBuilder('tipoProducto');
 
-        return await qb.getMany();
+      if (idSubCategoria && Number(idSubCategoria) > 0) {
+        qb.innerJoin('tipoProducto.sub_categoria_tipo_productos', 'sctp')
+          .andWhere('sctp.idSubCategoria = :subId', { subId: Number(idSubCategoria) });
       }
-      return await this.findAll();
+
+      if (idProducto && Number(idProducto) > 0) {
+        qb.innerJoin('tipoProducto.producto_tipo_productos', 'ptprod')
+          .andWhere('ptprod.idProducto = :prodId', { prodId: Number(idProducto) });
+      }
+      if (
+        (!idSubCategoria || Number(idSubCategoria) <= 0) &&
+        (!idProducto || Number(idProducto) <= 0)
+      ) {
+        return await this.findAll();
+      }
+
+      return await qb.getMany();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw new InternalServerErrorException(
-        'Ocurrió un error al obtener los tipos de producto por subcategoría',
+        'Ocurrió un error al obtener los tipos de producto filtrados',
       );
     }
   }

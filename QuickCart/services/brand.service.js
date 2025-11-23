@@ -12,13 +12,20 @@ export const brandService = {
   },
 
   async create(brandData, token) {
-    return client.post(endpoints.brands.base, brandData, {
+    const payload = {
+      nombre: formData.nombre?.trim() || "",
+    }
+    const response = await client.post(endpoints.brands.base, payload, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    return response.data;
   },
 
   async update(id, brandData, token) {
-    return client.put(endpoints.brands.byId(id), brandData, {
+    const payload = {
+      nombre: formData.nombre?.trim() || "",
+    }
+    return client.put(endpoints.brands.byId(id), payload, {
       headers: { Authorization: `Bearer ${token}` }
     });
   },

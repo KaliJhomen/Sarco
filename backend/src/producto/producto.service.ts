@@ -3,20 +3,35 @@ import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Producto } from './entities/producto.entity';
-import { Repository, SelectQueryBuilder } from 'typeorm';
-
+import { DeepPartial, Repository, SelectQueryBuilder } from 'typeorm';
+import { ProductoTipoProducto } from 'src/producto-tipo-producto/entities/producto-tipo-producto.entity';
+import { TipoProducto } from 'src/tipo-producto/entities/tipo-producto.entity';
 @Injectable()
 export class ProductoService {
 
   constructor(
     @InjectRepository(Producto)
     private productoRepository: Repository<Producto>,
+
+    @InjectRepository(ProductoTipoProducto)
+    private productoTipoProductoRepository: Repository<ProductoTipoProducto>, 
+
+    @InjectRepository(TipoProducto)
+    private tipoProductoRepository: Repository<TipoProducto>,
   ) { }
 
   async create(createProductoDto: CreateProductoDto) {
     try {
-      const producto = this.productoRepository.create(createProductoDto);
-      return await this.productoRepository.save(producto);
+      const {idTiposProducto, ...productoData}= createProductoDto;
+      const producto = this.productoRepository.create(productoData);
+      const productoGuardado = await this.productoRepository.save(producto);
+      if (idTiposProducto && Array.isArray(idTiposProducto)) {
+        const relaciones = idTiposProducto.map(id => ({
+          idProducto: productoGuardado,
+          idTipoProducto: { idTipoProducto: id }
+        })) as DeepPartial<ProductoTipoProducto>[];
+      return await this.productoTipoProductoRepository.save(relaciones);
+      }
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(
@@ -28,7 +43,7 @@ export class ProductoService {
   async findAll() {
     try {
       return await this.productoRepository.find({
-        relations: ["idMarca2"],
+        relations: ["idMarca2", "productoTipoProducto", "productoTipoProducto.idTipoProducto"],
       });
     } catch (error) {
       throw new InternalServerErrorException(
