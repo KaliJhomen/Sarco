@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from 'next/navigation';
-import { productService } from '@/services/product.service';
+import { useProducts } from '@/hooks/server/useProducts';
 import Loading from "@/components/Loading";
 import Image from "next/image";
 import { ExternalLink, Edit, Trash2 } from 'lucide-react';
@@ -13,32 +13,13 @@ const PAGE_SIZE = 20;
 
 const ProductListPage = () => {
   const router = useRouter();
-  const [allProducts, setAllProducts] = useState([]);
+  const { data: allProducts = [], isLoading } = useProducts();
   const [displayedCount, setDisplayedCount] = useState(PAGE_SIZE);
-  const [loading, setLoading] = useState(true);
   const observerRef = useRef(null);
-
-  // Fetch all products once
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const result = await productService.getAll(); // Sin paginación, trae todos
-      setAllProducts(result);
-    } catch (error) {
-      toast.error('Error al cargar productos');
-      setAllProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
   // Intersection Observer for lazy loading local
   useEffect(() => {
-    if (loading) return;
+    if (isLoading) return;
     const observerTarget = observerRef.current;
     if (!observerTarget) return;
 
@@ -56,7 +37,7 @@ const ProductListPage = () => {
     return () => {
       if (observerTarget) observer.unobserve(observerTarget);
     };
-  }, [loading, displayedCount, allProducts.length]);
+  }, [isLoading, displayedCount, allProducts.length]);
 
   const handleDelete = async (productId) => {
     if (confirm('¿Estás seguro de eliminar este producto?')) {
@@ -82,7 +63,7 @@ const ProductListPage = () => {
           </button>
         </div>
 
-        {loading && products.length === 0 ? (
+        {isLoading && products.length === 0 ? (
           <Loading />
         ) : (
           <div className="w-full overflow-x-auto rounded-lg bg-white border border-gray-200 shadow-sm">

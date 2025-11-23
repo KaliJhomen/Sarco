@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useProductForm } from '@/hooks/local/useProductForm';
 import { productTypeProductService } from '@/services/productTypeProduct.service';
-import { productService } from '@/services/product.service';
+import { useProduct, useUpdateProduct, useCreateProduct } from '@/hooks/server/useProducts';
 import { ProductForm } from '@/components/admin/product-form/page';
 import toast from 'react-hot-toast';
 import { useImageUpload } from "@/hooks/local/useImageUpload";
@@ -13,16 +13,17 @@ const AddProductPage = () => {
   const { idProducto } = useParams();
   const productForm = useProductForm();
 
+  const { data: productData, isLoading } = useProduct(idProducto);
+
   // Si hay idProducto, carga los datos del producto
   useEffect(() => {
-    if (idProducto) {
-      productService.getById(idProducto)
-        .then(data => {
-          productForm.setFormData(data); 
-        })
-        .catch(() => toast.error('No se pudo cargar el producto'));
+    if (idProducto && productData) {
+      productForm.setFormData(productData); 
     }
-  }, [idProducto]);
+  }, [idProducto, productData]);
+
+  const { mutate: createProduct } = useCreateProduct();
+  const { mutate: updateProduct } = useUpdateProduct();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,23 +37,37 @@ const AddProductPage = () => {
       const { idTiposProducto, ...productoPayload } = productForm.formData;
       let tiposProductoArray = Array.isArray(idTiposProducto) ? idTiposProducto : [idTiposProducto];
 
-      let result;
       if (idProducto) {
-        // 👈 Si hay idProducto, actualiza
-        result = await productService.update(idProducto, { ...productoPayload, idTiposProducto: tiposProductoArray });
-        toast.success('Producto actualizado exitosamente');
+        updateProduct(
+          { id: idProducto, ...productoPayload, idTiposProducto: tiposProductoArray },
+          {
+            onSuccess: (data) => {
+              toast.success('Producto actualizado exitosamente');
+              productForm.resetForm();
+              router.push(`/admin/products/${data.id || data.idProducto}`);
+            },
+            onError: (error) => toast.error(error.message || 'Error al guardar el producto'),
+          }
+        );
       } else {
-        // 👈 Si no hay idProducto, crea
-        result = await productService.create({ ...productoPayload, idTiposProducto: tiposProductoArray });
-        toast.success('Producto creado exitosamente');
+        createProduct(
+          { productData: { ...productoPayload, idTiposProducto: tiposProductoArray } }, // <-- estructura correcta
+          {
+            onSuccess: (data) => {
+              toast.success('Producto creado exitosamente');
+              productForm.resetForm();
+              router.push(`/admin/products/${data.id || data.idProducto}`);
+            },
+            onError: (error) => toast.error(error.message || 'Error al guardar el producto'),
+          }
+        );
       }
 
-      productForm.resetForm();
-      router.push(`/admin/products/${result.id || result.idProducto}`);
       return true;
     } catch (error) {
-      const errorMessage = error.response?.data?.message ||
-        error.response?.data?.error ||
+      const errorMessage = error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
         'Error al guardar el producto';
       toast.error(errorMessage);
       return false;

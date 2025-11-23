@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { BasicInfoSection } from './BasicInfoSection';
 import { PricingSection } from './PricingSection';
 import { WarrantySection } from './WarrantySection';
-import { calculateFinalPrice/*, calculateMonthlyPayment */} from '@/utils/helpers/calculators';
+import { calculateFinalPrice } from '@/utils/helpers/calculators';
 
 export const ProductForm = ({
   formData,
@@ -13,71 +13,24 @@ export const ProductForm = ({
   onSubmit,
   onCancel,
   stockTotal,
-  idProducto,
-  productService,
 }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showColors, setShowColors] = useState(formData.colores && formData.colores.length > 0);
-  const [categoriaId, setCategoriaId] = useState('');
-  const [subcategorias, setSubcategorias] = useState([]);
-  const [subcategoriaId, setSubcategoriaId] = useState('');
+  const [showColors, setShowColors] = useState(Array.isArray(formData.colores) && formData.colores.length > 0);
 
   const precioFinal = calculateFinalPrice(formData.precioVenta, formData.descuento);
-  /*const cuotaMensual = calculateMonthlyPayment(precioFinal, formData.mesesSinInteres);
-*/
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Intentando guardar producto...');
     const result = await onSubmit(e);
-    const token = localStorage.getItem('token');
-    console.log('Resultado de onSubmit:', result);
     if (result === true) {
       setShowSuccessModal(true);
     }
   };
 
-  // Nuevo: función para agregar el primer color y mostrar la sección
-  const handleAddFirstColor = () => {
-    addColor();
-    setShowColors(true);
-  };
-  /*
-
-  const handleCategoriaChange = async (e) => {
-    const id = e.target.value;
-    setCategoriaId(id);
-    setSubcategorias([]);
-    setSubcategoriaId('');
-
-    if (id) {
-      const subs = await fetch(`/api/subcategorias?categoriaId=${id}`).then(res => res.json());
-      setSubcategorias(subs);
-    }
-  };
-*/
+  // Actualiza showColors si cambia formData.colores
   useEffect(() => {
-    if (formData.colores.length === 0) {
-      setShowColors(false);
-    }
+    setShowColors(Array.isArray(formData.colores) && formData.colores.length > 0);
   }, [formData.colores]);
-
-  useEffect(() => {
-    if (idProducto) {
-      productService.getById(idProducto)
-        .then(data => {
-          setFormData({
-            ...data,
-            colores: Array.isArray(data.colores) ? data.colores : [],
-          });
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [idProducto, productService]);
-  
-  const safeFormData = {
-    ...formData,
-    colores: Array.isArray(formData?.colores) ? formData.colores : [],
-  };
 
   return (
     <>

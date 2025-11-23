@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useProductForm } from '@/hooks/local/useProductForm';
 import { productTypeProductService } from '@/services/productTypeProduct.service';
-import { productService } from '@/services/product.service';
+import {useProducts, useProduct, useProductsById, useCreateProduct} from '@/hooks/server/useProducts';
 import { ProductForm } from '@/components/admin/product-form/page';
 import toast from 'react-hot-toast';
 import { useImageUpload } from "@/hooks/local/useImageUpload";
@@ -16,7 +16,7 @@ const AddProductPage = () => {
   // Si hay idProducto, carga los datos del producto
   useEffect(() => {
     if (idProducto) {
-      productService.getById(idProducto)
+      useProduct(idProducto)
         .then(data => {
           productForm.setFormData(data); 
         })
@@ -38,12 +38,10 @@ const AddProductPage = () => {
 
       let result;
       if (idProducto) {
-        // 👈 Si hay idProducto, actualiza
-        result = await productService.update(idProducto, { ...productoPayload, idTiposProducto: tiposProductoArray });
+        result = await useUpgateProduct(idProducto, { ...productoPayload, idTiposProducto: tiposProductoArray });
         toast.success('Producto actualizado exitosamente');
       } else {
-        // 👈 Si no hay idProducto, crea
-        result = await productService.create({ ...productoPayload, idTiposProducto: tiposProductoArray });
+        result = await useCreateProduct({ ...productoPayload, idTiposProducto: tiposProductoArray });
         toast.success('Producto creado exitosamente');
       }
 
@@ -72,7 +70,7 @@ const AddProductPage = () => {
       <div className="md:p-10 p-4 max-w-5xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">
-            {idProducto ? 'Editar Producto' : 'Agregar Nuevo Producto'}
+            {idProducto ? 'Editar Producto' : 'Agregar Nueva Categoria'}
           </h1>
           <p className="text-gray-600 mt-1">
             Los campos marcados con (*) son obligatorios

@@ -1,9 +1,9 @@
 'use client';
 import React, { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useProductForm } from '@/hooks/local/useProductForm';
+import { useCategoryForm } from '@/hooks/local/useCategoryForm';
 import { categoryService } from '@/services/category.service';
-import { ProductForm } from '@/components/admin/product-form/page';
+import { CategoryForm } from '@/components/admin/category-form/page';
 import toast from 'react-hot-toast';
 import { useImageUpload } from "@/hooks/local/useImageUpload";
 
@@ -21,7 +21,7 @@ const AddCategoryPage = () => {
         })
         .catch(() => toast.error('No se pudo cargar el producto'));
     }
-  }, [idProducto]);
+  }, [idCategoria]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

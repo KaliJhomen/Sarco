@@ -30,12 +30,14 @@ const SideBar = () => {
                                     : "hover:bg-gray-100/90 border-white"
                                 }`
                             }
-                        >
-                            <Image
-                                src={item.icon}
-                                alt={`${item.name.toLowerCase()}_icon`}
-                                className="w-7 h-7"
-                            />
+                                >
+                            {item.icon &&(
+                                <Image
+                                    src={item.icon}
+                                    alt={`${item.name.toLowerCase()}_icon`}
+                                    className="w-7 h-7"
+                                />
+                            )}
                             <p className='md:block hidden text-center'>{item.name}</p>
                         </div>
                     </Link>

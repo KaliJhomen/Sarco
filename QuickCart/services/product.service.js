@@ -63,27 +63,27 @@ export const productService = {
     const payload = {
       //Campos Tabla Producto
       nombre: formData.nombre?.trim() || "",
-      modelo: formData.modelo?.trim() || "",
+      modelo: formData?.modelo?.trim() || "",
       idMarca: parseInt(formData.idMarca),
 
-      descripcion: formData.descripcion?.trim() || "",
-      stock: parseInt(formData.stock) || 0,
-      imagen: formData.imagen?.trim() || "",
+      descripcion: formData?.descripcion?.trim() || "",
+      stock: parseInt(formData?.stock) || 0,
+      imagen: formData?.imagen?.trim() || "",
       precioTope: parseFloat(formData.precioTope),
       precioVenta: parseFloat(formData.precioVenta), 
       fechaIngreso: formData.fechaIngreso || "",      
-      garantiaFabrica: parseInt(formData.garantiaFabrica) || null,
-      descuento: parseFloat(formData.descuento) || 0,
+      garantiaFabrica: parseInt(formData?.garantiaFabrica) || null,
+      descuento: parseFloat(formData?.descuento) || 0,
       idTiposProducto: Array.isArray(formData.idTiposProducto)
         ? formData.idTiposProducto.map(Number)
         : [Number(formData.idTiposProducto)],
 /*
       //Campos Relaciondos
-      idCategoria: parseInt(formData.idCategoria),
-      idSubCategoria: parseInt(formData.idSubCategoria),
-      idTienda: parseInt(formData.idTienda),
+      idCategoria: parseInt(formData?.idCategoria),
+      idSubCategoria: parseInt(formData?.idSubCategoria),
+      idTienda: parseInt(formData?.idTienda),
 /*
-      productoColor: formData.colores.map(color => ({
+      productoColor: formData?.colores.map(color => ({
         idColor: color.idColor, 
         stock: color.stock,
         imagen: color.imagenes?.[0] || "",
@@ -92,8 +92,8 @@ export const productService = {
       }))
       */
       /*
-      estado: formData.estado !== undefined ? formData.estado : 1,
-      mesesCredito: parseInt(formData.mesesCredito) || 0,
+      estado: formData?.estado !== undefined ? formData?.estado : 1,
+      mesesCredito: parseInt(formData?.mesesCredito) || 0,
       */
     };
 
