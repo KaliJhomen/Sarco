@@ -1,58 +1,60 @@
-"use client"
+"use client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { cartService } from '@/lib/api/cartService';
+import { cartService } from '@/services/cart.service';
 
 /**
  * Hook para obtener el carrito del usuario
  */
-export function useCart(token) {
+export function useCart(userId) {
   return useQuery({
-    queryKey: ['cart', token],
-    queryFn: () => cartService.getCart(token),
-    enabled: !!token,
-    staleTime: 30 * 1000, // 30 segundos (el carrito cambia frecuentemente)
+    queryKey: ['cart', userId],
+    queryFn: () => cartService.get(userId),
+    enabled: !!userId, // Solo se ejecuta si hay un userId
+    staleTime: 30 * 1000, // 30 segundos (el carrito puede cambiar frecuentemente)
   });
 }
 
 /**
- * Hook para agregar un item al carrito
+ * Hook para agregar un producto al carrito
  */
 export function useAddToCart() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ itemData, token }) => cartService.addItem(itemData, token),
+    mutationFn: ({ userId, productId, quantity }) =>
+      cartService.add(userId, productId, quantity),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['cart', variables.token] });
+      queryClient.invalidateQueries({ queryKey: ['cart', variables.userId] });
     },
   });
 }
 
 /**
- * Hook para actualizar cantidad de un item
+ * Hook para actualizar la cantidad de un producto en el carrito
  */
 export function useUpdateCartQuantity() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ itemId, quantity, token }) => 
-      cartService.updateQuantity(itemId, quantity, token),
+    mutationFn: ({ userId, productId, quantity }) =>
+      cartService.update(userId, productId, quantity),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['cart', variables.token] });
+      queryClient.invalidateQueries({ queryKey: ['cart', variables.userId] });
     },
   });
 }
 
 /**
- * Hook para eliminar un item del carrito
+ * Hook para eliminar un producto del carrito
  */
 export function useRemoveFromCart() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ itemId, token }) => cartService.removeItem(itemId, token),
+    mutationFn: ({ userId, productId }) =>
+      cartService.remove(userId, productId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['cart', variables.token] });
+      queryClient.invalidateQueries({ queryKey: ['cart', variables.userId] });
     },
   });
 }
@@ -64,9 +66,9 @@ export function useClearCart() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (token) => cartService.clearCart(token),
-    onSuccess: (_, token) => {
-      queryClient.invalidateQueries({ queryKey: ['cart', token] });
+    mutationFn: (userId) => cartService.clear(userId),
+    onSuccess: (_, userId) => {
+      queryClient.invalidateQueries({ queryKey: ['cart', userId] });
     },
   });
 }

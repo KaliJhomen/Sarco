@@ -9,13 +9,15 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Marca } from "../../marca/entities/marca.entity";
-import { ProductoTienda } from "src/producto-tienda-producto/entities/producto-tienda-producto.entity";
+import { ProductoTienda } from "src/producto-tienda/entities/producto-tienda.entity";
 import { DetalleCredito } from "../../detalle-credito/entities/detalle-credito.entity";
 import { DetalleSeparado } from "../../detalle-separado/entities/detalle-separado.entity";
 import { DetalleVenta } from "../../detalle-venta/entities/detalle-venta.entity";
-import { Garantia} from "../../garantia/entities/garantia.entity";
+import { Garantia } from "../../garantia/entities/garantia.entity";
 import { ProductoTipoProducto } from "src/producto-tipo-producto/entities/producto-tipo-producto.entity";
 import { ProductoColor } from "src/producto-color/entities/producto-color.entity";
+import { Carrito } from "../../carrito/entities/carrito.entity"; // Importa la entidad Carrito
+import { Favoritos } from "../../favoritos/entities/favoritos.entity"; // Importa la entidad Favorito
 
 @Index("fk_producto_marca_2", ["idMarca"], {})
 @Entity("producto", { schema: "sarcos_db" })
@@ -29,10 +31,15 @@ export class Producto {
   @Column("varchar", { name: "modelo", length: 255 })
   modelo: string ;
 
-  @Column("int", { name: "id_marca"})
+  @Column("int", { name: "id_marca" })
   idMarca: number;
 
-  @Column("varchar", { name: "descripcion", nullable: true, comment: " ", length: 1024,})
+  @Column("varchar", {
+    name: "descripcion",
+    nullable: true,
+    comment: " ",
+    length: 1024,
+  })
   descripcion: string | null;
 
   @Column("int", { name: "stock", default:0, nullable: true })
@@ -41,14 +48,24 @@ export class Producto {
   @Column("varchar", { name: "imagen", nullable: true, length: 255 })
   imagen: string | null;
 
-  @Column("decimal", { name: "precio_tope", nullable: true, precision: 20, scale: 2,})
+  @Column("decimal", {
+    name: "precio_tope",
+    nullable: true,
+    precision: 20,
+    scale: 2,
+  })
   precioTope: number | null;
 
-  @Column("decimal", { name: "precio_venta", nullable: true, precision: 20, scale: 2,})
+  @Column("decimal", {
+    name: "precio_venta",
+    nullable: true,
+    precision: 20,
+    scale: 2,
+  })
   precioVenta: number | null;
 
   @Column("tinyint", { name: "estado", nullable: true, default: () => "'1'" })
-  estado: boolean | null;    
+  estado: boolean | null;
 
   @Column("date", { name: "fecha_ingreso", nullable: true })
   fechaIngreso: string | null;
@@ -60,23 +77,22 @@ export class Producto {
   descuento: number | null;
 
   @OneToMany(
-    () => ProductoTipoProducto, (productoTipoProducto) => productoTipoProducto.idProducto,
-  {cascade:true}
+    () => ProductoTipoProducto,
+    (productoTipoProducto) => productoTipoProducto.idProducto,
+    { cascade: true }
   )
   productoTipoProducto: ProductoTipoProducto[];  
 
-  @ManyToOne(
-    () => Marca, (marca) => marca.productos, {
+  @ManyToOne(() => Marca, (marca) => marca.productos, {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",
   })
-
   @JoinColumn([{ name: "id_marca", referencedColumnName: "idMarca" }])
   idMarca2: Marca;
-  
+
   @OneToMany(() => ProductoColor, (productoColor) => productoColor.producto)
   productoColores: ProductoColor[];
-  
+
   @OneToMany(
     () => ProductoTienda,
     (productoTienda) => productoTienda.idProducto2
@@ -95,12 +111,17 @@ export class Producto {
   )
   detalleSeparados: DetalleSeparado[];
 
-  @OneToMany(
-    () => DetalleVenta, (detalleVenta) => detalleVenta.idProducto2)
+  @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.idProducto2)
   detalleVentas: DetalleVenta[];
 
-
-  @OneToOne(
-    () => Garantia, (garantia) => garantia.idProducto2)
+  @OneToOne(() => Garantia, (garantia) => garantia.idProducto2)
   garantia: Garantia;
+
+  // Relación con Carrito
+  @OneToMany(() => Carrito, (carrito) => carrito.producto)
+  carritos: Carrito[];
+
+  // Relación con Favorito
+  @OneToMany(() => Favoritos, (favoritos) => favoritos.producto)
+  favoritos: Favoritos[];
 }

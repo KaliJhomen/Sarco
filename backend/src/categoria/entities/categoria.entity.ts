@@ -13,5 +13,5 @@ export class Categoria {
   estado: boolean | null;
 
   @OneToMany(() => SubCategoria, (subCategoria) => subCategoria.idCategoria2)
-  sub_categorias: SubCategoria[];
+  subCategorias: SubCategoria[];
 }

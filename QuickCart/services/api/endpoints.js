@@ -96,6 +96,16 @@ const endpoints = {
   },
   
   // ============================================
+  // ANUNCIOS
+  // ============================================
+  anuncios: {
+    base: '/anuncio',
+    all: '/anuncio',
+    activos: '/anuncio/activos',
+    byId: (id) => `/anuncio/${id}`,
+  },
+
+  // ============================================
   // CARRITO
   // ============================================
   /*cart: {
@@ -130,7 +140,7 @@ const endpoints = {
     login: '/auth/login',
     register: '/auth/register',
     logout: '/auth/logout',
-    me: '/auth/me',
+    me: '/auth/profile', 
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
     verifyEmail: '/auth/verify-email',
@@ -140,19 +150,13 @@ const endpoints = {
   // USUARIOS
   // ============================================
   users: {
-    base: '/usuario',
-    all: '/usuario',
-    byId: (id) => `/usuario/${id}`,
-    /*
-    profile: '/usuario/perfil',
-    updateProfile: '/usuario/perfil',
-    changePassword: '/usuario/cambiar-password',
-    addresses: '/usuario/direcciones',
-    addAddress: '/usuario/direcciones',
-    updateAddress: (addressId) => `/usuario/direcciones/${addressId}`,
-    deleteAddress: (addressId) => `/usuario/direcciones/${addressId}`,
-    */
-    },
+    base: `/usuario`,
+    getAll: `/usuario`, // GET: Obtener todos los usuarios
+    getById: (id) => `/usuario/${id}`, // GET: Obtener un usuario por ID
+    create: `/usuario`, // POST: Crear un nuevo usuario
+    update: (id) => `/usuario/${id}`, // PATCH: Actualizar un usuario por ID
+    delete: (id) => `/usuario/${id}`, // DELETE: Eliminar un usuario por ID
+  },
 
   // ============================================
   // VENDEDORES 
@@ -164,6 +168,17 @@ const endpoints = {
     products: (sellerId) => `/vendedor/${sellerId}/productos`,
     orders: (sellerId) => `/vendedor/${sellerId}/ordenes`,
     stats: (sellerId) => `/vendedor/${sellerId}/estadisticas`,
+  },
+  // ============================================
+  // CLIENTES
+  // ============================================
+
+  clients: {
+    base: '/cliente',
+    all: '/cliente',
+    byId: (id) => `/cliente/${id}`,
+    search: (q) => `/cliente?q=${encodeURIComponent(q)}`,
+    filter: '/cliente/filter',
   },
   //============================================ 
   // Tiendas
@@ -248,6 +263,18 @@ const endpoints = {
     store: '/configuracion/tienda',
     email: '/configuracion/email',
     social: '/configuracion/redes-sociales',
+  },
+  // ============================================
+  // CARRITO
+  // ============================================
+  cart: {
+    base: '/carrito',
+    all: '/carrito', 
+    get: '/carrito', // GET: Obtener el carrito del usuario autenticado
+    update: (productId) => `/carrito/${productId}`, // PUT: Actualizar la cantidad de un producto en el carrito
+    remove: (productId) => `/carrito/${productId}`, // DELETE: Eliminar un producto del carrito
+    clear: '/carrito/limpiar', // DELETE: Vaciar el carrito
+    summary: '/carrito/resumen', // GET: Obtener el resumen del carrito (total de productos y costo total)
   },
 };
 

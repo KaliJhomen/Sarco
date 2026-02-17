@@ -167,13 +167,54 @@ export const useProductForm = () => {
   };
 
   const onSubmit = async (e, { onSuccess, onError }) => {
-    // ...validación y guardado...
-    if (guardadoExitoso) {
-      onSuccess && onSuccess();
-      return true;
-    } else {
+    e.preventDefault();
+    console.log("onSubmit called with formData:", formData);
+
+    // Validación básica
+    const validationErrors = {};
+    if (!formData.nombre) {
+      validationErrors.nombre = "El nombre del producto es obligatorio.";
+    }
+    if (!formData.idCategoria) {
+      validationErrors.idCategoria = "La categoría es obligatoria.";
+    }
+    if (!formData.idSubCategoria) {
+      validationErrors.idSubCategoria = "La subcategoría es obligatoria.";
+    }
+    if (!formData.idTiposProducto || formData.idTiposProducto.length === 0) {
+      validationErrors.idTiposProducto = "El tipo de producto es obligatorio.";
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      console.error("Validation errors:", validationErrors);
+      setErrors(validationErrors);
       onError && onError();
       return false;
+    }
+
+    try {
+      setIsSubmitting(true);
+      console.log("Sending data to API:", formData);
+
+      // Llamada a la API para guardar el producto
+      const response = await client.post('/productos', formData);
+      console.log("API response:", response);
+
+      if (response.status === 201) {
+        console.log("Producto guardado exitosamente.");
+        onSuccess && onSuccess();
+        return true;
+      } else {
+        console.error("Error al guardar el producto:", response.data);
+        onError && onError();
+        return false;
+      }
+    } catch (error) {
+      console.error("Error en la solicitud de guardado:", error);
+      onError && onError();
+      return false;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

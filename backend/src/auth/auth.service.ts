@@ -1,54 +1,61 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsuarioService } from 'src/usuario/usuario.service';
-import * as crypto from 'crypto';
 import * as bcryptjs from 'bcryptjs';
-import { UsersService } from 'src/users/users.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
-  generateToken: any;
   constructor(
-    private readonly usuarioService: UsuarioService,
-    private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
-  ) { }
+    private readonly userService: UserService, 
+    private readonly jwtService: JwtService,
+  ) {}
 
-  async login({ email, password }: LoginDto) {
-    const user = await this.usersService.findOneByEmail(email);
-    if (!user) throw new UnauthorizedException('Email incorrecto');
+  async login({ login, clave }: { login: string; clave: string }) {
+    // Buscar el usuario en la tabla user
+    const user = await this.userService.findOneByEmail(login);
+    if (!user) throw new UnauthorizedException('Login incorrecto');
 
-    const isPasswordValid = await bcryptjs.compare(password, user.password);
-    if (!isPasswordValid) throw new UnauthorizedException('Contraseña incorrecta');
+    // Comparar la clave (si en DB están hasheadas, usar bcrypt.compare)
+    const isValid = await bcryptjs.compare(clave, user.clave || '') || user.clave === clave;
+    if (!isValid) throw new UnauthorizedException('Clave incorrecta');
 
-    const payload = { sub: user.id, email: user.email };
+    // Normalizar el rol (puedes ajustar esta lógica según tu implementación)
+    const role = 'Usuario'; // Puedes cambiar esto si tienes roles en la tabla user
+
+    // Crear el payload del token
+    const payload = { sub: user.idUser, email: user.email, role };
     const token = await this.jwtService.signAsync(payload);
 
     return {
       token,
       user: {
-        id: user.id,
+        id: user.idUser,
+        nombre: user.nombre,
         email: user.email,
-        name: user.name,
-        rol: user.rol,
+        role,
       },
     };
   }
 
-
-  async register({ name, email, password }: RegisterDto) {
-    const user = await this.usersService.findOneByEmail(email);
-
-    if (user) {
-      throw new BadRequestException('Exist');
+  async register({ name, email, password }: { name?: string; email: string; password: string }) {
+    // Verificar si el email ya está registrado
+    const existing = await this.userService.findOneByEmail(email);
+    if (existing) {
+      throw new BadRequestException('El email ya está registrado');
     }
 
-    return await this.usersService.create({
+    // Hashear la contraseña
+    const hashed = await bcryptjs.hash(password, 10);
+
+    // Crear el nuevo usuario
+    const newUser = await this.userService.create({
       name,
       email,
-      password: await bcryptjs.hash(password, 10)
-    });
+      password: hashed,
+    } as any);
+
+    // Opcional: no devolver la contraseña
+    delete (newUser as any).password;
+    return newUser;
   }
 }

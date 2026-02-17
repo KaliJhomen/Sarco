@@ -9,12 +9,6 @@ const validateCategoryForm = (formData) => {
   if (!formData.nombre?.trim()) {
     errors.nombre = 'El nombre es requerido';
   }
-
-
-  if (!formData.idCategoria || isNaN(Number(formData.idCategoria))) {
-    errors.idCategoria = 'Debes seleccionar al menos una categoría';
-  }
-
   return {
     isValid: Object.keys(errors).length === 0,
     errors,

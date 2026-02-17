@@ -33,7 +33,7 @@ export function useSubCategoriesById(id){
   });
 }
 
- /* Hook para crear una subcategoría
+/* Hook para crear una subcategoría
  */
 export function useCreateSubCategory() {
   const queryClient = useQueryClient();
@@ -42,6 +42,21 @@ export function useCreateSubCategory() {
     mutationFn: ({ subCategoryData, token }) => subCategoryService.create(subCategoryData, token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subCategories'] });
+    },
+  });
+}
+
+/**
+ * Hook para actualizar una subcategoría
+ */
+export function useUpdateSubCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, subCategoryData, token }) => subCategoryService.update(id, subCategoryData, token),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['subCategories'] });
+      queryClient.invalidateQueries({ queryKey: ['subCategory', variables.id] });
     },
   });
 }

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Producto } from './entities/producto.entity';
@@ -45,15 +45,43 @@ export class ProductoService {
 
   async findAll() {
     try {
-      return await this.productoRepository.find({
-        relations: ["idMarca2", "productoTipoProducto", "productoTipoProducto.idTipoProducto"],
-      });
+      const productos = await this.productoRepository
+        .createQueryBuilder('producto')
+        .leftJoinAndSelect('producto.idMarca2', 'marca')
+        .leftJoinAndSelect('producto.productoTipoProducto', 'ptp')
+        .leftJoinAndSelect('ptp.idTipoProducto', 'tipoProducto')
+        .leftJoinAndSelect('tipoProducto.tipoProductoSubCategoria', 'tpsc')
+        .leftJoinAndSelect('tpsc.idSubCategoria', 'subCategoria')
+        .leftJoinAndSelect('subCategoria.idCategoria2', 'categoria')
+        .leftJoinAndSelect('producto.productoTiendas', 'pt')
+        .leftJoinAndSelect('pt.idTienda2', 'tienda')
+        .getMany();
+
+      const getCategoriaNombre = (p: Producto) => {
+        if (!p.productoTipoProducto) return null;
+        for (const ptp of p.productoTipoProducto) {
+          const tipo = ptp.idTipoProducto as any;
+          if (!tipo || !tipo.tipoProductoSubCategoria) continue;
+          for (const tpsc of tipo.tipoProductoSubCategoria) {
+            const sub = (tpsc as any).idSubCategoria;
+            const cat = sub?.idCategoria2;
+            if (cat?.nombre) return cat.nombre;
+          }
+        }
+        return null;
+      };
+
+      return productos.map(p => ({
+        ...p,
+        marca: p.idMarca2?.nombre ?? null,
+        categoria: getCategoriaNombre(p),
+      }));
     } catch (error) {
+      console.error('Error en findAll:', error);
       throw new InternalServerErrorException(
         'Ocurrió un error al obtener los productos',
       );
     }
-
   }
 
   // async findProductosFiltro(filtros: {
@@ -115,20 +143,39 @@ export class ProductoService {
   // }
 
   async findProductosFiltro(filtros: {
+    // IDs únicos (backwards compatibility)
     idCategoria?: number;
     idSubCategoria?: number;
     idTipoProducto?: number;
     idMarca?: number;
+    
+    // Arrays de IDs
     idMarcaList?: number[];
+    idTiendaList?: number[];
+    
+    // Nombres únicos (backwards compatibility)
     categoriaNombre?: string;
     subCategoriaNombre?: string;
     tipoProductoNombre?: string;
+    
+    // Arrays de nombres (nuevo - para selección múltiple)
+    categoriasNombres?: string[];
+    subcategoriasNombres?: string[];
+    tiposNombres?: string[];
+    
+    // Precio
     priceMin?: number;
     priceMax?: number;
+    
+    // Paginación
     page?: number;
     limit?: number;
+    
+    // Búsqueda
     busqueda?: string;
-    idTiendaList?: number[];
+
+    // Filtro de descuento ← AGREGAR ESTO
+    hasDiscount?: boolean;
   }) {
     try {
       const query = this.buildProductoQuery(filtros);
@@ -136,8 +183,6 @@ export class ProductoService {
       this.applyPagination(query, filtros);
 
       const [productos/*, total*/] = await query.getManyAndCount();
-      // Nota: mantenemos la compatibilidad retornando sólo productos.
-      // Si el controlador se ajusta, podemos devolver { data: productos, paginacion: { total, page, limit } }.
       return productos;
     } catch (error) {
       console.error('Error en findProductosFiltro:', error);
@@ -149,10 +194,10 @@ export class ProductoService {
     const query = this.productoRepository
       .createQueryBuilder('producto')
       .leftJoinAndSelect('producto.idMarca2', 'marca')
-      .leftJoinAndSelect('producto.producto_tipo_productos', 'ptp')
-      .leftJoinAndSelect('ptp.idTipoProducto2', 'tipoProducto')
-      .leftJoinAndSelect('tipoProducto.sub_categoria_tipo_productos', 'sctp')
-      .leftJoinAndSelect('sctp.idSubCategoria2', 'subCategoria')
+      .leftJoinAndSelect('producto.productoTipoProducto', 'ptp')
+      .leftJoinAndSelect('ptp.idTipoProducto', 'tipoProducto')
+      .leftJoinAndSelect('tipoProducto.tipoProductoSubCategoria', 'tpsc')
+      .leftJoinAndSelect('tpsc.idSubCategoria', 'subCategoria')
       .leftJoinAndSelect('subCategoria.idCategoria2', 'categoria')
       .leftJoinAndSelect('producto.productoTiendas', 'pt')
       .leftJoinAndSelect('pt.idTienda2', 'tienda');
@@ -165,30 +210,63 @@ export class ProductoService {
   }
 
   private applyFilters(query: SelectQueryBuilder<Producto>, filtros: any) {
+    // Filtro de marca única (backwards compatibility)
     if (filtros.idMarca)
       query.andWhere('marca.idMarca = :idMarca', { idMarca: filtros.idMarca });
 
+    // Filtro de múltiples marcas (nuevo)
     if (filtros.idMarcaList && filtros.idMarcaList.length)
       query.andWhere('marca.idMarca IN (:...idMarcaList)', { idMarcaList: filtros.idMarcaList });
 
+    // Filtro de tipo de producto único (backwards compatibility)
     if (filtros.idTipoProducto)
       query.andWhere('tipoProducto.idTipoProducto = :idTipoProducto', { idTipoProducto: filtros.idTipoProducto });
 
+    // Filtro de subcategoría única (backwards compatibility)
     if (filtros.idSubCategoria)
       query.andWhere('subCategoria.idSubCategoria = :idSubCategoria', { idSubCategoria: filtros.idSubCategoria });
 
+    // Filtro de categoría única (backwards compatibility)
     if (filtros.idCategoria)
       query.andWhere('categoria.idCategoria = :idCategoria', { idCategoria: filtros.idCategoria });
 
+    // Filtro de tiendas
     if (filtros.idTiendaList && filtros.idTiendaList.length)
       query.andWhere('tienda.idTienda IN (:...idTiendaList)', { idTiendaList: filtros.idTiendaList });
 
+    // Filtros por nombre único (backwards compatibility)
     if (filtros.categoriaNombre)
       query.andWhere('LOWER(categoria.nombre) = :categoriaNombre', { categoriaNombre: filtros.categoriaNombre });
     if (filtros.subCategoriaNombre)
       query.andWhere('LOWER(subCategoria.nombre) = :subCategoriaNombre', { subCategoriaNombre: filtros.subCategoriaNombre });
     if (filtros.tipoProductoNombre)
       query.andWhere('LOWER(tipoProducto.nombre) = :tipoProductoNombre', { tipoProductoNombre: filtros.tipoProductoNombre });
+
+    // Filtros por arrays de nombres (nuevo - OR logic)
+    if (filtros.categoriasNombres && filtros.categoriasNombres.length > 0) {
+      query.andWhere('LOWER(categoria.nombre) IN (:...categoriasNombres)', { 
+        categoriasNombres: filtros.categoriasNombres 
+      });
+    }
+
+    if (filtros.subcategoriasNombres && filtros.subcategoriasNombres.length > 0) {
+      query.andWhere('LOWER(subCategoria.nombre) IN (:...subcategoriasNombres)', { 
+        subcategoriasNombres: filtros.subcategoriasNombres 
+      });
+    }
+
+    if (filtros.tiposNombres && filtros.tiposNombres.length > 0) {
+      query.andWhere('LOWER(tipoProducto.nombre) IN (:...tiposNombres)', { 
+        tiposNombres: filtros.tiposNombres 
+      });
+    }
+
+    // Filtro de descuento
+    if (filtros.hasDiscount === true) {
+      console.log('🔍 DEBUG SERVICE - Aplicando filtro hasDiscount');
+      query.andWhere('producto.descuento > :minDiscount', { minDiscount: 0 });
+    }
+
   }
 
   private applyPriceFilters(query: SelectQueryBuilder<Producto>, filtros: any) {
@@ -220,12 +298,22 @@ export class ProductoService {
       query.skip((filtros.page - 1) * filtros.limit);
   }
 
-  // MÉTODO ACTUALIZADO - RETORNA DATOS REALES
   async findOne(id: number) {
     try {
       const producto = await this.productoRepository.findOne({
         where: { idProducto: id },
-        relations: ['idMarca2'], 
+        relations: [
+          'idMarca2',
+          'productoColores',
+          'productoColores.color',
+          'productoTipoProducto',
+          'productoTipoProducto.idTipoProducto',
+          'productoTipoProducto.idTipoProducto.tipoProductoSubCategoria',
+          'productoTipoProducto.idTipoProducto.tipoProductoSubCategoria.idSubCategoria',
+          'productoTipoProducto.idTipoProducto.tipoProductoSubCategoria.idSubCategoria.idCategoria2',
+          'productoTiendas',
+          'productoTiendas.idTienda2',
+        ],
       });
 
       if (!producto) {

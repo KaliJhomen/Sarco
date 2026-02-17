@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { ClienteService } from './cliente.service';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
@@ -21,11 +21,14 @@ export class ClienteController {
   }
 
   @Get()
-  //@UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'Obtener todos los clientes' })
-  @ApiResponse({ status: 200, description: 'Lista de clientes devuelta' })
-  getClientes() {
-    return this.clienteService.getClientes();
+  async findAll(@Query() query) {
+    // query: q, nombre, numeroDocumento, idDocumento, direccion, referencia, telefono, email, estado, page, limit, sortBy, sortOrder
+    return this.clienteService.findWithFilters(query);
+  }
+
+  @Post('filter')
+  async filter(@Body() body) {
+    return this.clienteService.filterWithBody(body);
   }
 
   @Get(':id')

@@ -1,67 +1,57 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsString } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsNumber, IsOptional, IsString } from "class-validator";
+import { Transform, Type } from "class-transformer";
 
 export class CreateClienteDto {
-    @ApiProperty({
-        description: 'Nombres del cliente',
-        example: 'Luis Carlos'
-    })
-    @IsString()
-    nombre: string;
+@ApiPropertyOptional({ description: 'Nombres del cliente' })
+@IsOptional()
+@IsString()
+@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
+nombre?: string | null;
 
-    @ApiProperty({
-        description: 'Id del tipo de documento',
-        example: '1'
-    })
-    @IsNumber()
-    idDocumento: number;
+@ApiPropertyOptional({ description: 'Id del tipo de documento' })
+@IsOptional()
+@Type(() => Number)
+@IsNumber()
+idDocumento?: number | null;
 
-    @ApiProperty({
-        description: 'Número del documento',
-        example: '70412345'
-    })
-    @IsString()
-    numeroDocumento: string;
+@ApiProperty({ description: 'Número del documento' })
+@IsString()
+@Transform(({ value }) => String(value).trim())
+numeroDocumento: string
+@ApiPropertyOptional({ description: 'Dirección del cliente' })
+@IsOptional()
+@IsString()
+@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
+direccion?: string | null;
 
-    @ApiProperty({
-        description: 'Dirección del cliente',
-        example: 'Jr. Los Alamos 123'
-    })
-    @IsString()
-    direccion: string;
+@ApiPropertyOptional({ description: 'Referencia de la dirección' })
+@IsOptional()
+@IsString()
+@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
+referencia?: string | null;
 
-    @ApiProperty({
-        description: 'Referencia de la dirección',
-        example: 'Cerca a la plaza'
-    })
-    @IsString()
-    referencia: string;
+@ApiPropertyOptional({ description: 'Dirección del DNI' })
+@IsOptional()
+@IsString()
+@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
+direccionDni?: string | null;
 
-    @ApiProperty({
-        description: 'Dirección del DNI',
-        example: 'Av. Los Alamos 456'
-    })
-    @IsString()
-    direccionDni: string;
+@ApiPropertyOptional({ description: 'Teléfono del cliente' })
+@IsOptional()
+@IsString()
+@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
+telefono?: string | null;
 
-    @ApiProperty({
-        description: 'Teléfono del cliente',
-        example: '987654321'
-    })
-    @IsString()
-    telefono: string;
+@ApiPropertyOptional({ description: 'Email del cliente' })
+@IsOptional()
+@IsString()
+@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
+email?: string | null;
 
-    @ApiProperty({
-        description: 'Email del cliente',
-        example: 'ejemplo@gmail.com'
-    })
-    @IsString()
-    email: string;
-
-    @ApiProperty({
-        description: 'Id del estado del cliente',
-        example: '1'
-    })
-    @IsNumber()
-    idEstadoCliente?: number;
+@ApiPropertyOptional({ description: 'Id del estado del cliente' })
+@IsOptional()
+@Type(() => Number)
+@IsNumber()
+idEstadoCliente?: number | null;
 }

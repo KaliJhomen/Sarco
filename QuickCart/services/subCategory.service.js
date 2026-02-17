@@ -1,29 +1,37 @@
 import client from './api/client';
 import endpoints from './api/endpoints';
-export const subCategoryService = {
 
-  async create(data) {
-    const response = await client.post(endpoints.subCategories.base, data);
-    return await response.data || response;
+export const subCategoryService = {
+  async create(data, token) {
+    return client.post(endpoints.subCategories.base, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
   },
+
   async getAll() {
     const response = await client.get(endpoints.subCategories.all);
-    return await response.data || response;
+    return response.data || response;
   },
+
   async getById(id) {
-    return await client.get(endpoints.subCategories.byId(id));
+    const response = await client.get(endpoints.subCategories.byId(id));
+    return response.data || response;
   },
+
   async getByCategoryId(id) {
     const response = await client.get(endpoints.subCategories.byCategoryId(id));
-    return await response.data || response;
+    return response.data || response;
   },
 
-  async update(id, data) {
-    const response = await client.put(endpoints.subCategories.byId(id), data);
-    return await response.data || response;
+  async update(id, data, token) {
+    return client.put(endpoints.subCategories.byId(id), data, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
   },
 
-  async delete (id) {
-    const response= await client.delete(endpoints.subCategories.delete(id));
-  } 
+  async delete(id, token) {
+    return client.delete(endpoints.subCategories.byId(id), {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
 }

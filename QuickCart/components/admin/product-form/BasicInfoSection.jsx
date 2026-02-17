@@ -3,23 +3,16 @@ import client from '@/services/api/client';
 import React, { useRef, useState } from 'react';
 import { Package, Loader2, Image as ImageIcon } from 'lucide-react';
 import { useBrands } from '@/hooks/server/useBrands';
-
 import { useCategories } from '@/hooks/server/useCategories';
-
 import { useSubCategories } from '@/hooks/server/useSubCategories';
 import { useSubCategoriesByCategoryId } from '@/hooks/server/useSubCategories';
-
-import { useProductTypeProduct} from '@/hooks/server/useProductTypeProducts';
-
+import { useProductTypeProduct } from '@/hooks/server/useProductTypeProducts';
 import { useProductTypes } from '@/hooks/server/useProductTypes';
-import { useProductTypesBySubCategoryId} from '@/hooks/server/useProductTypes';
+import { useProductTypesBySubCategoryId } from '@/hooks/server/useProductTypes';
 import { useAuth } from "@/hooks/server/useAuth";
-
 import { useStores } from '@/hooks/server/useStores';
 import { useImageUpload } from '@/hooks/local/useImageUpload';
-import { useColors} from '@/hooks/server/useColors';
-
-
+import { useColors } from '@/hooks/server/useColors';
 
 export const BasicInfoSection = ({
   formData,
@@ -27,44 +20,46 @@ export const BasicInfoSection = ({
   updateField,
 }) => {
   const { data: brands = [], isLoading: loadingBrands } = useBrands();
-  const { data: productTypes = [], isLoading: loadingproductTypes } = useProductTypes();
   const { data: categories = [], isLoading: loadingCategories } = useCategories();
-  const { data: subCategories= [], isLoading: loadingSubCategories} = useSubCategories();
+  const { data: subCategories = [], isLoading: loadingSubCategories } = useSubCategories();
+  const { data: productTypes = [], isLoading: loadingproductTypes } = useProductTypes();
+
   const { data: stores = [], isLoading: loadingStores } = useStores();
   const { data: colors = [], isLoading: loadingColors } = useColors();
   const fileInputRef = useRef();
   const categoriaId = formData.idCategoria || '';
   const subCategoriaId = formData.idSubCategoria || '';
-  const tipoProductoId = formData.idTipoProducto || '';
 
   // Subcategorías filtradas
   const { data: subCategoriesByCategoryId = [], isLoading: loadingSubCategoriesByCategoryId } = useSubCategoriesByCategoryId(categoriaId);
 
-  // Tipos de producto filtrados 
+  // Tipos de producto filtrados
   const { data: productTypesBySubCategoryId = [], isLoading: loadingProductTypesBySubCategoryId } = useProductTypesBySubCategoryId(subCategoriaId);
 
-  const [categoryId, setCategoryId] = useState('');
-  const [subCategoryId, setSubCategoryId] = useState('');
-  const [productTypeId, setProductTypeId] = useState('');
-  const [subCategoria, setSubCategoria] = useState([]);
-
-  
   const { uploadImage, uploading, error } = useImageUpload();
-  const { token } = useAuth(); 
+  const { token } = useAuth();
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const url = await uploadImage(file, token);
-    
+
     if (url) {
       const BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:4000';
       const imageUrl = url.startsWith("http")
         ? url
-      : `${BASE_URL}${url}`; 
+        : `${BASE_URL}${url}`;
       updateField('imagen', imageUrl);
     }
   };
+
+  const alphBrands = [...brands].sort((a, b) =>
+    (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' })
+  );
+
+  const alphCategories = [...categories].sort((a, b) =>
+    (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' })
+  );
 
   // Convierte los valores de los selects a número (o vacío)
   const handleSelectNumber = (field) => (e) => {
@@ -74,17 +69,11 @@ export const BasicInfoSection = ({
 
   const handleCategoriaChange = (e) => {
     const selectedCategoriaId = e.target.value;
-    setCategoriaId(selectedCategoriaId);
-    updateField('idCategoria', selectedCategoriaId);
-
-    if (selectedCategoriaId) {
-      const selectedCategoria = categories.find(cat => cat.idCategoria === Number(selectedCategoriaId));
-      setSubcategorias(selectedCategoria ? selectedCategoria.subcategorias : []);
-    } else {
-      setSubcategorias([]);
-      updateField('idSubCategoria', '');
-    }
+    updateField('idCategoria', selectedCategoriaId ? Number(selectedCategoriaId) : '');
+    updateField('idSubCategoria', ''); // Reinicia Sub-Categoría
+    updateField('idTiposProducto', []); // Reinicia Tipo Producto
   };
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
       {/* Header */}
@@ -112,46 +101,24 @@ export const BasicInfoSection = ({
             <p className="text-red-500 text-sm mt-1">{errors.nombre}</p>
           )}
         </div>
-
-        {/* Modelo */}
-        <div>
+        {/* Modelo del Producto */}
+        <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Modelo 
+            Modelo del Producto <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
-            placeholder="MODELO DEL PRODUCTO"
+            placeholder='MODELO'
             className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
               errors?.modelo ? 'border-red-500' : 'border-gray-300'
             }`}
-            value={formData.modelo}
+            value={formData.modelo || ''} // Ensure default value
             onChange={(e) => updateField('modelo', e.target.value)}
           />
           {errors?.modelo && (
             <p className="text-red-500 text-sm mt-1">{errors.modelo}</p>
           )}
         </div>
-
-        {/* Stock */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Stock Inicial<span> (Opcional):</span>
-          </label>
-          <input
-            type="number"
-            min={0}
-            placeholder="STOCK INICIAL"
-            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
-              errors?.stock ? 'border-red-500' : 'border-gray-300'
-            }`}
-            value={formData.stock}
-            onChange={(e) => updateField('stock', e.target.value)}
-          />
-          {errors?.stock && (
-            <p className="text-red-500 text-sm mt-1">{errors.stock}</p>
-          )}
-        </div>
-
         {/* Marca */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -162,14 +129,14 @@ export const BasicInfoSection = ({
               className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
                 errors?.marca || errors?.idMarca ? 'border-red-500' : 'border-gray-300'
               } ${loadingBrands ? 'opacity-50' : ''}`}
-              value={formData.idMarca || ""}
-              onChange={handleSelectNumber('idMarca')}
+              value={formData.idMarca || ""} // Conectar al estado formData.idMarca
+              onChange={handleSelectNumber('idMarca')} // Actualizar el estado al seleccionar una marca
               disabled={loadingBrands}
             >
               <option value="">
                 {loadingBrands ? 'Cargando marcas...' : 'Seleccionar marca'}
               </option>
-              {brands.map((marca) => (
+              {alphBrands.map((marca) => (
                 <option key={marca.idMarca} value={marca.idMarca}>
                   {marca.nombre}
                 </option>
@@ -184,8 +151,7 @@ export const BasicInfoSection = ({
           )}
         </div>
 
-
-        {/* Categoría*/}
+        {/* Categoría */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Categoría <span className="text-red-500">*</span>
@@ -196,13 +162,13 @@ export const BasicInfoSection = ({
                 errors?.categoria || errors?.idCategoria ? 'border-red-500' : 'border-gray-300'
               } ${loadingCategories ? 'opacity-50' : ''}`}
               value={formData.idCategoria || ""}
-              onChange={handleSelectNumber('idCategoria')}
+              onChange={handleCategoriaChange}
               disabled={loadingCategories}
             >
               <option value="">
                 {loadingCategories ? 'Cargando categorías...' : 'Seleccionar categoría'}
               </option>
-              {categories.map((categoria) => (
+              {alphCategories.map((categoria) => (
                 <option key={categoria.idCategoria} value={categoria.idCategoria}>
                   {categoria.nombre}
                 </option>
@@ -216,7 +182,8 @@ export const BasicInfoSection = ({
             <p className="text-red-500 text-sm mt-1">{errors.categoria || errors.idCategoria}</p>
           )}
         </div>
-        {/* Sub-Categoría*/}
+
+        {/* Sub-Categoría */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Sub-Categoría <span className="text-red-500">*</span>
@@ -225,7 +192,7 @@ export const BasicInfoSection = ({
             <select
               className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
                 errors?.subCategoria || errors?.idSubCategoria ? 'border-red-500' : 'border-gray-300'
-              } ${loadingSubCategories ? 'opacity-50' : ''}`}
+              } ${loadingSubCategoriesByCategoryId ? 'opacity-50' : ''}`}
               value={formData.idSubCategoria || ""}
               onChange={handleSelectNumber('idSubCategoria')}
               disabled={!categoriaId || loadingSubCategoriesByCategoryId}
@@ -241,7 +208,7 @@ export const BasicInfoSection = ({
                 </option>
               ))}
             </select>
-            {loadingSubCategories && (
+            {loadingSubCategoriesByCategoryId && (
               <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-gray-400" />
             )}
           </div>
@@ -249,6 +216,7 @@ export const BasicInfoSection = ({
             <p className="text-red-500 text-sm mt-1">{errors.subCategoria || errors.idSubCategoria}</p>
           )}
         </div>
+
         {/* Tipo Producto */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -258,8 +226,8 @@ export const BasicInfoSection = ({
             <select
               className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
                 errors?.tipoProducto || errors?.idTipoProducto ? 'border-red-500' : 'border-gray-300'
-              } ${loadingproductTypes ? 'opacity-50' : ''}`}
-              value={formData.idTiposProducto[0] || ""}
+              } ${loadingProductTypesBySubCategoryId ? 'opacity-50' : ''}`}
+              value={(formData.idTiposProducto && formData.idTiposProducto[0]) || ""} // Safeguard added
               onChange={e => updateField('idTiposProducto', [Number(e.target.value)])}
               disabled={!subCategoriaId || loadingProductTypesBySubCategoryId}
             >
@@ -274,7 +242,7 @@ export const BasicInfoSection = ({
                 </option>
               ))}
             </select>
-            {loadingproductTypes && (
+            {loadingProductTypesBySubCategoryId && (
               <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-gray-400" />
             )}
           </div>

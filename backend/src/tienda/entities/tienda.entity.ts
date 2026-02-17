@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 // import { ArticuloTienda } from "../../articulo-tienda/entities/articulo-tienda.entity";
-import { ProductoTienda } from "../../producto-tienda-producto/entities/producto-tienda-producto.entity";
+import { ProductoTienda } from "../../producto-tienda/entities/producto-tienda.entity";
 import { Credito } from "../../credito/entities/credito.entity";
 import { Egreso } from "../../egreso/entities/egreso.entity";
 import { Garantia } from "../../garantia/entities/garantia.entity";

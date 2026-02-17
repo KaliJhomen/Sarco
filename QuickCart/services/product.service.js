@@ -11,9 +11,10 @@ export const productService = {
   },
 
   async getById(id, token) {
-    return client.get(endpoints.products.byId(id), {
+    const response = await client.get(endpoints.products.byId(id), {
       headers: { Authorization: `Bearer ${token}` }
     });
+    return response.data || response;
   },
 
   async search(query, token) {
@@ -144,4 +145,62 @@ export const productService = {
       headers: { Authorization: `Bearer ${token}` }
     });
   },
+
+  /**
+   * Obtiene productos filtrados con parámetros complejos
+   * @param {Object} filters - Objeto con filtros
+   * @param {string[]} filters.c - Array de nombres de categorías normalizados
+   * @param {string[]} filters.s - Array de nombres de subcategorías normalizados
+   * @param {string[]} filters.t - Array de nombres de tipos normalizados
+   * @param {number[]} filters.marca_id - Array de IDs de marcas
+   * @param {number} filters.price_min - Precio mínimo
+   * @param {number} filters.price_max - Precio máximo
+   */
+  async getFiltered(filters = {}, token) {
+    const params = new URLSearchParams();
+    
+    // Agregar arrays de filtros
+    if (Array.isArray(filters.c) && filters.c.length > 0) {
+      filters.c.forEach(cat => params.append('c[]', cat));
+    }
+    
+    if (Array.isArray(filters.s) && filters.s.length > 0) {
+      filters.s.forEach(subcat => params.append('s[]', subcat));
+    }
+    
+    if (Array.isArray(filters.t) && filters.t.length > 0) {
+      filters.t.forEach(type => params.append('t[]', type));
+    }
+    
+    if (Array.isArray(filters.marca_id) && filters.marca_id.length > 0) {
+      filters.marca_id.forEach(id => params.append('marca_id[]', id));
+    }
+    
+    // Agregar rango de precios
+    if (filters.price_min !== undefined) {
+      params.set('price_min', filters.price_min);
+    }
+    
+    if (filters.price_max !== undefined) {
+      params.set('price_max', filters.price_max);
+    }
+    
+    // Búsqueda
+    if (filters.busqueda) {
+      params.set('busqueda', filters.busqueda);
+    }
+    
+    // Agregar filtro de descuento
+    if (filters.hasDiscount === true) {
+      params.set('hasDiscount', 'true'); 
+    }
+    const url = params.toString() 
+      ? `${endpoints.products.base}/filtro?${params.toString()}`
+      : `${endpoints.products.base}/filtro`;
+    
+    const response = await client.get(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data || response;
+  }
 };

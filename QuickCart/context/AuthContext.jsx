@@ -25,10 +25,22 @@ export const AuthProvider = ({ children }) => {
       }
 
       const result = await authService.getProfile(token);
-
+      console.log('Datos recibidos del backend:', result.data);
       if (result.success) {
         setUser(result.data);
+        console.log('Estado user en AuthContext:', result.data); // Verifica el estado almacenado
         setIsAuthenticated(true);
+      } else if (result.error === 'TokenExpiredError') {
+        // Si el token ha expirado, intenta renovarlo
+        const refreshResult = await authService.refreshToken(token);
+        if (refreshResult.success) {
+          const { token: newToken, user } = refreshResult.data;
+          localStorage.setItem('auth-token', newToken);
+          setUser(user);
+          setIsAuthenticated(true);
+        } else {
+          clearAuth();
+        }
       } else {
         clearAuth();
       }
@@ -46,6 +58,8 @@ export const AuthProvider = ({ children }) => {
     if (result.success) {
       const { token, user } = result.data;
 
+      console.log('Datos del usuario recibidos en login:', user); // Verifica los datos del login
+
       // Guardar token
       if (rememberMe) {
         localStorage.setItem('auth-token', token);
@@ -54,13 +68,14 @@ export const AuthProvider = ({ children }) => {
       }
 
       setUser(user);
+      console.log('Usuario almacenado en AuthContext después de login:', user); // Verifica los datos almacenados
       setIsAuthenticated(true);
 
       // Redirigir según rol
       if (user.role === 'admin') {
-        router.push('/admin/dashboard');
+        router.push('/admin');
       } else {
-        router.push('/shop');
+        router.push('/');
       }
 
       return { success: true };

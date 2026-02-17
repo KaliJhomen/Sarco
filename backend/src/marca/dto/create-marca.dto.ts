@@ -8,5 +8,5 @@ export class CreateMarcaDto {
 
     @ApiProperty()
     @IsBoolean()
-    condicion: boolean;
+    estado: boolean;
 }

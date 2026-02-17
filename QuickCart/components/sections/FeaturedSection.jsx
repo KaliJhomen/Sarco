@@ -3,7 +3,6 @@ import React from 'react';
 import CategorySection from './CategorySection';
 import { Percent, TrendingUp, Zap, Package, Star, Sparkles } from 'lucide-react';
 
-// ✅ Funciones de filtrado (basadas en campos de la BD)
 const FILTERS = {
   // Productos con descuento
   withDiscount: (product) => {
@@ -43,7 +42,6 @@ const FILTERS = {
   },
 };
 
-// ✅ Funciones de ordenamiento
 const SORTS = {
   // Mayor descuento primero
   byDiscountDesc: (a, b) => {
@@ -75,11 +73,10 @@ const SORTS = {
 };
 
 const FeaturedSection = () => {
-  // ✅ Configuración de secciones con iconos correctamente importados
   const sections = [
     {
-      title: "Ofertas del Día",
-      icon: Percent, // ✅ Componente de icono, no string
+      title: "Ofertas",
+      icon: Percent, 
       iconColor: "text-red-600",
       iconBgColor: "bg-red-100",
       description: "No te pierdas estas promociones",
@@ -89,7 +86,7 @@ const FeaturedSection = () => {
     },
     {
       title: "Más Vendidos",
-      icon: TrendingUp, // ✅ Componente de icono
+      icon: TrendingUp,
       iconColor: "text-orange-600",
       iconBgColor: "bg-orange-100",
       description: "Los favoritos de nuestros clientes",
@@ -130,8 +127,8 @@ const FeaturedSection = () => {
           >
             {/* Pasa filtros a CategorySection */}
             <CategorySection 
-              filterFn={FILTERS.withDiscount}  // ← Función de filtrado
-              sortFn={SORTS.byDiscountDesc}    // ← Función de ordenamiento
+              filterFn={FILTERS.withDiscount}  // Función de filtrado
+              sortFn={SORTS.byDiscountDesc}    // Función de ordenamiento
               {...section} 
             />
           </div>

@@ -25,20 +25,25 @@ export class SubCategoriaService {
   async findAll(categoriaId?: number) {
     try {
       if (categoriaId && Number(categoriaId) > 0) {
-        return await this.subCategoriaRepository.find({ where: { idCategoria: Number(categoriaId) } });
+        return await this.subCategoriaRepository.find({ 
+          where: { idCategoria: Number(categoriaId) },
+          relations: ['idCategoria2'] 
+        });
       }
-      return await this.subCategoriaRepository.find();
+      return await this.subCategoriaRepository.find({
+        relations: ['idCategoria2'] });
     } catch (error) {
       console.log(error);
-      throw new InternalServerErrorException(
-        'Ocurrió un error al obtener las subcategorías',
-      );
+      throw new InternalServerErrorException('Error al obtener subcategorías');
     }
   }
-  async findOne(id: number) {
-    return await this.subCategoriaRepository.findOne({ where: { idSubCategoria: id } });
-  }
 
+  async findOne(id: number) {
+    return await this.subCategoriaRepository.findOne({ 
+      where: { idSubCategoria: id },
+      relations: ['idCategoria2'] 
+    });
+  }
   async update(id: number, updateSubCategoriaDto: UpdateSubCategoriaDto) {
     return await this.subCategoriaRepository.update(id, updateSubCategoriaDto);
   }

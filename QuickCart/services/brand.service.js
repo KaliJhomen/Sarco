@@ -8,31 +8,36 @@ export const brandService = {
   },
 
   async getById(id) {
-    return client.get(endpoints.brands.byId(id));
+    const response = await client.get(endpoints.brands.byId(id));
+    return response.data || response;
   },
 
   async create(brandData, token) {
     const payload = {
-      nombre: formData.nombre?.trim() || "",
-    }
+      nombre: brandData.nombre?.trim() || "",
+      estado: brandData.estado ?? true,
+    };
     const response = await client.post(endpoints.brands.base, payload, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    return response.data;
+    return response.data || response;
   },
 
   async update(id, brandData, token) {
     const payload = {
-      nombre: formData.nombre?.trim() || "",
-    }
-    return client.put(endpoints.brands.byId(id), payload, {
+      nombre: brandData.nombre?.trim() || "",
+      estado: brandData.estado ?? true,
+    };
+    const response = await client.patch(endpoints.brands.byId(id), payload, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    return response.data || response;
   },
 
   async delete(id, token) {
-    return client.delete(endpoints.brands.byId(id), {
+    const response = await client.delete(endpoints.brands.byId(id), {
       headers: { Authorization: `Bearer ${token}` }
     });
+    return response.data || response;
   },
 };

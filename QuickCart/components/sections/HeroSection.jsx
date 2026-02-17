@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 import Image from 'next/image';
-import Carousel from '@/components/ads/Carousel';
+import AnunciosCarousel from '@/components/sections/AnunciosCarousel'; // Importar el nuevo componente
 import { Search, Laptop, Home, Car, Tag, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -15,14 +15,18 @@ const HeroSection = () => {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
-const slides=[
-  {src: '/productos/UNCHARTED4.jpg', alt: 'UNCHARTED 4', caption: 'UNCHARTED 4'},
-  {src: '/productos/18M38H.png', alt: 'Tele', caption: 'Tele'},
-  {src: '/productos/XBOX SERIES X.jpg', alt: 'Xbox Series X', caption: 'Xbox Series X'},
-]
   const categories = [
     { 
       id: 1, 
+      name: 'Ofertas', 
+      icon: Tag,
+      image: '/articulos/65A6NA.jfif',
+      color: 'from-gray-200 to-gray-600',
+      hoverColor: 'hover:from-gray-600 hover:to-gray-700',
+      description: 'Aprovéchalas!'
+    },
+    { 
+      id: 2, 
       name: 'Tecnología', 
       icon: Laptop,
       image: '/articulos/18M38H.png',
@@ -31,8 +35,8 @@ const slides=[
       description: 'Lo último en tech'
     },
     { 
-      id: 2, 
-      name: 'Hogar', 
+      id: 3, 
+      name: 'Mueblería', 
       icon: Home,
       image: '/articulos/250-22.jpeg',
       color: 'from-gray-200 to-gray-600',
@@ -40,22 +44,13 @@ const slides=[
       description: 'Para tu Hogar'
     },
     { 
-      id: 3, 
+      id: 4, 
       name: 'Movilidad', 
       icon: Car,
       image: '/articulos/CASCO LS2.jpeg', 
       color: 'from-gray-200 to-gray-600',
       hoverColor: 'hover:from-gray-600 hover:to-gray-700',
       description: 'Transporte'
-    },
-    { 
-      id: 4, 
-      name: 'Ofertas', 
-      icon: Tag,
-      image: '/articulos/65A6NA.jfif',
-      color: 'from-gray-200 to-gray-600',
-      hoverColor: 'hover:from-gray-600 hover:to-gray-700',
-      description: 'Aprovéchalas!'
     },
   ];
 
@@ -116,7 +111,8 @@ const slides=[
                 return (
                   <button
                     key={category.id}
-                    onClick={() => router.push(`/category/${category.id}`)}
+                    
+                    onClick={() => router.push(`/shop/${category.name}`)}
                     className={`group relative p-5 md:p-6 rounded-xl bg-gradient-to-br ${category.color} ${category.hoverColor} text-white shadow-lg hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 ${category.name === 'Ofertas' ? 'overflow-visible' : 'overflow-hidden'} backdrop-blur-sm`}
                   >
                     {/* Imagen de fondo con overlay */}
@@ -174,8 +170,7 @@ const slides=[
           {/* Derecha: carrusel (oculto en pantallas pequeñas) */}
           <div className="md:col-span-5 lg:col-span-4 hidden md:block">
             <div className="w-full rounded-lg overflow-hidden shadow-2xl">
-              {/* Carousel4x5 mantiene aspect ratio 4:5 */}
-              <Carousel slides={slides} autoplay={5000} className="w-full" />
+              <AnunciosCarousel />
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import React from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import Link from "next/link";
-import { socialMedia, contactInfo } from "@/config/socialMedia";
+import { socialMedia, contactInfo } from "@/utils/constants/socialMedia";
 
 const Footer = () => {
   return (
@@ -76,22 +76,22 @@ const Footer = () => {
             <h2 className="font-semibold text-white mb-5 text-lg">Categorías</h2>
             <ul className="text-sm space-y-3">
               <li>
-                <Link href="/category/tecnologia" className="hover:text-red-500 transition flex items-center gap-2">
+                <Link href="/shop/tecnologia" className="hover:text-red-500 transition flex items-center gap-2">
                   Tecnología
                 </Link>
               </li>
               <li>
-                <Link href="/category/movilidad" className="hover:text-red-500 transition flex items-center gap-2">
+                <Link href="/shop/movilidad" className="hover:text-red-500 transition flex items-center gap-2">
                   Movilidad
                 </Link>
               </li>
               <li>
-                <Link href="/category/hogar" className="hover:text-red-500 transition flex items-center gap-2">
+                <Link href="/shop/hogar" className="hover:text-red-500 transition flex items-center gap-2">
                   Hogar
                 </Link>
               </li>
               <li>
-                <Link href="/offers" className="hover:text-red-500 transition flex items-center gap-2">
+                <Link href="/shop/ofertas" className="hover:text-red-500 transition flex items-center gap-2">
                   Ofertas
                 </Link>
               </li>

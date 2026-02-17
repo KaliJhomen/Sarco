@@ -1,12 +1,11 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { validateCategoryForm } from '@/utils/helpers/categoryValidators';
 
 export const useCategoryForm = () => {
   const initialFormData = {
-    // Campos básicos del producto
-    idSubCategorias:[],
-    nombre: '',     
+    nombre: '',  
+    estado: true,   
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -23,6 +22,7 @@ export const useCategoryForm = () => {
   const validate = () => {
     const validation = validateCategoryForm({
       nombre: formData.nombre,
+      estado: formData.estado,
     });
 
     setErrors(validation.errors);
@@ -30,28 +30,14 @@ export const useCategoryForm = () => {
   };
 
   const resetForm = () => {
-    setFormData({
-      nombre: '',
-      // Relaciones (IDs)
-      SubCategorias: [],
-    });
+    setFormData(initialFormData);
     setErrors({});
-  };
-
-  const onSubmit = async (e, { onSuccess, onError }) => {
-    if (guardadoExitoso) {
-      onSuccess && onSuccess();
-      return true;
-    } else {
-      onError && onError();
-      return false;
-    }
   };
 
   return {
     formData,
+    setFormData, 
     errors,
-    onSubmit,
     isSubmitting,
     setIsSubmitting,
     updateField,

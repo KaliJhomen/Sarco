@@ -13,11 +13,19 @@ const PAGE_SIZE = 20;
 
 const ProductListPage = () => {
   const router = useRouter();
-  const { data: allProducts = [], isLoading } = useProducts();
+  const { data: fetchedProducts = [], isLoading } = useProducts();
+  const [allProducts, setAllProducts] = useState([]);
   const [displayedCount, setDisplayedCount] = useState(PAGE_SIZE);
   const observerRef = useRef(null);
 
-  // Intersection Observer for lazy loading local
+  // Sincronizar el estado local con los productos obtenidos del hook
+  useEffect(() => {
+    if (!isLoading) {
+      setAllProducts(fetchedProducts);
+    }
+  }, [fetchedProducts, isLoading]);
+
+  // Intersection Observer para lazy loading
   useEffect(() => {
     if (isLoading) return;
     const observerTarget = observerRef.current;
@@ -41,7 +49,8 @@ const ProductListPage = () => {
 
   const handleDelete = async (productId) => {
     if (confirm('¿Estás seguro de eliminar este producto?')) {
-      setAllProducts(allProducts.filter(p => p.idProducto !== productId));
+      // Simulación de eliminación
+      setAllProducts((prevProducts) => prevProducts.filter(p => p.idProducto !== productId));
       toast.success('Producto eliminado (simulación)');
     }
   };
@@ -56,7 +65,7 @@ const ProductListPage = () => {
             Todos los Productos ({allProducts.length})
           </h1>
           <button
-            onClick={() => router.push('/admin/storage/products/add/product')}
+            onClick={() => router.push('/admin/storage/products/add-product')}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             + Agregar Producto
@@ -95,14 +104,14 @@ const ProductListPage = () => {
                   products.map((product, index) => (
                     <tr key={product.idProducto} className="border-t border-gray-200 hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">{product.nombre}</td>
-                      <td className="px-4 py-3">{product.marca?.nombre || 'N/A'}</td>
-                      <td className="px-4 py-3">{product.categoria?.nombre || 'N/A'}</td>
+                      <td className="px-4 py-3">{product.marca || 'N/A'}</td>
+                      <td className="px-4 py-3">{product.categoria || 'N/A'}</td>
                       <td className="px-4 py-3">{product.modelo}</td>
                       <td className="px-4 py-3">{product.stock}</td>
                       <td className="px-4 py-3">
                         <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                           <Image
-                            src={product.imagen ? `/articulos/${product.imagen}` : '/no-image.png'}
+                            src={product.imagen ? `${process.env.NEXT_PUBLIC_API_URL}/public/productos/${product.imagen}` : '/no-image.png'}
                             alt={product.nombre}
                             width={64}
                             height={64}
@@ -126,7 +135,7 @@ const ProductListPage = () => {
                             <ExternalLink size={16} />
                           </button>
                           <button
-                            onClick={() => router.push(`/admin/storage/products/add/product/${product.idProducto}`)}
+                            onClick={() => router.push(`/admin/storage/products/add-product/${product.idProducto}`)}
                             className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                             title="Editar producto"
                           >

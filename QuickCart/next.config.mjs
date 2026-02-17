@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: process.cwd(),
   images: {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -15,13 +16,9 @@ const nextConfig = {
       },
     ],
   },
-  // Compresión habilitada
   compress: true,
-  // React strict mode
   reactStrictMode: true,
-  // Optimización de producción
   productionBrowserSourceMaps: false,
-  // Optimización de chunks
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },

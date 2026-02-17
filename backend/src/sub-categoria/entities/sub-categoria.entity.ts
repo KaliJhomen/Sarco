@@ -17,7 +17,7 @@ export class SubCategoria {
     @Column("boolean", { name: "estado", default: () => "'1'" })
     estado: boolean | null;
 
-    @ManyToOne(() => Categoria, (categoria) => categoria.sub_categorias, {
+    @ManyToOne(() => Categoria, (categoria) => categoria.subCategorias, {
         onDelete: "NO ACTION",
         onUpdate: "NO ACTION",
     })

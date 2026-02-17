@@ -21,7 +21,7 @@ const CategoryListPage = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const result = await categoryService.getAll(); // Sin paginación, trae todos
+      const result = await categoryService.getAll(); 
       setAllCategories(result);
     } catch (error) {
       toast.error('Error al cargar productos');
@@ -106,9 +106,11 @@ const CategoryListPage = () => {
                     <tr key={category.idCategoria} className="border-t border-gray-200 hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">{category.nombre}</td>
                       <td className="px-4 py-3">{category.estado ? 'Activo' : 'Inactivo'}</td>
+                      {/*
+
                       <td className="px-4 py-3">
+                  
                         <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-                          /*Por Si acaso*/
                           <Image
                             src={category.imagen ? `/articulos/${category.imagen}` : '/no-image.png'}
                             alt={category.nombre}
@@ -118,19 +120,20 @@ const CategoryListPage = () => {
                             unoptimized
                           />
                         </div>
+                      
                       </td>
-                      <td className="px-4 py-3">{category.estado ? 'Activo' : 'Inactivo'}</td>
+                      */}
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => router.push(`/category/${category.idCategoria}`)}
+                            onClick={() => router.push(`/admin/storage/categories/${category.idCategoria}`)}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Ver categoría"
                           >
                             <ExternalLink size={16} />
                           </button>
                           <button
-                            onClick={() => router.push(`/admin/storage/categories/add/category/${category.idCategoria   }`)}
+                            onClick={() => router.push(`/admin/storage/categories/add-category/${category.idCategoria   }`)}
                             className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                             title="Editar categoría"
                           >

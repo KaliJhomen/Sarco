@@ -84,7 +84,7 @@ const CategorySection = ({
       <ProductsGrid
         products={products}
         loading={isLoading}
-        cta={products.length > 0 ? { text: `Ver todos`, href: `/all-products` } : null}
+        cta={products.length > 0 ? { text: `Ver todos`, href: `/shop/products` } : null}
       />
 
       {/* Mensaje si no hay productos */}

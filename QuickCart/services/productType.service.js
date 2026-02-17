@@ -25,8 +25,10 @@ export const productTypeService = {
     const response = await client.put(endpoints.productTypes.byId(id), data);
     return await response.data || response;
   },
-  async delete (id) {
-    const response= await client.delete(endpoints.productTypes.byId(id));
-    return await response.data || response;
- }
+  async delete(id, token) {
+    const response = await client.delete(endpoints.productTypes.byId(id), {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data || response;
+  }
 }

@@ -1,8 +1,9 @@
 "use client"
-import { useContext } from 'react';
+import { useContext, useQuery } from 'react';
 import { AuthContext } from '@/context/AuthContext';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '@/services/auth.service';
+import axios from 'axios';
 
 // ============================================
 // QUERIES (GET - Lectura)
@@ -14,7 +15,12 @@ import { authService } from '@/services/auth.service';
 export function useMe(token) {
   return useQuery({
     queryKey: ['user', 'me'],
-    queryFn: () => authService.getMe(token),
+    queryFn: () => {
+      if (!token) {
+        throw new Error('Token no válido o no proporcionado');
+      }
+      return authService.getMe(token);
+    },
     enabled: !!token,
     staleTime: 5 * 60 * 1000,
     retry: false,
@@ -115,3 +121,31 @@ export function useLogout() {
     },
   });
 }
+
+/**
+ * Hook para obtener datos del usuario autenticado (usando axios)
+ */
+export const useAuthData = () => {
+  const { data, error, isLoading } = useQuery('auth', async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
+        withCredentials: true, // Ensure cookies are sent with the request
+      });
+      return response.data;
+    } catch (err) {
+      console.error('Error al obtener datos de autenticación:', err);
+      throw new Error('No se pudo obtener los datos de autenticación.');
+    }
+  }, {
+    retry: false, // Disable retries for authentication
+    refetchOnWindowFocus: false, // Prevent refetching when the window regains focus
+  });
+
+  
+  return {
+    isAuthenticated: !!data, // If data exists, the user is authenticated
+    user: data || null, // Return the user data if authenticated
+    isLoading: isLoading || false, // Ensure isLoading is never undefined
+    error: error || null, // Ensure error is never undefined
+  };
+};

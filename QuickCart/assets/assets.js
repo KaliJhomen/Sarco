@@ -47,10 +47,6 @@ import jbl_soundbox_image from "./jbl_soundbox_image.png";
 import boy_with_laptop_image from "./boy_with_laptop_image.png";
 import checkmark from "./checkmark.png";
 import product_details_page_apple_earphone_image1 from "./product_details_page_apple_earphone_image1.png";
-import product_details_page_apple_earphone_image2 from "./product_details_page_apple_earphone_image2.png";
-import product_details_page_apple_earphone_image3 from "./product_details_page_apple_earphone_image3.png";
-import product_details_page_apple_earphone_image4 from "./product_details_page_apple_earphone_image4.png";
-import product_details_page_apple_earphone_image5 from "./product_details_page_apple_earphone_image5.png";
 
 export const assets = {
   prueba_ad_banner4,
@@ -101,10 +97,7 @@ export const assets = {
   jbl_soundbox_image,
   boy_with_laptop_image,
   product_details_page_apple_earphone_image1,
-  product_details_page_apple_earphone_image2,
-  product_details_page_apple_earphone_image3,
-  product_details_page_apple_earphone_image4,
-  product_details_page_apple_earphone_image5,
+
   checkmark
 };
 

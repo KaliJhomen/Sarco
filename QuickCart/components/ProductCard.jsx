@@ -36,20 +36,17 @@ const ProductCard = ({ product }) => {
   const productStock = Number(stock) || 0;
   const brandName = idMarca2?.nombre || '';
 
-  // ✅ CALCULAR PRECIO FINAL
   const hasDiscount = productDiscount > 0;
   const finalPrice = hasDiscount 
     ? productPrice * (1 - productDiscount / 100)
     : productPrice;
 
-  // ✅ VERIFICAR STOCK
   const isOutOfStock = productStock === 0;
   const isLowStock = productStock > 0 && productStock <= 5;
 
-  // ✅ CONSTRUCCIÓN DE URL PARA CARPETA public/productos/
   const getImageUrl = (imageName) => {
     if (!imageName) {
-      return '/productos/UNCHARTED4.jpg'; // ← Imagen por defecto
+      return '/productos/placeholder.svg'; // ← Imagen por defecto
     }
 
     // Si ya es una URL completa, retornarla
@@ -65,10 +62,7 @@ const ProductCard = ({ product }) => {
     // Limpiar barra inicial si existe
     const cleanImageName = imageName.startsWith('/') ? imageName.slice(1) : imageName;
 
-    // ✅ CONSTRUIR RUTA RELATIVA A public/productos/
     return `/productos/${cleanImageName}`;
-    //      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    //      Next.js sirve public/ como raíz
   };
 
   const imageUrl = getImageUrl(imagen);
@@ -101,8 +95,6 @@ const ProductCard = ({ product }) => {
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className="object-cover group-hover:scale-110 transition-transform duration-500"
             onError={(e) => {
-              console.warn('❌ Error cargando imagen:', src);
-              console.warn('   Intentando con placeholder...');
               setSrc('/productos/placeholder.svg');
             }}
             priority={false}
@@ -163,7 +155,7 @@ const ProductCard = ({ product }) => {
           {/* Modelo */}
           {productModel && (
             <p className="text-xs text-gray-500 mb-2">
-              Modelo: {productModel}
+              Modelos: {productModel}
             </p>
           )}
 
@@ -207,7 +199,7 @@ const ProductCard = ({ product }) => {
               <p className="text-xs text-gray-500">
                 Stock: {productStock} unidad{productStock !== 1 ? 'es' : ''}
               </p>
-            )}
+            )}s
 
             {/* Botón agregar al carrito */}
             <button 
@@ -220,7 +212,7 @@ const ProductCard = ({ product }) => {
               }`}
             >
               <ShoppingCart size={18} />
-              {isOutOfStock ? 'Agotado' : 'Agregar al carrito'}
+              {isOutOfStock ? 'Agotado' : 'Agregar'}
             </button>
           </div>
         </div>

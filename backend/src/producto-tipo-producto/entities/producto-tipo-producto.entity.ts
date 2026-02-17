@@ -7,12 +7,14 @@ export class ProductoTipoProducto {
   @PrimaryGeneratedColumn({ type: "int", name: "id_producto_tipo_producto" })
   idProductoTipoProducto: number;
 
-  @ManyToOne(() => Producto, producto => producto.productoTipoProducto, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION"
+  
+  @ManyToOne(() => Producto, producto => producto.productoTipoProducto, { 
+    onDelete: 'CASCADE',
+    onUpdate: 'NO ACTION' 
   })
-  @JoinColumn({ name: "id_producto" })
+  @JoinColumn({ name: 'id_producto' })
   idProducto: Producto;
+
 
   @ManyToOne(
     () => TipoProducto,

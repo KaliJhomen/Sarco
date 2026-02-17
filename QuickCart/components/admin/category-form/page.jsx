@@ -9,14 +9,8 @@ export const CategoryForm = ({
   updateField,
   onSubmit,
   onCancel,
-  idCategoria,
-  categoryService,
 }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showColors, setShowColors] = useState(formData.colores && formData.colores.length > 0);
-  const [categoriaId, setCategoriaId] = useState('');
-  const [subcategorias, setSubcategorias] = useState([]);
-  const [subcategoriaId, setSubcategoriaId] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,20 +21,6 @@ export const CategoryForm = ({
     }
   };
 
-
-
-  const handleCategoriaChange = async (e) => {
-    const id = e.target.value;
-    setCategoriaId(id);
-    setSubcategorias([]);
-    setSubcategoriaId('');
-
-    if (id) {
-      const subs = await fetch(`/api/subcategorias?categoriaId=${id}`).then(res => res.json());
-      setSubcategorias(subs);
-    }
-  };
-  
   const safeFormData = {
     ...formData,
     colores: Array.isArray(formData?.colores) ? formData.colores : [],

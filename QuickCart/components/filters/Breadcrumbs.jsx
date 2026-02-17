@@ -63,7 +63,7 @@ const Breadcrumbs = ({ className = '' }) => {
     if (categoria) {
       items.push({
         label: categoria.title,
-        href: `/all-products?c=${encodeURIComponent(categoria.title)}`,
+        href: `/shop/products?c=${encodeURIComponent(categoria.title)}`,
         isActive: !subcategoria && !tipoProducto
       });
     }
@@ -71,7 +71,7 @@ const Breadcrumbs = ({ className = '' }) => {
     if (subcategoria) {
       items.push({
         label: subcategoria.title,
-        href: `/all-products?c=${encodeURIComponent(categoria.title)}&s=${encodeURIComponent(subcategoria.title)}`,
+        href: `/shop/products?c=${encodeURIComponent(categoria.title)}&s=${encodeURIComponent(subcategoria.title)}`,
         isActive: !tipoProducto
       });
     }

@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm'
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { MarcaModule } from './marca/marca.module';
+import { AnuncioModule } from './anuncio/anuncio.module';
 import { AgendaModule } from './agenda/agenda.module';
 import { CargoModule } from './cargo/cargo.module';
 import { CategoriaModule } from './categoria/categoria.module';
@@ -38,16 +41,19 @@ import { UsuarioRolModule } from './usuario-rol/usuario-rol.module';
 import { ModuloModule } from './modulo/modulo.module';
 import { AccionModule } from './accion/accion.module';
 import { RolPermisoModule } from './rol-permiso/rol-permiso.module';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
 import { SubCategoriaModule } from './sub-categoria/sub-categoria.module';
 import { TipoProductoModule } from './tipo-producto/tipo-producto.module';
 import { ProductoTipoProductoModule } from './producto-tipo-producto/producto-tipo-producto.module';
 import { TipoProductoSubCategoriaModule } from './TipoProductoSubCategoria/tipo-producto-sub-categoria.module';
 import { ProductoModule } from './producto/producto.module';
-import { ProductoTiendaProductoModule } from './producto-tienda-producto/producto-tienda-producto.module';
+import { ProductoTiendaModule } from './producto-tienda/producto-tienda.module';
 import { UploadModule } from './upload/upload.module';
 import { ProductoColorModule } from './producto-color/producto-color.module';
 import { ColorModule } from './color/color.module';
+import { CarritoModule } from './carrito/carrito.module';
+import { FavoritosModule } from './favoritos/favoritos.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -61,8 +67,14 @@ import { ColorModule } from './color/color.module';
       synchronize: false, 
       logging: true, 
     }),
+    // ServeStaticModule configuration to serve static files
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'), // Serve the "public" folder
+      serveRoot: '/public', // Files will be accessible under "/public"
+    }),
     MarcaModule,
     AgendaModule,
+    AnuncioModule,
     CargoModule,
     CategoriaModule,
     ClienteModule,
@@ -97,16 +109,18 @@ import { ColorModule } from './color/color.module';
     ModuloModule,
     AccionModule,
     RolPermisoModule,
-    UsersModule,
+    UserModule,
     SubCategoriaModule,
     TipoProductoModule,
     ProductoTipoProductoModule,
     TipoProductoSubCategoriaModule,
     ProductoModule,
-    ProductoTiendaProductoModule,
+    ProductoTiendaModule,
     UploadModule,
     ProductoColorModule,
-    ColorModule
+    ColorModule,
+    CarritoModule,
+    FavoritosModule
   ],
   controllers: [AppController],
   providers: [AppService],

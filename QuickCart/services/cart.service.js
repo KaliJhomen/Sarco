@@ -2,31 +2,72 @@ import client from './api/client';
 import endpoints from './api/endpoints';
 
 export const cartService = {
-  async get() {
-    return client.get(endpoints.cart.get);
+  /**
+   * Obtiene el carrito del usuario autenticado.
+   * @returns {Promise} Respuesta del servidor con los datos del carrito.
+   */
+  async get(userId) {
+    return client.get(`${endpoints.cart.get}?userId=${userId}`);
   },
 
-  async add(productId, quantity = 1, colorId = null) {
+  /**
+   * Agrega un producto al carrito del usuario autenticado.
+   * @param {number} userId - ID del usuario.
+   * @param {number} productId - ID del producto.
+   * @param {number} quantity - Cantidad del producto.
+   * @returns {Promise} Respuesta del servidor con el producto agregado.
+   */
+  async add(userId, productId, quantity = 1) {
     return client.post(endpoints.cart.add, {
+      userId,
       productId,
       quantity,
-      colorId,
     });
   },
 
-  async update(itemId, quantity) {
-    return client.put(endpoints.cart.update(itemId), { quantity });
+  /**
+   * Actualiza la cantidad de un producto en el carrito.
+   * @param {number} userId - ID del usuario.
+   * @param {number} productId - ID del producto.
+   * @param {number} quantity - Nueva cantidad del producto.
+   * @returns {Promise} Respuesta del servidor con el producto actualizado.
+   */
+  async update(userId, productId, quantity) {
+    return client.put(endpoints.cart.update(productId), {
+      userId,
+      quantity,
+    });
   },
 
-  async remove(itemId) {
-    return client.delete(endpoints.cart.remove(itemId));
+  /**
+   * Elimina un producto del carrito.
+   * @param {number} userId - ID del usuario.
+   * @param {number} productId - ID del producto.
+   * @returns {Promise} Respuesta del servidor con el producto eliminado.
+   */
+  async remove(userId, productId) {
+    return client.delete(endpoints.cart.remove(productId), {
+      params: { userId },
+    });
   },
 
-  async clear() {
-    return client.post(endpoints.cart.clear);
+  /**
+   * Vacía el carrito del usuario.
+   * @param {number} userId - ID del usuario.
+   * @returns {Promise} Respuesta del servidor confirmando el vaciado del carrito.
+   */
+  async clear(userId) {
+    return client.delete(endpoints.cart.clear, {
+      params: { userId },
+    });
   },
 
-  async getCount() {
-    return client.get(endpoints.cart.count);
+  /**
+   * Obtiene un resumen del carrito del usuario.
+   * @param {number} userId - ID del usuario.
+   * @returns {Promise} Resumen del carrito con el total de productos y el costo total.
+   */
+  async getSummary(userId) {
+    return client.get(`${endpoints.cart.summary}?userId=${userId}`);
   },
 };

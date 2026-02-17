@@ -17,34 +17,26 @@ export function useProducts() {
   });
 }
 
-/* Hook para obtener productos con stock */
-/*
-export function useProductsInStock() {
+/**
+ * Hook para obtener productos con filtros complejos
+ * @param {Object} filters - Filtros a aplicar
+ * @param {string[]} filters.c - Array de categorías (nombres normalizados)
+ * @param {string[]} filters.s - Array de subcategorías (nombres normalizados)
+ * @param {string[]} filters.t - Array de tipos de producto
+ * @param {number[]} filters.marca_id - Array de IDs de marcas
+ * @param {number} filters.price_min - Precio mínimo
+ * @param {number} filters.price_max - Precio máximo
+ * @param {string} filters.busqueda - Término de búsqueda
+ */
+export function useFilteredProducts(filters = {}) {
   return useQuery({
-    queryKey: ['products', 'in-stock'],
-    queryFn: async () => {
-      const allProducts = await productService.getAll();
-      
-      // Filtrar solo productos con stock > 0
-      return allProducts.filter(product => {
-        // Si tiene múltiples colores con stock
-        if (product.colores && Array.isArray(product.colores)) {
-          return product.colores.some(color => color.stock > 0);
-        }
-        
-        // Si tiene un campo stock directo
-        if (product.stock !== undefined) {
-          return product.stock > 0;
-        }
-        
-        // Por defecto, incluir el producto
-        return true;
-      });
-    },
-    staleTime: 2 * 60 * 1000, // 2 minutos
+    queryKey: ['products', 'filtered', filters],
+    queryFn: () => productService.getFiltered(filters),
+    staleTime: 2 * 60 * 1000,
+    keepPreviousData: true, // Mantiene datos anteriores durante la carga
   });
 }
-*/
+
 /**
  * Hook para obtener un producto por ID
  */
@@ -56,6 +48,7 @@ export function useProduct(id) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
 /**
  * Hook para buscar productos
  */
@@ -67,6 +60,7 @@ export function useSearchProducts(query) {
     staleTime: 1 * 60 * 1000,
   });
 }
+
 /**
  * Hook para obtener productos por marca
  */
@@ -78,6 +72,7 @@ export function useProductsByBrand(idMarca) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
 /**
  * Hook para obtener productos por marcas
  */
@@ -89,6 +84,7 @@ export function useProductsByBrands(marcas) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
 /**
  * Hook para obtener productos por categoría
  */
@@ -112,6 +108,7 @@ export function useProductsBySubCategory(idSubCategoria) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
 /**
  * Hook para obtener productos por Tipo Producto
  */
@@ -123,6 +120,7 @@ export function useProductsByProductType(idTipoProducto) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
 /**
  * Hook para obtener productos por tienda
  */
@@ -134,6 +132,7 @@ export function useProductsByStore(tienda_id) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
 /**
  * Hook para obtener productos por tiendas
  */
@@ -145,8 +144,9 @@ export function useProductsByStores(tiendas) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
 // ============================================
-// MUTATIONS (POST/PUT/DELETE - Escritura)
+// MUTATIONS (POST/PUT/DELETE)
 // ============================================
 
 /**
@@ -156,13 +156,9 @@ export function useCreateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ productData, token }) => productService.create(productData, token),
+    mutationFn: ({ formData, token }) => productService.create(formData, token),
     onSuccess: () => {
-      // Invalidar caché para refrescar lista
       queryClient.invalidateQueries({ queryKey: ['products'] });
-    },
-    onError: (error) => {
-      console.error('Error al crear producto:', error);
     },
   });
 }
@@ -174,14 +170,10 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, productData, token }) => productService.update(id, productData, token),
+    mutationFn: ({ id, data, token }) => productService.update(id, data, token),
     onSuccess: (_, variables) => {
-      // Invalidar caché del producto específico y la lista
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['product', variables.id] });
-    },
-    onError: (error) => {
-      console.error('Error al actualizar producto:', error);
     },
   });
 }
@@ -197,38 +189,5 @@ export function useDeleteProduct() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
     },
-    onError: (error) => {
-      console.error('Error al eliminar producto:', error);
-    },
   });
-}
-
-/**
- * Hook para actualizar stock de un producto
- */
-export function useUpdateStock() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, colorId, quantity, token }) => 
-      productService.updateStock(id, colorId, quantity, token),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['product', variables.id] });
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-    },
-    onError: (error) => {
-      console.error('Error al actualizar stock:', error);
-    },
-  });
-}
-
-/**
- * Hook para invalidar/refrescar productos
- */
-export function useRefreshProducts() {
-  const queryClient = useQueryClient();
-
-  return () => {
-    queryClient.invalidateQueries({ queryKey: ['products'] });
-  };
 }
