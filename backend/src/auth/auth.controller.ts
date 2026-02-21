@@ -58,7 +58,7 @@ export class AuthController {
   @Get('profile')
   @ApiOperation({ summary: 'Perfil del usuario (requiere auth)' })
   async profile(@Request() req) {
-    const userId = req.user?.sub;
+    const userId = req.user.id;
     if (!userId) return {};
 
     const usuario = await this.userService.findOne(userId);

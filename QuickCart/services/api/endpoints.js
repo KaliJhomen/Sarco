@@ -1,7 +1,7 @@
 /*Endpoints centralizados de la API
  */
 
-import { productTypeProductService } from "../productTypeProduct.service";
+// import { productTypeProductService } from "../productTypeProduct.service";
 
 const endpoints = {
   // ============================================
@@ -29,7 +29,7 @@ const endpoints = {
     },
 ///
 /// Tipo Productos 
-////
+///
   productTypes: {
     base: '/tipo-producto',
     all: '/tipo-producto',
@@ -108,16 +108,15 @@ const endpoints = {
   // ============================================
   // CARRITO
   // ============================================
-  /*cart: {
+  cart: {
     base: '/carrito',
     get: '/carrito',
-    add: '/carrito/agregar',
-    update: (itemId) => `/carrito/item/${itemId}`,
-    remove: (itemId) => `/carrito/item/${itemId}`,
-    clear: '/carrito/limpiar',
-    count: '/carrito/count',
+    add: '/carrito',
+    update: (idProducto) => `/carrito-item/${idProducto}`,
+    remove: (idProducto) => `/carrito-item/${idProducto}`,
+    // clear: '/carrito/limpiar',   // solo si existe en backend
+    // summary: '/carrito/resumen', // solo si existe en backend
   },
-  */
   // ============================================
   // ÓRDENES/PEDIDOS
   // ============================================
@@ -263,18 +262,6 @@ const endpoints = {
     store: '/configuracion/tienda',
     email: '/configuracion/email',
     social: '/configuracion/redes-sociales',
-  },
-  // ============================================
-  // CARRITO
-  // ============================================
-  cart: {
-    base: '/carrito',
-    all: '/carrito', 
-    get: '/carrito', // GET: Obtener el carrito del usuario autenticado
-    update: (productId) => `/carrito/${productId}`, // PUT: Actualizar la cantidad de un producto en el carrito
-    remove: (productId) => `/carrito/${productId}`, // DELETE: Eliminar un producto del carrito
-    clear: '/carrito/limpiar', // DELETE: Vaciar el carrito
-    summary: '/carrito/resumen', // GET: Obtener el resumen del carrito (total de productos y costo total)
   },
 };
 

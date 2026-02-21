@@ -52,6 +52,7 @@ import { UploadModule } from './upload/upload.module';
 import { ProductoColorModule } from './producto-color/producto-color.module';
 import { ColorModule } from './color/color.module';
 import { CarritoModule } from './carrito/carrito.module';
+import { CarritoItemModule } from './carrito-item/carrito-item.module';
 import { FavoritosModule } from './favoritos/favoritos.module';
 
 @Module({
@@ -120,6 +121,7 @@ import { FavoritosModule } from './favoritos/favoritos.module';
     ProductoColorModule,
     ColorModule,
     CarritoModule,
+    CarritoItemModule,
     FavoritosModule
   ],
   controllers: [AppController],

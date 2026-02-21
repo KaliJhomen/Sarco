@@ -1,22 +1,18 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Carrito } from './entities/carrito.entity';
-import { CarritoItem } from '../carrito-item/entities/carrito-item.entity';
+import { CarritoItem } from './entities/carrito-item.entity';
+import { Carrito } from '../carrito/entities/carrito.entity';
 import { Producto } from '../producto/entities/producto.entity';
 import { User } from '../user/entities/user.entity';
 
 @Injectable()
-export class CarritoService {
+export class CarritoItemService {
   constructor(
-    @InjectRepository(Carrito)
-    private readonly carritoRepository: Repository<Carrito>,
     @InjectRepository(CarritoItem)
     private readonly carritoItemRepository: Repository<CarritoItem>,
+    @InjectRepository(Carrito)
+    private readonly carritoRepository: Repository<Carrito>,
     @InjectRepository(Producto)
     private readonly productRepository: Repository<Producto>,
     @InjectRepository(User)
@@ -31,38 +27,35 @@ export class CarritoService {
 
     let cart = await this.carritoRepository.findOne({
       where: { user: { idUser } },
-      relations: ['items', 'items.producto'],
     });
 
     if (!cart) {
       cart = this.carritoRepository.create({ user });
       cart = await this.carritoRepository.save(cart);
-      cart.items = [];
     }
 
     return cart;
   }
 
-  private validateId(value: number, field: string) {
-    if (!Number.isInteger(value) || value <= 0) {
-      throw new BadRequestException(`${field} inválido`);
-    }
-  }
-
   async getCart(idUser: number) {
-    this.validateId(idUser, 'idUser');
     const cart = await this.carritoRepository.findOne({
       where: { user: { idUser } },
       relations: ['items', 'items.producto'],
     });
+
     if (!cart) {
-      return { idUser, idCarrito: null, items: [], totalItems: 0 };
+      return {
+        userId: idUser,
+        idCarrito: null,
+        items: [],
+        totalItems: 0,
+      };
     }
 
     const items = cart.items || [];
 
     return {
-      idUser,
+      userId: idUser,
       idCarrito: cart.idCarrito,
       items,
       totalItems: items.reduce((acc, it) => acc + (Number(it.cantidad) || 0), 0),
@@ -70,8 +63,6 @@ export class CarritoService {
   }
 
   async addToCart(idUser: number, idProducto: number, quantity: number) {
-    this.validateId(idUser, 'idUser');
-    this.validateId(idProducto, 'idProducto');
     if (!Number.isInteger(quantity) || quantity <= 0) {
       throw new BadRequestException('La cantidad debe ser mayor a 0');
     }

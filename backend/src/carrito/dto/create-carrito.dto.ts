@@ -1,57 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
-import { Transform, Type } from "class-transformer";
+import { IsInt, Min, IsOptional } from "class-validator";
 
 export class CreateCarritoDto {
-@ApiProperty({ description: 'Carrito' })
-@IsOptional()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
-nombre?: string | null;
+  @ApiProperty({ example: 123, description: 'ID del producto a agregar' })
+  @IsInt()
+  idProducto: number;
 
-@ApiPropertyOptional({ description: 'Id del carrito' })
-@IsOptional()
-@Type(() => Number)
-@IsNumber()
-idDocumento?: number | null;
-
-@ApiProperty({ description: 'Número del documento' })
-@IsString()
-@Transform(({ value }) => String(value).trim())
-numeroDocumento: string
-@ApiPropertyOptional({ description: 'Dirección del cliente' })
-@IsOptional()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
-direccion?: string | null;
-
-@ApiPropertyOptional({ description: 'Referencia de la dirección' })
-@IsOptional()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
-referencia?: string | null;
-
-@ApiPropertyOptional({ description: 'Dirección del DNI' })
-@IsOptional()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
-direccionDni?: string | null;
-
-@ApiPropertyOptional({ description: 'Teléfono del cliente' })
-@IsOptional()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
-telefono?: string | null;
-
-@ApiPropertyOptional({ description: 'Email del cliente' })
-@IsOptional()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
-email?: string | null;
-
-@ApiPropertyOptional({ description: 'Id del estado del cliente' })
-@IsOptional()
-@Type(() => Number)
-@IsNumber()
-idEstadoCliente?: number | null;
+  @ApiPropertyOptional({ example: 1, description: 'Cantidad del producto' })
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  quantity?: number = 1;
 }

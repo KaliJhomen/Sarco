@@ -34,10 +34,9 @@ export default function UserPage() {
   console.log('Datos del usuario desde AuthContext:', user);
 
   const getImage = () => user.imagen ? `/productos/${user.imagen}` : '/productos/placeholder.svg';
-  const cargo = user.idCargo2.nombre || 'No especificado'; // Cambiado de idCargo2 a cargo
-  const tienda = user.idTienda2.nombre || 'No especificada'; // Cambiado de idTienda2 a tienda
-  const direccionTienda = user.idTienda2.direccion || 'No especificada'; // Cambiado de idTienda2 a tienda
-
+  const cargo = user.nombre || 'No especificado'; // Cambiado de idCargo2 a cargo
+  const email = user.email || 'No especificada'; // Cambiado de idTienda2 a tienda
+  const rol = user.rol || 'No especificada';
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Mi cuenta</h1>
@@ -61,11 +60,7 @@ export default function UserPage() {
 
           <div className="grid grid-cols-1 gap-4 text-sm">
             <InfoRow label="Email" value={user.email} />
-            <InfoRow label="Teléfono" value={user.telefono} />
-            <InfoRow label="Dirección" value={user.direccion} />
-            <InfoRow label="Cargo" value={cargo} />
-            <InfoRow label="Tienda" value={tienda} />
-            <InfoRow label="Dirección de la tienda" value={direccionTienda} />
+            <InfoRow label="Rol" value={rol} />
           </div>
         </div>
       </div>

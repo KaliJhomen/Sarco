@@ -2,13 +2,19 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { useAppContext } from "@/context/AppContext";
-import { Heart, ShoppingCart, Package } from "lucide-react";
+import { Heart, ShoppingCart, Package, CheckCircle } from "lucide-react";
 import { formatPrice } from "@/utils/helpers/formatters";
+import { useAddToCart } from "@/hooks/server/useCart";
+import { useNotification } from "@/context/NotificationContext";
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useAppContext();
+  const { addNotification } = useNotification();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const addToCartMutation = useAddToCart();
 
   if (!product) {
     return null;
@@ -28,16 +34,16 @@ const ProductCard = ({ product }) => {
   } = product;
 
   const productId = idProducto;
-  const productName = nombre || 'Producto sin nombre';
-  const productModel = modelo || '';
-  const productDescription = descripcion || '';
+  const productName = nombre || "Producto sin nombre";
+  const productModel = modelo || "";
+  const productDescription = descripcion || "";
   const productPrice = Number(precioVenta) || 0;
   const productDiscount = Number(descuento) || 0;
   const productStock = Number(stock) || 0;
-  const brandName = idMarca2?.nombre || '';
+  const brandName = idMarca2?.nombre || "";
 
   const hasDiscount = productDiscount > 0;
-  const finalPrice = hasDiscount 
+  const finalPrice = hasDiscount
     ? productPrice * (1 - productDiscount / 100)
     : productPrice;
 
@@ -46,21 +52,21 @@ const ProductCard = ({ product }) => {
 
   const getImageUrl = (imageName) => {
     if (!imageName) {
-      return '/productos/placeholder.svg'; // ← Imagen por defecto
+      return "/productos/placeholder.svg"; // ← Imagen por defecto
     }
 
     // Si ya es una URL completa, retornarla
-    if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
+    if (imageName.startsWith("http://") || imageName.startsWith("https://")) {
       return imageName;
     }
 
     // Si ya tiene /productos/, retornarla directamente
-    if (imageName.startsWith('/productos/')) {
+    if (imageName.startsWith("/productos/")) {
       return imageName;
     }
 
     // Limpiar barra inicial si existe
-    const cleanImageName = imageName.startsWith('/') ? imageName.slice(1) : imageName;
+    const cleanImageName = imageName.startsWith("/") ? imageName.slice(1) : imageName;
 
     return `/productos/${cleanImageName}`;
   };
@@ -74,17 +80,36 @@ const ProductCard = ({ product }) => {
     setIsFavorite(!isFavorite);
   };
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isOutOfStock) {
-      addToCart(productId);
+
+    if (isOutOfStock || isAdding) return;
+
+    setIsAdding(true);
+
+    try {
+      await addToCartMutation.mutateAsync({
+        idProducto: Number(idProducto),
+        quantity: 1,
+      });
+
+      addNotification(`✓ ${productName} agregado al carrito`, 'success');
+
+      setTimeout(() => {
+        setIsAdding(false);
+      }, 1000);
+
+    } catch (error) {
+      console.error("Error al agregar:", error);
+      addNotification("Error al agregar al carrito", 'error');
+      setIsAdding(false);
     }
   };
 
   return (
     <Link href={`/product/${productId}`}>
-      <div className="group cursor-pointer bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
+      <div className="group cursor-pointer bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col relative">
         
         {/* Imagen del producto */}
         <div className="relative h-48 bg-gray-100 overflow-hidden">
@@ -95,11 +120,11 @@ const ProductCard = ({ product }) => {
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className="object-cover group-hover:scale-110 transition-transform duration-500"
             onError={(e) => {
-              setSrc('/productos/placeholder.svg');
+              setSrc("/productos/placeholder.svg");
             }}
             priority={false}
           />
-          
+
           {/* Badge de descuento */}
           {hasDiscount && (
             <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg z-10">
@@ -199,20 +224,20 @@ const ProductCard = ({ product }) => {
               <p className="text-xs text-gray-500">
                 Stock: {productStock} unidad{productStock !== 1 ? 'es' : ''}
               </p>
-            )}s
+            )}
 
             {/* Botón agregar al carrito */}
             <button 
               onClick={handleAddToCart}
-              disabled={isOutOfStock}
+              disabled={isOutOfStock || isAdding}
               className={`w-full py-2.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                isOutOfStock
+                isOutOfStock || isAdding
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-orange-600 text-white hover:bg-orange-700 active:scale-95 shadow-md hover:shadow-lg'
               }`}
             >
               <ShoppingCart size={18} />
-              {isOutOfStock ? 'Agotado' : 'Agregar'}
+              {isAdding ? 'Agregando...' : isOutOfStock ? 'Agotado' : 'Agregar'}
             </button>
           </div>
         </div>

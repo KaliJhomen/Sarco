@@ -1,4 +1,3 @@
-// filepath: backend/src/favorito/favorito.controller.ts
 import { Controller, Post, Delete, Get, Param, Body } from '@nestjs/common';
 import { FavoritosService } from './favoritos.service';
 
@@ -7,17 +6,17 @@ export class FavoritosController {
   constructor(private readonly favoritosService: FavoritosService) {}
 
   @Post()
-  async addFavorito(@Body() body: { userId: number; productoId: number }) {
-    return this.favoritosService.addFavorito(body.userId, body.productoId);
+  async addFavorito(@Body() body: { userId: number; idProducto: number }) {
+    return this.favoritosService.addFavorito(body.userId, body.idProducto);
   }
 
-  @Delete(':productoId')
-  async removeFavorito(@Param('productoId') productoId: number, @Body('userId') userId: number) {
-    return this.favoritosService.removeFavorito(userId, productoId);
+  @Delete(':idProducto')
+  async removeFavorito(@Param('idProducto') idProducto: number, @Body('userId') userId: number) {
+    return this.favoritosService.removeFavorito(userId, idProducto);
   }
 
-  @Get(':userId')
-  async getFavoritos(@Param('userId') userId: number) {
-    return this.favoritosService.getFavoritos(userId);
+  @Get(':idUser')
+  async getFavoritos(@Param('idUser') idUser: number) {
+    return this.favoritosService.getFavoritos(idUser);
   }
 }

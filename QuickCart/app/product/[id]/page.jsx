@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ import {
   Tag
 } from 'lucide-react';
 import { useProduct } from "@/hooks/server/useProducts";
+import { useAddToCart } from "@/hooks/server/useCart"; 
 import { formatPrice } from '@/utils/helpers/formatters';
 
 const Product = () => {
@@ -29,12 +30,15 @@ const Product = () => {
   // Obtener producto con todas sus relaciones
   const { data: productData, isLoading, error } = useProduct(id);
 
+  const addToCartMutation = useAddToCart(); 
+
   const [colorSeleccionado, setColorSeleccionado] = useState(null);
   const [imagenActiva, setImagenActiva] = useState(0);
   const [cantidad, setCantidad] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [notification, setNotification] = useState("");
   const [imageError, setImageError] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Seleccionar primer color disponible
   useEffect(() => {
@@ -76,7 +80,7 @@ const Product = () => {
             Producto no encontrado
           </h2>
           <p className="text-gray-600 mb-8">
-            {error || 'El producto que buscas no está disponible o no existe.'}
+            {error?.message || String(error) || 'El producto que buscas no está disponible o no existe.'}
           </p>
           <div className="flex gap-4 justify-center">
             <button
@@ -175,8 +179,34 @@ const Product = () => {
     });
   };
 
+  const getFriendlyCartError = (err) => {
+    const status = err?.response?.status;
+    const rawMessage =
+      err?.response?.data?.message ||
+      err?.message ||
+      "";
+
+    const text = Array.isArray(rawMessage) ? rawMessage.join(" ") : String(rawMessage);
+
+    if (
+      status === 401 ||
+      status === 403 ||
+      /unauthorized|token|jwt|no autenticado|forbidden|login/i.test(text)
+    ) {
+      return {
+        message: "Para agregar productos al carrito, primero inicia sesión.",
+        shouldRedirect: true,
+      };
+    }
+
+    return {
+      message: text || "No se pudo agregar al carrito. Inténtalo nuevamente.",
+      shouldRedirect: false,
+    };
+  };
+
   // Handlers
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (isOutOfStock) {
       setNotification("Producto agotado");
       return;
@@ -192,17 +222,22 @@ const Product = () => {
       return;
     }
 
-    addToCart({
-      id: idProducto,
-      nombre: nombre,
-      precio: precioFinal,
-      color: colorSeleccionado?.color?.nombre || 'Sin color',
-      cantidad,
-      imagen: imagenPrincipal,
-      modelo: modelo || ''
-    });
+    try {
+      await addToCartMutation.mutateAsync({
+        idProducto: Number(idProducto),
+        quantity: cantidad,
+        precioUnitario: precioFinal, // ← Añade el precio unitario aquí
+      });
 
-    setNotification(`${cantidad}x ${nombre} agregado al carrito`);
+      setNotification(`${cantidad}x ${nombre} agregado al carrito`);
+    } catch (err) {
+      const { message, shouldRedirect } = getFriendlyCartError(err);
+      setNotification(message);
+
+      if (shouldRedirect) {
+        setShowLoginPrompt(true); 
+      }
+    }
   };
 
   const handleToggleFavorite = () => {
@@ -244,6 +279,16 @@ const Product = () => {
     }
   };
 
+  const handleGoToLogin = () => {
+    const redirect = encodeURIComponent(window.location.pathname);
+    setShowLoginPrompt(false);
+    router.push(`/auth/login?redirect=${redirect}`);
+  };
+
+  const handleStayHere = () => {
+    setShowLoginPrompt(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Notificación Toast */}
@@ -253,17 +298,43 @@ const Product = () => {
         </div>
       )}
 
+      {showLoginPrompt && (
+        <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">¿Deseas iniciar sesión?</h3>
+            <p className="text-gray-600 mb-6">
+              Para agregar productos al carrito necesitas iniciar sesión.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleStayHere}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Seguir navegando
+              </button>
+              <button
+                onClick={handleGoToLogin}
+                className="px-4 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700"
+              >
+                Iniciar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="mb-8 flex items-center gap-2 text-sm text-gray-600 flex-wrap">
-          <button onClick={() => router.push('/')} className="hover:text-orange-600 transition-colors">
+          <button onClick={() => router.push('/')}
+            className="hover:text-orange-600 transition-colors">
             Inicio
           </button>
           <span>/</span>
           {primeraCategoria && (
             <>
               <button 
-                onClick={() => router.push(`/?c[]=${primeraCategoria.nombre}`)} 
+                onClick={() => router.push(`/?c[]=${primeraCategoria.nombre}`)}
                 className="hover:text-orange-600 transition-colors"
               >
                 {primeraCategoria.nombre}
@@ -274,7 +345,7 @@ const Product = () => {
           {primeraSubCategoria && (
             <>
               <button 
-                onClick={() => router.push(`/?s[]=${primeraSubCategoria.nombre}`)} 
+                onClick={() => router.push(`/?s[]=${primeraSubCategoria.nombre}`)}
                 className="hover:text-orange-600 transition-colors"
               >
                 {primeraSubCategoria.nombre}
@@ -579,7 +650,7 @@ const Product = () => {
             <div className="space-y-4 pt-4">
               <button
                 onClick={handleAddToCart}
-                disabled={isOutOfStock || estado === false}
+                disabled={isOutOfStock || estado === false || addToCartMutation.isLoading}
                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 ${
                   isOutOfStock || estado === false
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -587,7 +658,13 @@ const Product = () => {
                 }`}
               >
                 <ShoppingCart size={24} />
-                {'Comprar Ahora'}
+                {addToCartMutation.isLoading
+                  ? "Agregando..."
+                  : isOutOfStock
+                  ? "Producto agotado"
+                  : estado === false
+                  ? "No disponible"
+                  : `Comprar  • ${formatPrice(precioFinal * cantidad)}`}
               </button>
             </div>
 
@@ -630,7 +707,7 @@ const Product = () => {
 
               <button
                 onClick={handleAddToCart}
-                disabled={isOutOfStock || estado === false}
+                disabled={isOutOfStock || estado === false || addToCartMutation.isLoading}
                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 ${
                   isOutOfStock || estado === false
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -638,7 +715,13 @@ const Product = () => {
                 }`}
               >
                 <ShoppingCart size={24} />
-                {isOutOfStock ? 'Producto agotado' : estado === false ? 'No disponible' : `Agregar al carrito • ${formatPrice(precioFinal * cantidad)}`}
+                {addToCartMutation.isLoading
+                  ? "Agregando..."
+                  : isOutOfStock
+                  ? "Producto agotado"
+                  : estado === false
+                  ? "No disponible"
+                  : `Agregar al carrito • ${formatPrice(precioFinal * cantidad)}`}
               </button>
             </div>
 

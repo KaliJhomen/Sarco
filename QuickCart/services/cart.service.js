@@ -4,70 +4,71 @@ import endpoints from './api/endpoints';
 export const cartService = {
   /**
    * Obtiene el carrito del usuario autenticado.
-   * @returns {Promise} Respuesta del servidor con los datos del carrito.
    */
-  async get(userId) {
-    return client.get(`${endpoints.cart.get}?userId=${userId}`);
+  async get() {
+    return client.get(endpoints.cart.get);
   },
 
   /**
-   * Agrega un producto al carrito del usuario autenticado.
-   * @param {number} userId - ID del usuario.
-   * @param {number} productId - ID del producto.
-   * @param {number} quantity - Cantidad del producto.
-   * @returns {Promise} Respuesta del servidor con el producto agregado.
+   * Agrega un producto al carrito.
+   * Valida el stock disponible antes de enviar la petición.
    */
-  async add(userId, productId, quantity = 1) {
+  async add(idProducto, quantity = 1, stockDisponible) {
+    if (quantity > stockDisponible) {
+      throw new Error(`Solo hay ${stockDisponible} unidades disponibles`);
+    }
     return client.post(endpoints.cart.add, {
-      userId,
-      productId,
+      idProducto,
       quantity,
     });
   },
 
   /**
    * Actualiza la cantidad de un producto en el carrito.
-   * @param {number} userId - ID del usuario.
-   * @param {number} productId - ID del producto.
-   * @param {number} quantity - Nueva cantidad del producto.
-   * @returns {Promise} Respuesta del servidor con el producto actualizado.
    */
-  async update(userId, productId, quantity) {
-    return client.put(endpoints.cart.update(productId), {
-      userId,
+  async update(idProducto, quantity) {
+    return client.put(endpoints.cart.update(idProducto), {
       quantity,
     });
   },
 
   /**
    * Elimina un producto del carrito.
-   * @param {number} userId - ID del usuario.
-   * @param {number} productId - ID del producto.
-   * @returns {Promise} Respuesta del servidor con el producto eliminado.
    */
-  async remove(userId, productId) {
-    return client.delete(endpoints.cart.remove(productId), {
-      params: { userId },
-    });
+  async remove(idProducto) {
+    return client.delete(endpoints.cart.remove(idProducto));
   },
 
   /**
-   * Vacía el carrito del usuario.
-   * @param {number} userId - ID del usuario.
-   * @returns {Promise} Respuesta del servidor confirmando el vaciado del carrito.
+   * Vacía el carrito (fallback sin endpoint dedicado).
    */
-  async clear(userId) {
-    return client.delete(endpoints.cart.clear, {
-      params: { userId },
-    });
+  async clear() {
+    const response = await this.get();
+    const payload = response?.data ?? response;
+    const items = Array.isArray(payload?.items) ? payload.items : [];
+
+    await Promise.all(
+      items.map((item) => this.remove(item?.producto?.idProducto))
+    );
+
+    return { ok: true };
   },
 
   /**
-   * Obtiene un resumen del carrito del usuario.
-   * @param {number} userId - ID del usuario.
-   * @returns {Promise} Resumen del carrito con el total de productos y el costo total.
+   * Resumen calculado en frontend.
    */
-  async getSummary(userId) {
-    return client.get(`${endpoints.cart.summary}?userId=${userId}`);
+  async getSummary() {
+    const response = await this.get();
+    const payload = response?.data ?? response;
+    const items = Array.isArray(payload?.items) ? payload.items : [];
+
+    const totalItems = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 0), 0);
+    const totalAmount = items.reduce((acc, it) => {
+      const qty = Number(it?.cantidad) || 0;
+      const price = Number(it?.producto?.precioVenta) || 0;
+      return acc + qty * price;
+    }, 0);
+
+    return { totalItems, totalAmount };
   },
 };

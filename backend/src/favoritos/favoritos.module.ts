@@ -10,6 +10,6 @@ import { Producto } from 'src/producto/entities/producto.entity';
   imports: [TypeOrmModule.forFeature([Favoritos, User, Producto])],
   controllers: [FavoritosController],
   providers: [FavoritosService],
-  exports: [FavoritosService], // Ensure the service is exported if used elsewhere
+  exports: [FavoritosService], 
 })
 export class FavoritosModule {}

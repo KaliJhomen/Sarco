@@ -3,6 +3,7 @@ import '@/services/api/interceptors';
 import { QueryClientProvider } from '@/providers/QueryClientProvider';
 import { AppProvider } from '@/context/AppContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { NotificationProvider } from '@/context/NotificationContext';
 import NavbarController from '@/components/layout/NavbarController';
 import Footer from '@/components/Footer';
 export const metadata = {
@@ -14,15 +15,16 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
-        <QueryClientProvider>
-          <AuthProvider>
-            <AppProvider>
-              <NavbarController />
-              <main>{children}</main>
-              <Footer />
-            </AppProvider>
-          </AuthProvider>
-        </QueryClientProvider>
+        <NotificationProvider>
+          <AppProvider>
+            <QueryClientProvider>
+              <AuthProvider>
+                <NavbarController />
+                <main>{children} </main>
+              </AuthProvider>
+            </QueryClientProvider>
+          </AppProvider>
+        </NotificationProvider>
       </body>
     </html>
   );

@@ -7,28 +7,28 @@ import Navbar from "@/components/Navbar";
 import { useCart, useAddToCart, useUpdateCartQuantity, useRemoveFromCart } from "@/hooks/server/useCart";
 
 const Cart = () => {
-  const userId = 1; // Reemplaza con el ID del usuario autenticado
-  const { data: cartData, isLoading, error } = useCart(userId);
+  const idUser = 1; // Reemplaza con el ID del usuario autenticado
+  const { data: cartData, isLoading, error } = useCart(idUser);
   const addToCartMutation = useAddToCart();
   const updateCartQuantityMutation = useUpdateCartQuantity();
   const removeFromCartMutation = useRemoveFromCart();
 
   const items = cartData || [];
 
-  const handleAddToCart = (productId) => {
-    addToCartMutation.mutate({ userId, productId, quantity: 1 });
+  const handleAddToCart = (idProducto) => {
+    addToCartMutation.mutate({ idUser, idProducto, quantity: 1 });
   };
 
-  const handleUpdateCartQuantity = (productId, quantity) => {
+  const handleUpdateCartQuantity = (idProducto, quantity) => {
     if (quantity <= 0) {
-      removeFromCartMutation.mutate({ userId, productId });
+      removeFromCartMutation.mutate({ idUser, idProducto });
     } else {
-      updateCartQuantityMutation.mutate({ userId, productId, quantity });
+      updateCartQuantityMutation.mutate({ idUser, idProducto, quantity });
     }
   };
 
-  const handleRemoveFromCart = (productId) => {
-    removeFromCartMutation.mutate({ userId, productId });
+  const handleRemoveFromCart = (idProducto) => {
+    removeFromCartMutation.mutate({ idUser, idProducto });
   };
 
   if (isLoading) {
@@ -36,7 +36,37 @@ const Cart = () => {
   }
 
   if (error) {
-    return <p>Error loading cart: {error.message}</p>;
+    const status = error?.response?.status;
+    const msg =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Ocurrió un error al cargar el carrito.";
+
+    if (status === 404 && msg.toLowerCase().includes("carrito")) {
+      return (
+        <>
+          <Navbar />
+          <div className="px-6 md:px-16 lg:px-32 pt-14">
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-6 text-gray-700">
+              <p className="font-medium text-lg">Tu carrito está vacío</p>
+              <p className="text-sm">Agrega productos para verlos aquí.</p>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Navbar />
+        <div className="px-6 md:px-16 lg:px-32 pt-14">
+          <div className="rounded-md border border-red-300 bg-red-50 p-4 text-red-700">
+            <p className="font-medium">No se pudo cargar el carrito</p>
+            <p className="text-sm">{msg}</p>
+          </div>
+        </div>
+      </>
+    );
   }
 
   return (

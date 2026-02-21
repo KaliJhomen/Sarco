@@ -121,9 +121,24 @@ const Navbar = () => {
               Favoritos
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
             </Link>
-            <Link href="/user/cart" className="text-white hover:text-red-100 transition-colors duration-300 font-bold relative group">
-              Carrito
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
+            <Link
+              href="/user/cart"
+              aria-label="Carrito"
+              title="Carrito"
+              className="p-2 hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="w-5 h-5 text-white"
+              >
+                <circle cx="9" cy="20" r="1" />
+                <circle cx="17" cy="20" r="1" />
+                <path d="M3 4h2l2.4 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 7H7" />
+              </svg>
             </Link>
             <div className="relative flex items-center gap-3" ref={menuRef}>
               {isAuthenticated ? (

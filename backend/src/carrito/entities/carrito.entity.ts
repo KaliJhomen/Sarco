@@ -1,28 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-import { Producto } from '../../producto/entities/producto.entity';
+import { CarritoItem } from '../../carrito-item/entities/carrito-item.entity';
 
-@Entity('carrito') 
+@Entity('carrito')
 export class Carrito {
-  @PrimaryGeneratedColumn({name : 'id_carrito' })
+  @PrimaryGeneratedColumn({ name: 'id_carrito' })
   idCarrito: number;
 
   @OneToOne(() => User, (user) => user.carrito, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'idUser' })
+  @JoinColumn({ name: 'id_usuario' })
   user: User;
 
-  @Column( {name: 'id_user' })
-  idUser: number;
-
-  @ManyToOne(() => Producto, (producto) => producto.carritos, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'idProducto' })
-  producto: Producto;
-
-  @Column({name: 'id_producto' })
-  idProducto: number;
-
-  @Column({ type: 'int' }) 
-  cantidad: number;
+  @OneToMany(() => CarritoItem, (item) => item.carrito, { cascade: true })
+  items: CarritoItem[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

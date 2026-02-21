@@ -20,11 +20,7 @@ export class UserService {
 
   // Buscar un usuario por su email
   async findOneByEmail(email: string): Promise<User | null> {
-    const user = await this.userRepository.findOneBy({ email });
-    if (!user) {
-      throw new NotFoundException(`Usuario con email ${email} no encontrado`);
-    }
-    return user;
+    return this.userRepository.findOneBy({ email });
   }
 
   // Obtener todos los usuarios

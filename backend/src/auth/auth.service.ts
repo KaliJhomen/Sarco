@@ -23,7 +23,7 @@ export class AuthService {
     const role = 'Usuario'; // Puedes cambiar esto si tienes roles en la tabla user
 
     // Crear el payload del token
-    const payload = { sub: user.idUser, email: user.email, role };
+    const payload = { id: user.idUser, email: user.email, role };
     const token = await this.jwtService.signAsync(payload);
 
     return {
@@ -49,13 +49,14 @@ export class AuthService {
 
     // Crear el nuevo usuario
     const newUser = await this.userService.create({
-      name,
+      nombre: name,
       email,
-      password: hashed,
+      clave: hashed,
+      rol: 'Usuario',
     } as any);
 
     // Opcional: no devolver la contraseña
-    delete (newUser as any).password;
+    delete (newUser as any).clave;
     return newUser;
   }
 }
