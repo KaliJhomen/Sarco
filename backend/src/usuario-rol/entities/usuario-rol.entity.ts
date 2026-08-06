@@ -5,22 +5,22 @@ import { Rol } from "../../rol/entities/rol.entity";
 @Entity("usuario_rol", { schema: "sarcos_db" })
 export class UsuarioRol {
   @PrimaryColumn({ type: "int", name: "id_usuario" })
-  idUsuario: number;
+  idUser!: number;
 
   @PrimaryColumn({ type: "int", name: "id_rol" })
-  idRol: number;
+  idRole!: number;
 
   @ManyToOne(() => Usuario, (usuario) => usuario.roles, {
     onDelete: "CASCADE",
   })
   
   @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  usuario: Usuario;
+  user!: Usuario;
 
   @ManyToOne(() => Rol, (rol) => rol.usuarios, {
     onDelete: "CASCADE",
   })
 
   @JoinColumn([{ name: "id_rol", referencedColumnName: "idRol" }])
-  rol: Rol;
+  role!: Rol;
 }

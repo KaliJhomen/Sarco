@@ -25,14 +25,14 @@ export class CategoriaController {
   @ApiOperation({ summary: 'Obtener todas las categorias' })
   @ApiResponse({ status: 200, description: 'Lista de categorias devuelta' })
   getCategorias() {
-    return this.categoriaService.getCategorias();
+    return this.categoriaService.findAll();
   }
 
   @Get('public')
   @ApiOperation({ summary: 'Obtener todas las categorias (público)' })
   @ApiResponse({ status: 200, description: 'Lista de categorias devuelta' })
   getCategoriasPublic() {
-    return this.categoriaService.getCategorias();
+    return this.categoriaService.findAll();
   }
 
   @Get(':id')
@@ -47,7 +47,7 @@ export class CategoriaController {
   @ApiResponse({ status: 200, description: 'Categoria encontrada' })
   @ApiResponse({ status: 404, description: 'Categoria no encontrada' })
   getCategoria(@Param('id') id: string) {
-    return this.categoriaService.getCategoria(+id);
+    return this.categoriaService.findOne(+id);
   }
 
   @Patch(':id')
@@ -57,7 +57,7 @@ export class CategoriaController {
   @ApiResponse({ status: 400, description: 'Categoria no encontrada' })
   @ApiBody({ type: UpdateCategoriaDto })
   update(@Param('id') id: string, @Body() updateCategoriaDto: UpdateCategoriaDto) {
-    return this.categoriaService.updateCategoria(+id, updateCategoriaDto);
+    return this.categoriaService.update(+id, updateCategoriaDto);
   }
 
   @Delete(':id')
@@ -66,6 +66,6 @@ export class CategoriaController {
   @ApiResponse({ status: 200, description: 'Categoria eliminada correctamente' })
   @ApiResponse({ status: 400, description: 'Categoria no encontrada' })
   remove(@Param('id') id: string) {
-    return this.categoriaService.deleteCategoria(+id);
+    return this.categoriaService.remove(+id);
   }
 }

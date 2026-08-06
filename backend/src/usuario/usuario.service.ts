@@ -14,14 +14,26 @@ export class UsuarioService {
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
-    const usuario: Usuario = Object.assign(new Usuario(), createUsuarioDto as any);
-    if (createUsuarioDto.clave) {
-      usuario.clave = await bcryptjs.hash(createUsuarioDto.clave, 10);
+      const newUser: Usuario = Object.assign(new Usuario(), createUsuarioDto as any);
+    if (createUsuarioDto.password) {
+      newUser.password = await bcryptjs.hash(createUsuarioDto.password, 10);
     }
-
-    return await this.usuarioRepository.save(usuario);
+    return await this.usuarioRepository.save(newUser);
   }
-
+  async findOne(idUser: number) {
+    const user = await this.usuarioRepository.findOne({
+      where: { idUser: idUser },
+      relations: ['idCargo2', 'idTienda2'],
+    });
+    if (!user) throw new NotFoundException(`Usuario ${idUser} no encontrado`);
+    return user;
+  }
+  
+  findAll() {
+    return this.usuarioRepository.find({
+      relations: ['idCargo2', 'idTienda2'],
+    });
+  }
   findOneByLogin(login: string) {
     return this.usuarioRepository.findOne({
       where: { login },
@@ -29,40 +41,27 @@ export class UsuarioService {
     });
   }
 
-  getFoto(imagen: string) {
+  async findOneByEmail(email: string): Promise<Usuario | null> {
+    return this.usuarioRepository.findOneBy({ email });
+  }
+
+  findByImagen(image: string) {
     return this.usuarioRepository.findOne({
-      where: { imagen },
+      where: { image },
     });
   }
 
-  getUsuarios() {
-    return this.usuarioRepository.find({
-      relations: ['idCargo2', 'idTienda2'],
-    });
-  }
 
-  findAll() {
 
-    return this.getUsuarios();
-  }
-
-  async findOne(id: number) {
-    const usuario = await this.usuarioRepository.findOne({
-      where: { idUsuario: id },
-      relations: ['idCargo2', 'idTienda2'],
-    });
-    if (!usuario) throw new NotFoundException(`Usuario ${id} no encontrado`);
-    return usuario;
-  }
 
   async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    const usuario = await this.usuarioRepository.findOne({ where: { idUsuario: id } });
+    const usuario = await this.usuarioRepository.findOne({ where: { idUser: id } });
     if (!usuario) throw new NotFoundException(`Usuario ${id} no encontrado`);
 
     const toSave = { ...usuario, ...updateUsuarioDto } as any;
 
-    if (updateUsuarioDto.clave) {
-      toSave.clave = await bcryptjs.hash(updateUsuarioDto.clave, 10);
+    if (updateUsuarioDto.password) {
+      toSave.password = await bcryptjs.hash(updateUsuarioDto.password, 10);
     }
 
     await this.usuarioRepository.save(toSave);
@@ -70,7 +69,7 @@ export class UsuarioService {
   }
 
   async remove(id: number) {
-    const res = await this.usuarioRepository.delete({ idUsuario: id });
+    const res = await this.usuarioRepository.delete({ idUser: id });
     if (res.affected === 0) throw new NotFoundException(`Usuario ${id} no encontrado`);
     return { success: true };
   }

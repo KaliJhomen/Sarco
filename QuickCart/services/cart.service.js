@@ -5,22 +5,24 @@ export const cartService = {
   /**
    * Obtiene el carrito del usuario autenticado.
    */
-  async get() {
-    return client.get(endpoints.cart.get);
+  async get({idUser, sessionToken}) {
+    return client.get(endpoints.cart.get, {
+      params: {
+        idUser,
+        sessionToken
+      }
+    });
   },
 
   /**
    * Agrega un producto al carrito.
    * Valida el stock disponible antes de enviar la petición.
    */
-  async add(idProducto, quantity = 1, stockDisponible) {
-    if (quantity > stockDisponible) {
-      throw new Error(`Solo hay ${stockDisponible} unidades disponibles`);
+  async add(data) {
+    if (data.quantity > data.stockDisponible) {
+      throw new Error(`Solo hay ${data.stockDisponible} unidades disponibles`);
     }
-    return client.post(endpoints.cart.add, {
-      idProducto,
-      quantity,
-    });
+    return client.post(endpoints.cart.add, data);
   },
 
   /**
@@ -54,9 +56,6 @@ export const cartService = {
     return { ok: true };
   },
 
-  /**
-   * Resumen calculado en frontend.
-   */
   async getSummary() {
     const response = await this.get();
     const payload = response?.data ?? response;
@@ -70,5 +69,15 @@ export const cartService = {
     }, 0);
 
     return { totalItems, totalAmount };
+  },
+
+  async generateShareToken(ident) {
+    const response = await client.post(endpoints.cart.genToken, ident);
+    return response?.data ?? response;
+  },
+
+  async getSharedCart(shareToken) {
+    const response = await client.get(endpoints.cart.getShared(shareToken));
+    return response?.data ?? response;
   },
 };

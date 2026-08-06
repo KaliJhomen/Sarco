@@ -3,10 +3,13 @@ import {
   Entity,
   Index,
   JoinColumn,
+  OneToOne,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import {Carrito } from "../../carrito/entities/carrito.entity"
+import { Favoritos } from "../../favoritos/entities/favoritos.entity"
 import { Documento } from "../../documento/entities/documento.entity";
 import { EstadoCliente } from "../../estado-cliente/entities/estado-cliente.entity";
 import { Credito } from "../../credito/entities/credito.entity";
@@ -24,6 +27,9 @@ export class Cliente {
 
   @Column("varchar", { name: "nombre", nullable: true, length: 255 })
   nombre: string | null;
+
+  @Column("varchar", { name: "clave", nullable: true, length: 255 })
+  clave: string | null;
 
   @Column("int", { name: "id_documento", nullable: true })
   idDocumento: number | null;
@@ -55,6 +61,12 @@ export class Cliente {
   })
   @JoinColumn([{ name: "id_documento", referencedColumnName: "idDocumento" }])
   idDocumento2: Documento;
+
+  @OneToOne(() => Carrito, (carrito) => carrito.cliente)
+  carrito: Carrito;
+
+  @OneToMany(() => Favoritos, (favoritos) => favoritos.cliente)
+  favoritos: Favoritos[];
 
   @ManyToOne(() => EstadoCliente, (estadoCliente) => estadoCliente.clientes, {
     onDelete: "NO ACTION",

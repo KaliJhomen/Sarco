@@ -54,7 +54,10 @@ import { ColorModule } from './color/color.module';
 import { CarritoModule } from './carrito/carrito.module';
 import { CarritoItemModule } from './carrito-item/carrito-item.module';
 import { FavoritosModule } from './favoritos/favoritos.module';
-
+import { FavoritosItemModule } from './favoritos-item/favoritos-item.module';
+import { PedidoModule} from './pedido/pedido.module';
+import { PedidoDetalleModule } from './pedido-detalle/pedido-detalle.module';
+import { ConfigModule} from './config/config.module'
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -122,7 +125,11 @@ import { FavoritosModule } from './favoritos/favoritos.module';
     ColorModule,
     CarritoModule,
     CarritoItemModule,
-    FavoritosModule
+    FavoritosModule,
+    FavoritosItemModule,
+    PedidoModule,
+    PedidoDetalleModule,
+    ConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],

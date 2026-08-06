@@ -27,7 +27,6 @@ export class UploadController {
       filename: (req, file, cb) => {
         // Extrae el nombre base sin extensión
         const baseName = file.originalname.replace(/\.[^/.]+$/, "");
-        // Genera un nombre único: timestamp + baseName + extensión
         const uniqueName = `${Date.now()}-${baseName}${extname(file.originalname)}`;
         cb(null, uniqueName);
       },

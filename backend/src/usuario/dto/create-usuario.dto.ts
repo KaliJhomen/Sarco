@@ -4,61 +4,61 @@ import { IsString, IsInt, IsOptional, IsEmail, MinLength } from 'class-validator
 export class CreateUsuarioDto {
   @ApiProperty()
   @IsString()
-  nombre: string;
+  name!: string;
 
   @ApiProperty()
   @IsInt()
-  idDocumento: number;
+  idDocument!: number;
 
   @ApiProperty()
   @IsString()
-  numeroDocumento: string;
+  document!: string;
 
   @ApiProperty()
   @IsInt()
-  idCargo: number;
+  idRole!: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  direccion: string;
+  address!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  telefono: string;
+  phone!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
-  email: string;
+  email!: string;
 
   @ApiProperty()
   @IsString()
-  login: string;
+  login!: string;
 
   @ApiProperty()
   @IsString()
   @MinLength(6)
-  clave: string;
+  password!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  imagen: string;
+  image!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  fondo: string;
+  background!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsInt()
-  condicion?: number;
+  condition?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsInt()
-  idTienda: number;
+  idStore!: number;
 }

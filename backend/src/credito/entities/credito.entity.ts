@@ -28,47 +28,47 @@ import { TicketCredito } from "../../ticket-credito/entities/ticket-credito.enti
 @Entity("credito", { schema: "sarcos_db" })
 export class Credito {
   @PrimaryGeneratedColumn({ type: "int", name: "id_credito" })
-  idCredito: number;
+  idCredito!: number;
 
   @Column("int", { name: "id_usuario", nullable: true })
-  idUsuario: number | null;
+  idUsuario!: number | null;
 
   @Column("int", { name: "id_cliente_garante", nullable: true })
-  idClienteGarante: number | null;
+  idClienteGarante!: number | null;
 
   @Column("int", { name: "id_cliente", nullable: true })
-  idCliente: number | null;
+  idCliente!: number | null;
 
   @Column("int", { name: "id_metodo_pago", nullable: true })
-  idMetodoPago: number | null;
+  idMetodoPago!: number | null;
 
   @Column("int", { name: "num_cuotas", nullable: true })
-  numCuotas: number | null;
+  numCuotas!: number | null;
 
   @Column("int", { name: "num_cuotas_restante", nullable: true })
-  numCuotasRestante: number | null;
+  numCuotasRestante!: number | null;
 
   @Column("datetime", { name: "fecha_inicio", nullable: true })
-  fechaInicio: Date | null;
+  fechaInicio!: Date | null;
 
   @Column("date", { name: "fecha_final", nullable: true })
-  fechaFinal: Date | null;
+  fechaFinal!: Date | null;
 
   @Column("int", { name: "id_estado_credito", nullable: true })
-  idEstadoCredito: number | null;
+  idEstadoCredito!: number | null;
 
   @Column("varchar", {
     name: "garantia_extendida_credito",
     nullable: true,
     length: 255,
   })
-  garantiaExtendidaCredito: string | null;
+  garantiaExtendidaCredito!: string | null;
 
   @Column("varchar", { name: "garantia_tienda", nullable: true, length: 255 })
-  garantiaTienda: string | null;
+  garantiaTienda!: string | null;
 
   @Column("varchar", { name: "periodo_pago", nullable: true, length: 20 })
-  periodoPago: string | null;
+  periodoPago!: string | null;
 
   @Column("decimal", {
     name: "interes",
@@ -76,7 +76,7 @@ export class Credito {
     precision: 20,
     scale: 2,
   })
-  interes: string | null;
+  interes!: string | null;
 
   @Column("decimal", {
     name: "inicial",
@@ -84,7 +84,7 @@ export class Credito {
     precision: 20,
     scale: 2,
   })
-  inicial: string | null;
+  inicial!: string | null;
 
   @Column("decimal", {
     name: "monto_cuota",
@@ -92,7 +92,7 @@ export class Credito {
     precision: 20,
     scale: 2,
   })
-  montoCuota: string | null;
+  montoCuota!: string | null;
 
   @Column("decimal", {
     name: "monto_deuda",
@@ -100,7 +100,7 @@ export class Credito {
     precision: 20,
     scale: 2,
   })
-  montoDeuda: string | null;
+  montoDeuda!: string | null;
 
   @Column("decimal", {
     name: "monto_deuda_base",
@@ -108,7 +108,7 @@ export class Credito {
     precision: 20,
     scale: 2,
   })
-  montoDeudaBase: string | null;
+  montoDeudaBase!: string | null;
 
   @Column("decimal", {
     name: "monto_deuda_restante",
@@ -116,26 +116,26 @@ export class Credito {
     precision: 20,
     scale: 2,
   })
-  montoDeudaRestante: string | null;
+  montoDeudaRestante!: string | null;
 
   @Column("int", { name: "id_comprobante", nullable: true })
-  idComprobante: number | null;
+  idComprobante!: number | null;
 
   @Column("int", { name: "registrar", nullable: true })
-  registrar: number | null;
+  registrar!: number | null;
 
   @Column("int", { name: "id_tienda", nullable: true })
-  idTienda: number | null;
+  idTienda!: number | null;
 
   @Column("varchar", { name: "justificacion", nullable: true, length: 255 })
-  justificacion: string | null;
+  justificacion!: string | null;
 
   @ManyToOne(() => Tienda, (tienda) => tienda.creditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_tienda", referencedColumnName: "idTienda" }])
-  idTienda2: Tienda;
+  idTienda2!: Tienda;
 
   @ManyToOne(() => Cliente, (cliente) => cliente.creditos, {
     onDelete: "NO ACTION",
@@ -144,14 +144,14 @@ export class Credito {
   @JoinColumn([
     { name: "id_cliente_garante", referencedColumnName: "idCliente" },
   ])
-  idClienteGarante2: Cliente;
+  idClienteGarante2!: Cliente;
 
   @ManyToOne(() => Cliente, (cliente) => cliente.creditos2, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_cliente", referencedColumnName: "idCliente" }])
-  idCliente2: Cliente;
+  idCliente2!: Cliente;
 
   @ManyToOne(() => Comprobante, (comprobante) => comprobante.creditos, {
     onDelete: "NO ACTION",
@@ -160,7 +160,7 @@ export class Credito {
   @JoinColumn([
     { name: "id_comprobante", referencedColumnName: "idComprobante" },
   ])
-  idComprobante2: Comprobante;
+  idComprobante2!: Comprobante;
 
   @ManyToOne(() => EstadoCredito, (estadoCredito) => estadoCredito.creditos, {
     onDelete: "NO ACTION",
@@ -169,7 +169,7 @@ export class Credito {
   @JoinColumn([
     { name: "id_estado_credito", referencedColumnName: "idEstadoCredito" },
   ])
-  idEstadoCredito2: EstadoCredito;
+  idEstadoCredito2!: EstadoCredito;
 
   @ManyToOne(() => MetodoPago, (metodoPago) => metodoPago.creditos, {
     onDelete: "NO ACTION",
@@ -178,27 +178,27 @@ export class Credito {
   @JoinColumn([
     { name: "id_metodo_pago", referencedColumnName: "idMetodoPago" },
   ])
-  idMetodoPago2: MetodoPago;
+  idMetodoPago2!: MetodoPago;
 
   @ManyToOne(() => Usuario, (usuario) => usuario.creditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  idUsuario2: Usuario;
+  idUsuario2!: Usuario;
 
   @OneToMany(
     () => DetalleCredito,
     (detalleCredito) => detalleCredito.idCredito2
   )
-  detalleCreditos: DetalleCredito[];
+  detalleCreditos!: DetalleCredito[];
 
   @OneToMany(() => Penalidades, (penalidades) => penalidades.idCredito2)
-  penalidades: Penalidades[];
+  penalidades!: Penalidades[];
 
   @OneToMany(() => PlanPago, (planPago) => planPago.idCredito2)
-  planPagos: PlanPago[];
+  planPagos!: PlanPago[];
 
   @OneToMany(() => TicketCredito, (ticketCredito) => ticketCredito.idCredito2)
-  ticketCreditos: TicketCredito[];
+  ticketCreditos!: TicketCredito[];
 }

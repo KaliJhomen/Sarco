@@ -4,48 +4,79 @@ import { Repository } from 'typeorm';
 import { CarritoItem } from './entities/carrito-item.entity';
 import { Carrito } from '../carrito/entities/carrito.entity';
 import { Producto } from '../producto/entities/producto.entity';
+import { Cliente } from '../cliente/entities/cliente.entity';
 import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class CarritoItemService {
   constructor(
     @InjectRepository(CarritoItem)
-    private readonly carritoItemRepository: Repository<CarritoItem>,
+    private readonly cartItemRepository: Repository<CarritoItem>,
     @InjectRepository(Carrito)
-    private readonly carritoRepository: Repository<Carrito>,
+    private readonly cartRepository: Repository<Carrito>,
     @InjectRepository(Producto)
     private readonly productRepository: Repository<Producto>,
+    @InjectRepository(Cliente)
+    private readonly clientRepository: Repository<Cliente>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
 
-  private async getOrCreateCart(idUser: number): Promise<Carrito> {
-    const user = await this.userRepository.findOne({ where: { idUser } });
-    if (!user) {
-      throw new NotFoundException(`Usuario con ID ${idUser} no encontrado`);
+  private async findClienteByUserId(idUser: number): Promise<Cliente> {
+    const user = await this.userRepository.findOne({ where: { id: idUser } });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    let cliente = await this.clientRepository.findOne({ where: { email: user.email } });
+    if (!cliente) {
+      cliente = this.clientRepository.create({
+        nombre: user.name,
+        email: user.email,
+      });
+      cliente = await this.clientRepository.save(cliente);
     }
-
-    let cart = await this.carritoRepository.findOne({
-      where: { user: { idUser } },
-    });
-
-    if (!cart) {
-      cart = this.carritoRepository.create({ user });
-      cart = await this.carritoRepository.save(cart);
-    }
-
-    return cart;
+    return cliente;
   }
 
-  async getCart(idUser: number) {
-    const cart = await this.carritoRepository.findOne({
-      where: { user: { idUser } },
-      relations: ['items', 'items.producto'],
-    });
+  private async getOrCreateCart({ idUser, sessionToken }: { idUser?: number, sessionToken?: string }): Promise<Carrito> {
+
+    if (idUser) {
+      const cliente = await this.findClienteByUserId(idUser);
+      const cart = await this.cartRepository.findOne({ where: { cliente: { idCliente: cliente.idCliente } } });
+      if (cart) return cart;
+      const newCart = this.cartRepository.create({ cliente });
+      return this.cartRepository.save(newCart);
+    } else if (sessionToken) {
+      const cart = await this.cartRepository.findOne({ where: { sessionToken } });
+      if (cart) return cart;
+      const newCart = this.cartRepository.create({ sessionToken });
+      return this.cartRepository.save(newCart);
+    } else {
+      throw new BadRequestException('Debe proporcionar idUser o sessionToken');
+    }
+  }
+
+  async findByUser({ idUser, sessionToken }: { idUser?: number, sessionToken?: string }) {
+    let cart: Carrito | null = null;
+
+    if (idUser) {
+      const cliente = await this.findClienteByUserId(idUser);
+      cart = await this.cartRepository.findOne({
+        where: { cliente: { idCliente: cliente.idCliente } },
+        relations: ['items', 'items.producto'],
+      });
+    } else if (sessionToken) {
+      cart = await this.cartRepository.findOne({
+        where: { sessionToken },
+        relations: ['items', 'items.producto'],
+      });
+    } else {
+      throw new BadRequestException('Debe proporcionar idUser o sessionToken');
+    }
 
     if (!cart) {
       return {
-        userId: idUser,
+        idUser,
+        sessionToken,
         idCarrito: null,
         items: [],
         totalItems: 0,
@@ -53,28 +84,30 @@ export class CarritoItemService {
     }
 
     const items = cart.items || [];
-
     return {
-      userId: idUser,
+      idUser,
+      sessionToken,
       idCarrito: cart.idCarrito,
       items,
       totalItems: items.reduce((acc, it) => acc + (Number(it.cantidad) || 0), 0),
     };
   }
 
-  async addToCart(idUser: number, idProducto: number, quantity: number) {
+  async addToCart(
+    { idUser, sessionToken }: { idUser?: number, sessionToken?: string },
+    idProducto: number,
+    quantity: number
+  ) {
     if (!Number.isInteger(quantity) || quantity <= 0) {
       throw new BadRequestException('La cantidad debe ser mayor a 0');
     }
 
     const product = await this.productRepository.findOne({ where: { idProducto } });
-    if (!product) {
-      throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);
-    }
+    if (!product) throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);
 
-    const cart = await this.getOrCreateCart(idUser);
+    const cart = await this.getOrCreateCart({ idUser, sessionToken });
 
-    const existingItem = await this.carritoItemRepository.findOne({
+    const existingItem = await this.cartItemRepository.findOne({
       where: {
         carrito: { idCarrito: cart.idCarrito },
         producto: { idProducto },
@@ -84,32 +117,42 @@ export class CarritoItemService {
 
     if (existingItem) {
       existingItem.cantidad += quantity;
-      return this.carritoItemRepository.save(existingItem);
+      return this.cartItemRepository.save(existingItem);
     }
 
-    const newItem = this.carritoItemRepository.create({
+    const newItem = this.cartItemRepository.create({
       carrito: cart,
       producto: product,
       cantidad: quantity,
     });
 
-    return this.carritoItemRepository.save(newItem);
+    return this.cartItemRepository.save(newItem);
   }
 
-  async updateCartItem(idUser: number, idProducto: number, quantity: number) {
+  async updateCartItem(params: { idUser?: number, sessionToken?: string }, idProducto: number, quantity: number) {
+    const { idUser, sessionToken } = params;
+    let cart: Carrito | null = null;
+
+    if (idUser) {
+      const cliente = await this.findClienteByUserId(idUser);
+      cart = await this.cartRepository.findOne({
+        where: { cliente: { idCliente: cliente.idCliente } },
+      });
+    } else if (sessionToken) {
+      cart = await this.cartRepository.findOne({
+        where: { sessionToken },
+      });
+    }
+
     if (!Number.isInteger(quantity) || quantity <= 0) {
       throw new BadRequestException('La cantidad debe ser mayor a 0');
     }
-
-    const cart = await this.carritoRepository.findOne({
-      where: { user: { idUser } },
-    });
 
     if (!cart) {
       throw new NotFoundException('Carrito no encontrado');
     }
 
-    const existingItem = await this.carritoItemRepository.findOne({
+    const existingItem = await this.cartItemRepository.findOne({
       where: {
         carrito: { idCarrito: cart.idCarrito },
         producto: { idProducto },
@@ -122,19 +165,29 @@ export class CarritoItemService {
     }
 
     existingItem.cantidad = quantity;
-    return this.carritoItemRepository.save(existingItem);
+    return this.cartItemRepository.save(existingItem);
   }
 
-  async removeFromCart(idUser: number, idProducto: number) {
-    const cart = await this.carritoRepository.findOne({
-      where: { user: { idUser } },
-    });
+  async removeFromCart(params: { idUser?: number, sessionToken?: string }, idProducto: number) {
+    const { idUser, sessionToken } = params;
+    let cart: Carrito | null = null;
+
+    if (idUser) {
+      const cliente = await this.findClienteByUserId(idUser);
+      cart = await this.cartRepository.findOne({
+        where: { cliente: { idCliente: cliente.idCliente } },
+      });
+    } else if (sessionToken) {
+      cart = await this.cartRepository.findOne({
+        where: { sessionToken },
+      });
+    }
 
     if (!cart) {
       throw new NotFoundException('Carrito no encontrado');
     }
 
-    const existingItem = await this.carritoItemRepository.findOne({
+    const existingItem = await this.cartItemRepository.findOne({
       where: {
         carrito: { idCarrito: cart.idCarrito },
         producto: { idProducto },
@@ -145,6 +198,6 @@ export class CarritoItemService {
       throw new NotFoundException(`El producto con ID ${idProducto} no está en el carrito`);
     }
 
-    return this.carritoItemRepository.remove(existingItem);
+    return this.cartItemRepository.remove(existingItem);
   }
 }

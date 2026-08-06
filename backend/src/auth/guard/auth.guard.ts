@@ -14,7 +14,6 @@ declare module 'express' {
   }
 }
 
-// auth.guard.ts
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}

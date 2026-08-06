@@ -20,7 +20,7 @@ export class AnuncioController {
   @ApiResponse({ status: 200, description: 'Lista de anuncios obtenida exitosamente.' })
   @Get()
   getAnuncios() {
-    return this.anuncioService.getAnuncios();
+    return this.anuncioService.findAll();
   }
   @ApiOperation({ summary: 'Obtener un anuncio por ID' })
   @ApiResponse({ status: 200, description: 'Anuncio obtenido exitosamente.' })

@@ -9,31 +9,30 @@ import { User } from './entities/user.entity';
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>, // Cambiado a minúscula para seguir las convenciones
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  // Crear un nuevo usuario
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = this.userRepository.create(createUserDto); // Crea una nueva instancia del usuario
-    return this.userRepository.save(newUser); // Guarda el usuario en la base de datos
+    try {
+      const newUser = this.userRepository.create(createUserDto);
+      return await this.userRepository.save(newUser);
+    } catch (error) {
+      throw new InternalServerErrorException('Ocurrió un error al guardar el usuario');
+    }
   }
 
-  // Buscar un usuario por su email
   async findOneByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOneBy({ email });
   }
 
-  // Obtener todos los usuarios
   async findAll(): Promise<User[]> {
     try {
       return await this.userRepository.find();
     } catch (error) {
-      console.error('Error al consultar la base de datos:', error);
       throw new InternalServerErrorException('Error al consultar la base de datos.');
     }
   }
 
-  // Buscar un usuario por su ID
   async findOne(idUser: number): Promise<User> {
     const user = await this.userRepository.findOneBy({ idUser });
     if (!user) {
@@ -42,7 +41,6 @@ export class UserService {
     return user;
   }
 
-  // Actualizar un usuario por su ID
   async update(idUser: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.preload({
       idUser,
@@ -53,16 +51,15 @@ export class UserService {
       throw new NotFoundException(`Usuario con ID ${idUser} no encontrado`);
     }
 
-    return this.userRepository.save(user); // Guarda los cambios en la base de datos
+    return this.userRepository.save(user);
   }
 
-  // Eliminar un usuario por su ID
   async remove(idUser: number): Promise<void> {
     const user = await this.userRepository.findOneBy({ idUser });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${idUser} no encontrado`);
     }
 
-    await this.userRepository.remove(user); // Elimina el usuario de la base de datos
+    await this.userRepository.remove(user);
   }
 }

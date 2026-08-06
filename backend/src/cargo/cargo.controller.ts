@@ -17,7 +17,7 @@ export class CargoController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiBody({ type: CreateCargoDto })
   createCargo(@Body() createCargoDto: CreateCargoDto) {
-    return this.cargoService.createCargo(createCargoDto);
+    return this.cargoService.create(createCargoDto);
   }
 
   @Get()
@@ -25,7 +25,7 @@ export class CargoController {
   @ApiOperation({ summary: 'Obtener todos los cargos' })
   @ApiResponse({ status: 200, description: 'Lista de cargos devuelta' })
   getCargos() {
-    return this.cargoService.getCargos();
+    return this.cargoService.findAll();
   }
 
   @Get(':id')
@@ -40,7 +40,7 @@ export class CargoController {
   @ApiResponse({ status: 200, description: 'Cargo encontrado' })
   @ApiResponse({ status: 404, description: 'Cargo no encontrado' })
   getCargo(@Param('id') id: string) {
-    return this.cargoService.getCargo(+id);
+    return this.cargoService.findOne(+id);
   }
 
   @Patch(':id')
@@ -50,7 +50,7 @@ export class CargoController {
   @ApiResponse({ status: 400, description: 'Cargo no encontrado' })
   @ApiBody({ type: UpdateCargoDto })
   update(@Param('id') id: string, @Body() updateCargoDto: UpdateCargoDto) {
-    return this.cargoService.updateCargo(+id, updateCargoDto);
+    return this.cargoService.update(+id, updateCargoDto);
   }
 
   @Delete(':id')
@@ -59,6 +59,6 @@ export class CargoController {
   @ApiResponse({ status: 200, description: 'Cargo eliminado correctamente' })
   @ApiResponse({ status: 400, description: 'Cargo no encontrado' })
   remove(@Param('id') id: string) {
-    return this.cargoService.deleteCargo(+id);
+    return this.cargoService.remove(+id);
   }
 }

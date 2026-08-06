@@ -18,27 +18,28 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
 
   const { user, isAuthenticated, logout } = useContext(AuthContext);
-
+  const handleToggle = () => setOpen((s) => !s);
+  console.log("Navbar use r:", user);
+  const handleProfile = () => {
+    setOpen(false);
+    router.push("/user/profile");
+  };
+  /*
   // Verifica si el usuario es administrador o gerente
   const isAdminOrManager = useMemo(() => ["Administrador", "Gerente"].includes(user?.role), [user]);
 
-  const handleToggle = () => setOpen((s) => !s);
-  const handleProfile = () => {
-    setOpen(false);
-    router.push("/admin/user");
-  };
+
   const handleAdminPanel = () => {
     setOpen(false);
     router.push("/admin");
   };
+*/
   const handleLogout = async () => {
     setOpen(false);
     await logout();
   };
-
   const { data: categories = [], isLoading: loadingCategories } = useCategories();
 
-  // Cierra el menú al hacer clic fuera de él
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -154,7 +155,8 @@ const Navbar = () => {
                       width={20}
                       height={20}
                     />
-                    <span className="hidden lg:inline font-bold">{user.nombre}</span>
+                    
+                    <span className="hidden lg:inline font-bold">{user.name}</span>
                   </button>
 
                   {open && (
@@ -164,6 +166,7 @@ const Navbar = () => {
                       }`}
                     >
                       <div className="py-2">
+                        {/*}
                         {isAdminOrManager && (
                           <button
                             onClick={handleAdminPanel}
@@ -172,6 +175,7 @@ const Navbar = () => {
                             Panel Administración
                           </button>
                         )}
+                        */}
                         <button
                           onClick={handleProfile}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

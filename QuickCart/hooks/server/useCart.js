@@ -2,13 +2,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { cartService } from "@/services/cart.service";
 
-/**
+/*
  * Hook para obtener el carrito del usuario autenticado
  */
-export function useCart() {
+export function useCart({idUser, sessionToken}) {
   return useQuery({
-    queryKey: ["cart"],
-    queryFn: () => cartService.get(),
+    queryKey: ["cart", idUser, sessionToken],
+    queryFn: () => cartService.get({ idUser, sessionToken }),
+    
     staleTime: 30 * 1000,
   });
 }
@@ -20,7 +21,7 @@ export function useAddToCart() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ idProducto, quantity }) => cartService.add(idProducto, quantity),
+    mutationFn: (data) => cartService.add(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
@@ -46,9 +47,8 @@ export function useUpdateCartQuantity() {
  */
 export function useRemoveFromCart() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: ({ idProducto }) => cartService.remove(idProducto),
+    mutationFn: (data) => cartService.remove(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
@@ -66,5 +66,19 @@ export function useClearCart() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
+  });
+}
+
+export function useGenerateShareCart() {
+  return useMutation({
+    mutationFn: (ident) => cartService.generateShareToken(ident),
+  });
+}
+
+export function useSharedCart(shareToken) {
+  return useQuery({
+    queryKey: ["sharedCart", shareToken],
+    queryFn: () => cartService.getSharedCart(shareToken),
+    enabled: !!shareToken,
   });
 }

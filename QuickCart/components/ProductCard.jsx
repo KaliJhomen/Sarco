@@ -8,18 +8,14 @@ import { Heart, ShoppingCart, Package, CheckCircle } from "lucide-react";
 import { formatPrice } from "@/utils/helpers/formatters";
 import { useAddToCart } from "@/hooks/server/useCart";
 import { useNotification } from "@/context/NotificationContext";
+import { useAddToFavorites, useRemoveFromFavorites, useFavorites } from "@/hooks/server/useFavorites";
+import { getOrCreateSessionToken } from "@/utils/constants/session";
 
 const ProductCard = ({ product }) => {
-  const { addToCart } = useAppContext();
-  const { addNotification } = useNotification();
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
-  const addToCartMutation = useAddToCart();
-
+const { user } = useAppContext();
   if (!product) {
     return null;
   }
-
   const {
     idProducto,
     nombre,
@@ -32,6 +28,57 @@ const ProductCard = ({ product }) => {
     imagen,
     idMarca2,
   } = product;
+
+  const { addToCart } = useAppContext();
+  const { addNotification } = useNotification();
+  const [isAdding, setIsAdding] = useState(false);
+  const addToCartMutation = useAddToCart();
+
+  // Hooks de favoritos
+  const { data: favoritesData } = useFavorites();
+  const addToFavoritesMutation = useAddToFavorites();
+  const removeFromFavoritesMutation = useRemoveFromFavorites();
+
+  // Determinar si el producto está en favoritos
+  const isFavorite = Array.isArray(favoritesData?.items)
+    ? favoritesData.items.some((fav) =>
+        fav.idProducto
+          ? fav.idProducto === idProducto
+          : fav.producto?.idProducto === idProducto
+      )
+    : false;
+
+  const [isProcessingFavorite, setIsProcessingFavorite] = useState(false);
+
+  const handleFavorite = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isProcessingFavorite) return;
+    setIsProcessingFavorite(true);
+    const sessionToken= getOrCreateSessionToken();
+    const payload = { idProducto: Number(product.idProducto) };
+    if (!user) {
+      payload.sessionToken = sessionToken;
+    }
+    await addToFavoritesMutation.mutateAsync(payload);
+    try {
+      if (isFavorite) {
+        await removeFromFavoritesMutation.mutateAsync(payload);
+        addNotification("Eliminado de favoritos", "success");
+      } else {
+        await addToFavoritesMutation.mutateAsync(payload);
+        addNotification("Agregado a favoritos", "success");
+      }
+    } catch (err) {
+          console.log(idProducto)
+
+      addNotification("Error al actualizar favoritos", "error");
+    } finally {
+      setIsProcessingFavorite(false);
+    }
+  };
+
+///
 
   const productId = idProducto;
   const productName = nombre || "Producto sin nombre";
@@ -52,7 +99,7 @@ const ProductCard = ({ product }) => {
 
   const getImageUrl = (imageName) => {
     if (!imageName) {
-      return "/productos/placeholder.svg"; // ← Imagen por defecto
+      return "/productos/placeholder.svg"; //Imagen por defecto
     }
 
     // Si ya es una URL completa, retornarla
@@ -74,12 +121,6 @@ const ProductCard = ({ product }) => {
   const imageUrl = getImageUrl(imagen);
   const [src, setSrc] = useState(imageUrl);
 
-  const handleFavorite = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsFavorite(!isFavorite);
-  };
-
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -89,10 +130,18 @@ const ProductCard = ({ product }) => {
     setIsAdding(true);
 
     try {
-      await addToCartMutation.mutateAsync({
+      // Si el usuario está autenticado, solo envía idProducto y quantity
+      // Si es guest, agrega sessionToken
+      const payload = {
         idProducto: Number(idProducto),
         quantity: 1,
-      });
+      };
+
+      if (!user) {
+        payload.sessionToken = getOrCreateSessionToken();
+      }
+
+      await addToCartMutation.mutateAsync(payload);
 
       addNotification(`✓ ${productName} agregado al carrito`, 'success');
 
@@ -135,11 +184,13 @@ const ProductCard = ({ product }) => {
           {/* Botón de favoritos */}
           <button
             onClick={handleFavorite}
+            disabled={isProcessingFavorite}
             className={`absolute top-2 left-2 p-2 rounded-full transition-all duration-200 z-10 shadow-md ${
-              isFavorite 
-                ? 'bg-red-500 text-white scale-100' 
+              isFavorite
+                ? 'bg-red-500 text-white scale-100'
                 : 'bg-white/90 text-gray-600 hover:bg-red-50 scale-0 group-hover:scale-100'
             }`}
+            aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
           >
             <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
           </button>

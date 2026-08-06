@@ -5,7 +5,7 @@ export const authService = {
   async login(identifier, password) {
     try {
       const res = await client.post(endpoints.auth.login, {
-        login: identifier, 
+        email: identifier, 
         clave: password,   
       });
       return { success: true, data: res.data };

@@ -12,7 +12,7 @@ export class CargoService {
     private cargoRepository: Repository<Cargo>,
   ) { }
 
-  async createCargo(createCargoDto: CreateCargoDto) {
+  async create(createCargoDto: CreateCargoDto) {
     try {
       const newCargo = this.cargoRepository.create(createCargoDto);
       return await this.cargoRepository.save(newCargo);
@@ -23,7 +23,7 @@ export class CargoService {
     }
   }
 
-  async getCargos() {
+  async findAll() {
     try {
       return await this.cargoRepository.find();
     } catch (error) {
@@ -33,7 +33,7 @@ export class CargoService {
     }
   }
 
-  async getCargo(id: number) {
+  async findOne(id: number) {
     try {
       const cargoFound = await this.cargoRepository.findOne({ where: { idCargo: id } });
       if (!cargoFound) {
@@ -50,7 +50,7 @@ export class CargoService {
     }
   }
 
-  async updateCargo(id: number, updateCargoDto: UpdateCargoDto) {
+  async update(id: number, updateCargoDto: UpdateCargoDto) {
     try {
       const cargoFound = await this.cargoRepository.findOne({
         where: { idCargo: id },
@@ -70,7 +70,7 @@ export class CargoService {
     }
   }
 
-  async deleteCargo(idCargo: number) {
+  async remove(idCargo: number) {
     try {
       const deleteResult = await this.cargoRepository.delete(idCargo);
 

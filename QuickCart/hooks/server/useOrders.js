@@ -1,6 +1,6 @@
 "use client"
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { orderService } from '@/lib/api/orderService';
+import ordersService from '@/services/orders.service';
 
 // ============================================
 // QUERIES (GET - Lectura)
@@ -12,7 +12,7 @@ import { orderService } from '@/lib/api/orderService';
 export function useOrders(token) {
   return useQuery({
     queryKey: ['orders', token],
-    queryFn: () => orderService.getAll(token),
+    queryFn: () => ordersService.getAllOrders(token),
     enabled: !!token,
     staleTime: 2 * 60 * 1000, // 2 minutos
   });
@@ -24,7 +24,7 @@ export function useOrders(token) {
 export function useOrder(id, token) {
   return useQuery({
     queryKey: ['order', id],
-    queryFn: () => orderService.getById(id, token),
+    queryFn: () => ordersService.getOrderById(id, token),
     enabled: !!id && !!token,
     staleTime: 1 * 60 * 1000,
   });
@@ -41,9 +41,8 @@ export function useCreateOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ orderData, token }) => orderService.create(orderData, token),
+    mutationFn: ({ orderData, token }) => ordersService.createOrder(orderData, token),
     onSuccess: (_, variables) => {
-      // Invalidar órdenes y carrito
       queryClient.invalidateQueries({ queryKey: ['orders', variables.token] });
       queryClient.invalidateQueries({ queryKey: ['cart', variables.token] });
     },
@@ -57,7 +56,7 @@ export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, status, token }) => orderService.updateStatus(id, status, token),
+    mutationFn: ({ id, status, token }) => ordersService.updateOrderStatus(id, status, token),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['orders', variables.token] });
       queryClient.invalidateQueries({ queryKey: ['order', variables.id] });
@@ -72,7 +71,7 @@ export function useCancelOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, token }) => orderService.cancel(id, token),
+    mutationFn: ({ id, token }) => ordersService.cancelOrder(id, token),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['orders', variables.token] });
       queryClient.invalidateQueries({ queryKey: ['order', variables.id] });

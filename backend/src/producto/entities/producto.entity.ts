@@ -17,7 +17,7 @@ import { Garantia } from "../../garantia/entities/garantia.entity";
 import { ProductoTipoProducto } from "src/producto-tipo-producto/entities/producto-tipo-producto.entity";
 import { ProductoColor } from "src/producto-color/entities/producto-color.entity";
 import { CarritoItem } from "../../carrito-item/entities/carrito-item.entity"; 
-import { Favoritos } from "../../favoritos/entities/favoritos.entity";
+import { FavoritosItem } from "src/favoritos-item/entities/favoritos-item.entity";
 
 @Index("fk_producto_marca_2", ["idMarca"], {})
 @Entity("producto", { schema: "sarcos_db" })
@@ -42,8 +42,8 @@ export class Producto {
   })
   descripcion: string | null;
 
-  @Column("int", { name: "stock", default:0, nullable: true })
-  stock: number | null;
+  @Column("int", { name: "stock", default:0, nullable: false })
+  stock: number;
 
   @Column("varchar", { name: "imagen", nullable: true, length: 255 })
   imagen: string | null;
@@ -121,6 +121,6 @@ export class Producto {
   carritoItems: CarritoItem[];
 
   // Relación con Favorito
-  @OneToMany(() => Favoritos, (favoritos) => favoritos.producto)
-  favoritos: Favoritos[];
+  @OneToMany(() => FavoritosItem, (favoritosItem) => favoritosItem.producto)
+  favoritosItems: FavoritosItem[];
 }

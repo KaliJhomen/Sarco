@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { User, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, Phone } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, Phone, IdCard } from 'lucide-react';
 import AuthHeader from './AuthHeader';
 import { assets } from '@/assets/assets';
 import { authService } from '@/services/auth.service';
@@ -20,8 +20,9 @@ export const RegisterForm = () => {
     nombre: '',
     email: '',
     telefono: '',
-    password: '',
+    clave: '',
     confirmPassword: '',
+    numeroDocumento: '',
     acceptTerms: false
   });
 
@@ -46,11 +47,11 @@ export const RegisterForm = () => {
 
     if (formData.telefono && !/^\d{9}$/.test(formData.telefono)) newErrors.telefono = 'Ingrese un número de teléfono válido';
 
-    if (!formData.password) newErrors.password = 'La contraseña es requerida';
-    else if (formData.password.length < 8) newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
-    else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) newErrors.password = 'Debe contener mayúscula, minúscula y número';
+    if (!formData.clave) newErrors.clave = 'La contraseña es requerida';
+    else if (formData.clave.length < 8) newErrors.clave = 'La contraseña debe tener al menos 8 caracteres';
+    else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.clave)) newErrors.clave = 'Debe contener mayúscula, minúscula y número';
 
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    if (formData.clave !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
 
 
     setErrors(newErrors);
@@ -66,9 +67,11 @@ export const RegisterForm = () => {
 
     try {
       const payload = {
-        name: formData.nombre,
+        nombre: formData.nombre,
         email: formData.email,
-        password: formData.password,
+        clave: formData.clave,
+        numeroDocumento: formData.numeroDocumento,
+        telefono: formData.telefono
       };
 
       const result = await authService.register(payload);
@@ -161,6 +164,7 @@ export const RegisterForm = () => {
                 required
                 className={`w-full pl-11 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-300 ${errors.nombre ? 'border-red-500 shake' : 'border-gray-300'}`}
                 value={formData.nombre}
+                placeholder= "Correo"
                 onChange={(e) => handleChange('nombre', e.target.value)}
               />
             </div>
@@ -178,6 +182,7 @@ export const RegisterForm = () => {
                 required
                 className={`w-full pl-11 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-300 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                 value={formData.email}
+                placeholder= "Email"
                 onChange={(e) => handleChange('email', e.target.value)}
               />
             </div>
@@ -195,10 +200,29 @@ export const RegisterForm = () => {
                 className={`w-full pl-11 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-300 ${errors.telefono ? 'border-red-500' : 'border-gray-300'}`}
                 value={formData.telefono}
                 onChange={(e) => handleChange('telefono', e.target.value)}
+                placeholder= "Teléfono"
                 maxLength="9"
               />
             </div>
             {errors.telefono && <p className="text-red-500 text-xs mt-1 animate-fade-in">{errors.telefono}</p>}
+          </div>
+
+          <div className="animate-slide-up animation-delay-400">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Numero de DNI <span className="text-gray-400 text-xs"></span>
+            </label>
+            <div className="relative">
+              <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="id"
+                className={`w-full pl-11 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-300 ${errors.numeroDocumento ? 'border-red-500' : 'border-gray-300'}`}
+                value={formData.numeroDocumento}
+                onChange={(e) => handleChange('numeroDocumento', e.target.value)}
+                placeholder= "Número de Documento"
+                maxLength="9"
+              />
+            </div>
+            {errors.numeroDocumento && <p className="text-red-500 text-xs mt-1 animate-fade-in">{errors.numeroDocumento}</p>}
           </div>
 
           <div className="animate-slide-up animation-delay-500">
@@ -208,19 +232,20 @@ export const RegisterForm = () => {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? 'text' : 'clave'}
                 required
-                className={`w-full pl-11 pr-11 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-300 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
-                value={formData.password}
-                onChange={(e) => handleChange('password', e.target.value)}
+                className={`w-full pl-11 pr-11 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-300 ${errors.clave ? 'border-red-500' : 'border-gray-300'}`}
+                value={formData.clave}
+                placeholder= "Contraseña"
+                onChange={(e) => handleChange('clave', e.target.value)}
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            {errors.password && <p className="text-red-500 text-xs mt-1 animate-fade-in">{errors.password}</p>}
+            {errors.clave && <p className="text-red-500 text-xs mt-1 animate-fade-in">{errors.clave}</p>}
 
-            {formData.password && (
+            {formData.clave && (
               <div className="mt-2 animate-fade-in">
                 <div className="flex gap-1 mb-1">
                   {[1,2,3,4,5].map((level) => (
@@ -243,6 +268,7 @@ export const RegisterForm = () => {
                 required
                 className={`w-full pl-11 pr-11 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-300 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}
                 value={formData.confirmPassword}
+                placeholder= "Confirmar Contraseña"
                 onChange={(e) => handleChange('confirmPassword', e.target.value)}
               />
               <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">

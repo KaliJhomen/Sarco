@@ -1,9 +1,12 @@
 'use client';
-import React, { createContext, useState, useEffect } from 'react';
+
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth.service';
 
 export const AuthContext = createContext();
+
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
@@ -12,27 +15,27 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+  
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token');
-      
+      console.log("TOKEN:", token);
       if (!token) {
         setLoading(false);
         return;
       }
-
       const result = await authService.getProfile(token);
-      console.log('Datos recibidos del backend:', result.data);
       if (result.success) {
-        setUser(result.data);
-        console.log('Estado user en AuthContext:', result.data); // Verifica el estado almacenado
+        setUser(result.data.user);
         setIsAuthenticated(true);
       } else if (result.error === 'TokenExpiredError') {
-        // Si el token ha expirado, intenta renovarlo
+        // Si el token ha expirado, intenta renovarlo 
+
         const refreshResult = await authService.refreshToken(token);
+    
         if (refreshResult.success) {
           const { token: newToken, user } = refreshResult.data;
           localStorage.setItem('auth-token', newToken);
@@ -45,7 +48,6 @@ export const AuthProvider = ({ children }) => {
         clearAuth();
       }
     } catch (error) {
-      console.error('Error verificando autenticación:', error);
       clearAuth();
     } finally {
       setLoading(false);
@@ -54,13 +56,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password, rememberMe = false) => {
     const result = await authService.login(email, password);
-
+    
     if (result.success) {
       const { token, user } = result.data;
-
-      console.log('Datos del usuario recibidos en login:', user); // Verifica los datos del login
-
-      // Guardar token
       if (rememberMe) {
         localStorage.setItem('auth-token', token);
       } else {
@@ -68,15 +66,11 @@ export const AuthProvider = ({ children }) => {
       }
 
       setUser(user);
+
       console.log('Usuario almacenado en AuthContext después de login:', user); // Verifica los datos almacenados
       setIsAuthenticated(true);
 
-      // Redirigir según rol
-      if (user.role === 'admin') {
-        router.push('/admin');
-      } else {
-        router.push('/');
-      }
+      router.push('/');
 
       return { success: true };
     }
@@ -145,4 +139,5 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+
 };

@@ -7,11 +7,19 @@ export class RegisterDto {
     name?: string;
 
     @IsEmail()
-    email: string;
+    email!: string;
+    /*
+    @IsString()
+    @MinLength(9)
+    phone!: string;
 
+    @IsString()
+    @MinLength(1)
+    document!: string;
+    */
     @Transform(({value}) => value.trim())
     @IsString()
-    @MinLength(6)
-    password: string;
+    @MinLength(8)
+    password!: string;
 
 }

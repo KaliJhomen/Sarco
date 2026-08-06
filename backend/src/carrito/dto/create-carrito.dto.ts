@@ -1,14 +1,19 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsInt, Min, IsOptional } from "class-validator";
+import { IsInt, Min, IsOptional, IsString } from "class-validator";
 
 export class CreateCarritoDto {
-  @ApiProperty({ example: 123, description: 'ID del producto a agregar' })
+  @ApiProperty({description: 'ID del producto a agregar' })
   @IsInt()
   idProducto: number;
 
-  @ApiPropertyOptional({ example: 1, description: 'Cantidad del producto' })
+  @ApiPropertyOptional({description: 'Cantidad del producto' })
   @IsInt()
   @Min(1)
   @IsOptional()
   quantity?: number = 1;
+
+  @ApiPropertyOptional({description: 'Token de sesión para carritos de invitados' })
+  @IsString()
+  @IsOptional()
+  sessionToken?: string;
 }

@@ -21,11 +21,12 @@ import {
 import { useProduct } from "@/hooks/server/useProducts";
 import { useAddToCart } from "@/hooks/server/useCart"; 
 import { formatPrice } from '@/utils/helpers/formatters';
+import { getOrCreateSessionToken } from "@/utils/constants/session";
 
 const Product = () => {
   const { id } = useParams();
   const router = useRouter();
-  const { addToCart } = useAppContext();
+  const { user } = useAppContext();
 
   // Obtener producto con todas sus relaciones
   const { data: productData, isLoading, error } = useProduct(id);
@@ -40,7 +41,6 @@ const Product = () => {
   const [imageError, setImageError] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-  // Seleccionar primer color disponible
   useEffect(() => {
     if (productData?.productoColores?.length > 0) {
       const primerColorConStock = productData.productoColores.find(c => c.stock > 0);
@@ -70,7 +70,7 @@ const Product = () => {
       </div>
     );
   }
-
+  // error producto no encontrado 
   if (error || !productData) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6">
@@ -180,7 +180,6 @@ const Product = () => {
   };
 
   const getFriendlyCartError = (err) => {
-    const status = err?.response?.status;
     const rawMessage =
       err?.response?.data?.message ||
       err?.message ||
@@ -188,22 +187,12 @@ const Product = () => {
 
     const text = Array.isArray(rawMessage) ? rawMessage.join(" ") : String(rawMessage);
 
-    if (
-      status === 401 ||
-      status === 403 ||
-      /unauthorized|token|jwt|no autenticado|forbidden|login/i.test(text)
-    ) {
-      return {
-        message: "Para agregar productos al carrito, primero inicia sesión.",
-        shouldRedirect: true,
-      };
-    }
-
     return {
       message: text || "No se pudo agregar al carrito. Inténtalo nuevamente.",
       shouldRedirect: false,
     };
   };
+
 
   // Handlers
   const handleAddToCart = async () => {
@@ -223,15 +212,34 @@ const Product = () => {
     }
 
     try {
-      await addToCartMutation.mutateAsync({
+      const token = getOrCreateSessionToken();
+
+      const payload = {
         idProducto: Number(idProducto),
         quantity: cantidad,
-        precioUnitario: precioFinal, // ← Añade el precio unitario aquí
-      });
+        sessionToken: !user ? token : undefined,
+      };
 
+      console.log("PAYLOAD FINAL:", payload);
+
+      await addToCartMutation.mutateAsync(payload);
+/*
+      const payload = {
+        idProducto: Number(idProducto),
+        quantity: cantidad,
+        precioUnitario: precioFinal,
+      };
+
+      // Si el usuario no está autenticado, agrega el sessionToken
+      if (!user) {
+        payload.sessionToken = getOrCreateSessionToken();
+      }
+
+      await addToCartMutation.mutateAsync(payload);
+*/
       setNotification(`${cantidad}x ${nombre} agregado al carrito`);
     } catch (err) {
-      const { message, shouldRedirect } = getFriendlyCartError(err);
+      const {message, shouldRedirect} = getFriendlyCartError(err);
       setNotification(message);
 
       if (shouldRedirect) {
@@ -244,7 +252,7 @@ const Product = () => {
     setIsFavorite(!isFavorite);
     setNotification(isFavorite ? "💔 Quitado de favoritos" : "❤️ Agregado a favoritos");
   };
-
+  //Compartir producto
   const handleShare = async () => {
     try {
       if (navigator.share) {
@@ -278,7 +286,7 @@ const Product = () => {
       );
     }
   };
-
+/*
   const handleGoToLogin = () => {
     const redirect = encodeURIComponent(window.location.pathname);
     setShowLoginPrompt(false);
@@ -288,38 +296,13 @@ const Product = () => {
   const handleStayHere = () => {
     setShowLoginPrompt(false);
   };
-
+*/
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Notificación Toast */}
       {notification && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-4 rounded-lg shadow-2xl z-50 animate-fade-in-down max-w-md">
           <p className="text-center font-medium">{notification}</p>
-        </div>
-      )}
-
-      {showLoginPrompt && (
-        <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">¿Deseas iniciar sesión?</h3>
-            <p className="text-gray-600 mb-6">
-              Para agregar productos al carrito necesitas iniciar sesión.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={handleStayHere}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                Seguir navegando
-              </button>
-              <button
-                onClick={handleGoToLogin}
-                className="px-4 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700"
-              >
-                Iniciar sesión
-              </button>
-            </div>
-          </div>
         </div>
       )}
 

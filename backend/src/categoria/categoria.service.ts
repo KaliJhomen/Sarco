@@ -27,7 +27,7 @@ export class CategoriaService {
     }
   }
 
-  async getCategorias() {
+  async findAll() {
     try {
       return await this.categoriaRepository.find({
         relations: ['subCategorias'], // ✅ Verificar nombre correcto en entidad
@@ -41,7 +41,7 @@ export class CategoriaService {
     }
   }
 
-  async getCategoria(id: number) {
+  async findOne(id: number) {
     try {
       const categoriaFound = await this.categoriaRepository.findOne({
         where: { idCategoria: id },
@@ -63,7 +63,7 @@ export class CategoriaService {
     }
   }
 
-  async updateCategoria(id: number, updateCategoriaDto: UpdateCategoriaDto) {
+  async update(id: number, updateCategoriaDto: UpdateCategoriaDto) {
     try {
       const categoriaFound = await this.categoriaRepository.findOne({
         where: { idCategoria: id }
@@ -86,7 +86,7 @@ export class CategoriaService {
     }
   }
 
-  async deleteCategoria(id: number) {
+  async remove(id: number) {
     try {
       // Verificar que existe primero
       const categoriaFound = await this.categoriaRepository.findOne({

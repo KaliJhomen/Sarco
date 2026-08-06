@@ -8,7 +8,7 @@ export const useLoginForm = () => {
   
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
+    clave: '',
     rememberMe: false
   });
 
@@ -24,7 +24,7 @@ export const useLoginForm = () => {
 
     const result = await login(
       formData.email, 
-      formData.password, 
+      formData.clave, 
       formData.rememberMe
     );
 

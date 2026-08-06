@@ -1,5 +1,5 @@
 // backend/src/anuncio/entities/anuncio.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn } from 'typeorm';
 
 @Entity('anuncio', {schema: 'sarcos_db'})
 export class Anuncio {
@@ -20,9 +20,9 @@ export class Anuncio {
   @Column('boolean', { default: true })
   estado: boolean;
 
-  @Column('datetime', { default: () => 'CURRENT_TIMESTAMP' })
-  fechaCreacion: Date;
+  @CreateDateColumn({name: 'created_at'})
+  createdAt: Date;
 
-  @Column('datetime', { nullable: true })
-  fechaModificacion: Date;
+  @UpdateDateColumn({name: 'updated_at'})
+  updatedAt: Date;
 }

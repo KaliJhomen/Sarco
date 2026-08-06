@@ -13,7 +13,7 @@ export class AgendaService {
     private agendaRepository: Repository<Agenda>,
   ) { }
 
-  async createAgenda(createAgendaDto: CreateAgendaDto) {
+  async create(createAgendaDto: CreateAgendaDto) {
     try {
       const newAgenda = this.agendaRepository.create(createAgendaDto);
       return await this.agendaRepository.save(newAgenda);
@@ -25,7 +25,7 @@ export class AgendaService {
   }
 
 
-  async getAgendas() {
+  async findAll() {
     try {
       return await this.agendaRepository.find({
         relations: ['idUsuario2'],
@@ -43,7 +43,7 @@ export class AgendaService {
     }
   }
 
-  async getAgenda(id: number) {
+  async findOne(id: number) {
     try {
       const agendaFound = await this.agendaRepository.findOne({
         where: { id },
@@ -70,7 +70,7 @@ export class AgendaService {
   }
 
 
-  async updateAgenda(id: number, updateAgendaDto: UpdateAgendaDto) {
+  async update(id: number, updateAgendaDto: UpdateAgendaDto) {
     try {
       const agendaFound = await this.agendaRepository.findOneBy({ id });
 
@@ -110,7 +110,7 @@ export class AgendaService {
     }
   }
 
-  async deleteAgenda(id: number) {
+  async remove(id: number) {
     try {
       const result = await this.agendaRepository.delete(id);
 

@@ -6,29 +6,45 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { useCart, useAddToCart, useUpdateCartQuantity, useRemoveFromCart } from "@/hooks/server/useCart";
 
+import {AuthContext} from "@/context/AuthContext"
+
+import { getOrCreateSessionToken } from "@/utils/constants/session";
+
 const Cart = () => {
-  const idUser = 1; // Reemplaza con el ID del usuario autenticado
-  const { data: cartData, isLoading, error } = useCart(idUser);
+  console.log("CART COMPONENT RENDER");
+  const {user} = useAuth();
+  const sessionToken= user ? undefined : getOrCreateSessionToken();
+
+  const { data: cartData, isLoading, error } = useCart({
+    sessionToken  
+});
+  console.log("CART DATA:", cartData);
+  const items = cartData?.items || [];
+
   const addToCartMutation = useAddToCart();
   const updateCartQuantityMutation = useUpdateCartQuantity();
   const removeFromCartMutation = useRemoveFromCart();
 
-  const items = cartData || [];
+
 
   const handleAddToCart = (idProducto) => {
-    addToCartMutation.mutate({ idUser, idProducto, quantity: 1 });
+    addToCartMutation.mutate({ 
+      sessionToken: user ? undefined : sessionToken,
+      idProducto, 
+      quantity: 1 
+    });
   };
 
   const handleUpdateCartQuantity = (idProducto, quantity) => {
     if (quantity <= 0) {
-      removeFromCartMutation.mutate({ idUser, idProducto });
+      removeFromCartMutation.mutate({ idUser: user?.id, sessionToken, idProducto });
     } else {
-      updateCartQuantityMutation.mutate({ idUser, idProducto, quantity });
+      updateCartQuantityMutation.mutate({ idUser: user?.id, sessionToken, idProducto, quantity });
     }
   };
 
   const handleRemoveFromCart = (idProducto) => {
-    removeFromCartMutation.mutate({ idUser, idProducto });
+    removeFromCartMutation.mutate({ idUser: user?.id, sessionToken, idProducto });
   };
 
   if (isLoading) {
@@ -91,11 +107,11 @@ const Cart = () => {
                 </tr>
               </thead>
               <tbody>
-                {items.map(({ id, producto, cantidad }) => {
+                {items.map(({ idCarritoItem, producto, cantidad }) => {
                   if (!cantidad) return null;
                   const imageSrc = producto.imagen || "/productos/placeholder.svg";
                   return (
-                    <tr key={id}>
+                    <tr key={idCarritoItem} className="border-b border-gray-200">
                       <td className="flex items-center gap-4 py-4 md:px-4 px-1">
                         <div>
                           <div className="rounded-lg overflow-hidden bg-gray-500/10 p-2">

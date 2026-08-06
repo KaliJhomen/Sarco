@@ -17,13 +17,13 @@ export class ClienteController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiBody({ type: CreateClienteDto })
   create(@Body() createClienteDto: CreateClienteDto) {
-    return this.clienteService.createCliente(createClienteDto);
+    return this.clienteService.create(createClienteDto);
   }
 
   @Get()
   async findAll(@Query() query) {
     // query: q, nombre, numeroDocumento, idDocumento, direccion, referencia, telefono, email, estado, page, limit, sortBy, sortOrder
-    return this.clienteService.findWithFilters(query);
+    return this.clienteService.findAll();
   }
 
   @Post('filter')
@@ -43,7 +43,7 @@ export class ClienteController {
   @ApiResponse({ status: 200, description: 'Cliente encontrado' })
   @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
   getCliente(@Param('id') id: string) {
-    return this.clienteService.getCliente(+id);
+    return this.clienteService.findOneWithRelations(+id);
   }
 
   @Patch(':id')
@@ -53,7 +53,7 @@ export class ClienteController {
   @ApiResponse({ status: 400, description: 'Cliente no encontrado' })
   @ApiBody({ type: UpdateClienteDto })
   update(@Param('id') id: string, @Body() updateClienteDto: UpdateClienteDto) {
-    return this.clienteService.updateCliente(+id, updateClienteDto);
+    return this.clienteService.update(+id, updateClienteDto);
   }
 
   @Delete(':id')
@@ -62,6 +62,6 @@ export class ClienteController {
   @ApiResponse({ status: 200, description: 'Cliente eliminado correctamente' })
   @ApiResponse({ status: 400, description: 'Cliente no encontrado' })
   remove(@Param('id') id: string) {
-    return this.clienteService.deleteCliente(+id);
+    return this.clienteService.remove(+id);
   }
 }

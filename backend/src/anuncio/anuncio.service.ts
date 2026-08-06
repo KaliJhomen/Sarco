@@ -17,7 +17,7 @@ export class AnuncioService {
     return await this.anuncioRepository.save(anuncio);
   }
 
-  async getAnuncios() {
+  async findAll() {
     return await this.anuncioRepository.find({
       where: { estado: true },
       order: { orden: 'ASC' },
@@ -40,7 +40,7 @@ export class AnuncioService {
     const anuncio = await this.findOne(id);
     
     Object.assign(anuncio, updateAnuncioDto);
-    anuncio.fechaModificacion = new Date();
+    anuncio.updatedAt = new Date();
     
     return await this.anuncioRepository.save(anuncio);
   }

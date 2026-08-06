@@ -5,8 +5,10 @@ import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth.guard';
 import type { Response } from 'express';
-import express from 'express';
-import { UserService } from 'src/user/user.service';
+
+import { UserService } from '../user/user.service';
+
+import { CarritoService } from '../carrito/carrito.service';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -14,16 +16,19 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly carritoService: CarritoService,
   ) {}
 
   @Post('login')
-  @ApiOperation({ summary: 'Login usuario (tabla user)' })
+  @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiBody({ type: LoginDto })
   async login(@Body() body: LoginDto, @Res() res: Response) {
     const { token, user } = await this.authService.login(body);
+    const userDB = await this.userService.findOne(user.idUser);
 
-    // Obtener el usuario completo con relaciones
-    const usuarioCompleto = await this.userService.findOne(user.id);
+    if (body.sessionToken) {
+      await this.carritoService.mergeGuestCart(user.idUser, body.sessionToken);
+    }
 
     res.cookie('token', token, {
       httpOnly: true,
@@ -33,8 +38,14 @@ export class AuthController {
       maxAge: 60 * 1000 * 60,
     });
 
-    // Devuelve el usuario completo
-    return res.json({ user: usuarioCompleto });
+    return res.json({
+      token,
+      user: {
+        id: userDB.idUser,
+        name: userDB.name,
+        email: userDB.email,
+      },
+    });
   }
 
   @Post('logout')
@@ -44,11 +55,11 @@ export class AuthController {
       secure: false,
       sameSite: 'strict',
     });
-    return res.json({ message: 'Logout successful' });
+    return res.json({ message: 'Sesión cerrada' });
   }
 
   @Post('register')
-  @ApiOperation({ summary: 'Registrar nuevo usuario (users table)' })
+  @ApiOperation({ summary: 'Registrar nuevo usuario' })
   @ApiBody({ type: RegisterDto })
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
@@ -56,33 +67,18 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  @ApiOperation({ summary: 'Perfil del usuario (requiere auth)' })
-  async profile(@Request() req) {
-    const userId = req.user.id;
+  @ApiOperation({ summary: 'Perfil del usuario' })
+  async profile(@Request() req: any) {
+    const userId = req.user?.id;
     if (!userId) return {};
 
-    const usuario = await this.userService.findOne(userId);
-
-    // Devuelve toda la información del usuario, incluyendo las relaciones completas
-    const safe = {
-      id: usuario.idUser,
-      nombre: usuario.nombre,
-      email: usuario.email,
-      clave: usuario.clave,
-      rol: usuario.rol,
-      carrito: usuario.carrito,
-      favoritos: usuario.favoritos,
-      /*
-      login: usuario.login,
-      direccion: usuario.direccion,
-      telefono: usuario.telefono,
-      imagen: usuario.imagen,
-      role: usuario.idCargo2?.nombre || null,
-      cargo: usuario.idCargo2 
-      tienda: usuario.idTienda2 || null, 
-      */  
+    const user = await this.userService.findOne(userId);
+    return {
+      user: {
+        id: user.idUser,
+        name: user.name,
+        email: user.email,
+      },
     };
-
-    return safe;
   }
 }

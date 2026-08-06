@@ -18,7 +18,7 @@ export class AgendaController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiBody({ type: CreateAgendaDto })
   create(@Body() createAgendaDto: CreateAgendaDto) {
-    return this.agendaService.createAgenda(createAgendaDto);
+    return this.agendaService.create(createAgendaDto);
   }
 
   @Get()
@@ -26,7 +26,7 @@ export class AgendaController {
   @ApiOperation({ summary: 'Obtener todas las agendas' })
   @ApiResponse({ status: 200, description: 'Lista de agendas devuelta' })
   getAgendas() {
-    return this.agendaService.getAgendas();
+    return this.agendaService.findAll();
   }
 
   @Get(':id')
@@ -41,7 +41,7 @@ export class AgendaController {
   @ApiResponse({ status: 200, description: 'Agenda encontrada' })
   @ApiResponse({ status: 404, description: 'Agenda no encontrada' })
   getAgenda(@Param('id') id: string) {
-    return this.agendaService.getAgenda(+id);
+    return this.agendaService.findOne(+id);
   }
 
   @Patch(':id')
@@ -51,7 +51,7 @@ export class AgendaController {
   @ApiResponse({ status: 400, description: 'Agenda no encontrada' })
   @ApiBody({ type: UpdateAgendaDto })
   update(@Param('id') id: string, @Body() updateAgendaDto: UpdateAgendaDto) {
-    return this.agendaService.updateAgenda(+id, updateAgendaDto);
+    return this.agendaService.update(+id, updateAgendaDto);
   }
   
   @Patch('estado/:id')  
@@ -69,6 +69,6 @@ export class AgendaController {
   @ApiOperation({ summary: 'Eliminar una agenda' })
   @ApiResponse({ status: 200, description: 'Agenda eliminada correctamente' })
   deleteAgenda(@Param('id') id: string) {
-    return this.agendaService.deleteAgenda(+id);
+    return this.agendaService.remove(+id);
   }
 }

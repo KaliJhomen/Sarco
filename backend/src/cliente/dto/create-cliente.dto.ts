@@ -19,6 +19,7 @@ idDocumento?: number | null;
 @IsString()
 @Transform(({ value }) => String(value).trim())
 numeroDocumento: string
+
 @ApiPropertyOptional({ description: 'Dirección del cliente' })
 @IsOptional()
 @IsString()

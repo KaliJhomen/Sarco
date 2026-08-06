@@ -30,7 +30,7 @@ export const LoginForm = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="animate-slide-up animation-delay-200">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Usuario o correo
+              Correo
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors" size={20} />
@@ -40,15 +40,15 @@ export const LoginForm = () => {
                 className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300"
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
-                placeholder="Usuario o correo"
+                placeholder="Correo"
               />
             </div>
           </div>
 
           <PasswordInput
             label="Contraseña"
-            value={formData.password}
-            onChange={(e) => handleChange('password', e.target.value)}
+            value={formData.clave}
+            onChange={(e) => handleChange('clave', e.target.value)}
             animationDelay="animation-delay-300"
           />
 

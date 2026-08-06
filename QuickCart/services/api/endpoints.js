@@ -114,24 +114,42 @@ const endpoints = {
     add: '/carrito',
     update: (idProducto) => `/carrito-item/${idProducto}`,
     remove: (idProducto) => `/carrito-item/${idProducto}`,
-    // clear: '/carrito/limpiar',   // solo si existe en backend
-    // summary: '/carrito/resumen', // solo si existe en backend
+    genToken: '/carrito/share',
+    getShared: (shareToken) => `/carrito/shared/${shareToken}`,
+    // clear: '/carrito/limpiar',
+    // summary: '/carrito/resumen',
+  }, 
+  // ============================================
+  // FAVORITOS
+  // ============================================
+  favorites: {
+    base: '/favoritos',
+    get: '/favoritos', // GET: Obtener todos los favoritos del usuario autenticado
+    add: `/favoritos`, // POST: Agregar producto a favoritos (body: { idProducto })
+    update: (idProducto) => `/favoritos-item/${idProducto}`, // PUT: Actualizar cantidad u otra info
+    remove: (idProducto) => `/favoritos-item/${idProducto}`, // DELETE: Quitar producto de favoritos
+    genToken: '/favoritos/share',
+    getShared: (shareToken) => `/favoritos/shared/${shareToken}`,
   },
+  
   // ============================================
   // ÓRDENES/PEDIDOS
   // ============================================
-  /*
   orders: {
-    base: '/orden',
-    all: '/orden',
-    byId: (id) => `/orden/${id}`,
-    create: '/orden/crear',
-    update: (id) => `/orden/${id}`,
-    cancel: (id) => `/orden/${id}/cancelar`,
-    byUser: (userId) => `/orden/usuario/${userId}`,
-    byStatus: (status) => `/orden/estado/${status}`,
+    base: '/pedido',
+    all: '/pedido',
+    byId: (id) => `/pedido/${id}`,
+    byUser: (userId) => `/pedido/usuario/${userId}`,
+    create: '/pedido',
+    update: (id) => `/pedido/${id}`,
+    cancel: (id) => `/pedido/${id}/cancelar`,
   },
-  */
+  orderDetails: {
+    byOrderId: (pedidoId) => `/pedido/${pedidoId}/detalles`,
+    byId: (detalleId) => `/pedido-detalle/${detalleId}`,
+    update: (detalleId) => `/pedido-detalle/${detalleId}`,
+    delete: (detalleId) => `/pedido-detalle/${detalleId}`,
+  },
   // ============================================
   // AUTENTICACIÓN
   // ============================================
@@ -192,17 +210,7 @@ const endpoints = {
     */
     },
     
-  // ============================================
-  // WISHLIST/FAVORITOS
-  // ============================================
-  /*wishlist: {
-    base: '/favoritos',
-    all: '/favoritos',
-    add: '/favoritos/agregar',
-    remove: (productId) => `/favoritos/${productId}`,
-    check: (productId) => `/favoritos/check/${productId}`,
-  },
-  */
+
   // ============================================
   // CUPONES/DESCUENTOS
   // ============================================
