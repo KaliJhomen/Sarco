@@ -5,11 +5,11 @@ import { CarritoItem } from '../../carrito-item/entities/carrito-item.entity';
 @Entity('carrito')
 export class Carrito {
   @PrimaryGeneratedColumn({ name: 'id_carrito' })
-  idCart!: number;
+  idCarrito!: number;
 
   @ManyToOne(() => Usuario, { nullable: true, onDelete:'CASCADE' })
   @JoinColumn({ name: 'id_usuario' })
-  user?: Usuario;
+  usuario?: Usuario;
 
     //ITEMS
   @OneToMany(() => CarritoItem, (item) => item.cart, {cascade: true})
@@ -21,7 +21,7 @@ export class Carrito {
     length: 36, 
     nullable: true, 
     unique: true })
-  sessionToken?: string | null;
+  tokenSesion?: string | null;
 
   @Column({
     name: 'share_token',
@@ -29,17 +29,17 @@ export class Carrito {
     length: 36,
     nullable: true, 
     unique: true})
-  shareToken?: string | null;
+  tokenCompartir?: string | null;
   
   @Column({
     name: 'expires_at',
     type: 'timestamp',
     nullable: true,})
-  expiresAt!: Date | null;
+  fechaExpiracion!: Date | null;
     
   @CreateDateColumn({name: 'created_at'})
-  createdAt!: Date;
+  fechaCreacion!: Date;
 
   @UpdateDateColumn({name: 'updated_at'})
-  updatedAt!: Date;
+  fechaActualizacion!: Date;
 }

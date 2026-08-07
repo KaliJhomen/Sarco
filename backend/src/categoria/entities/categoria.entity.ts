@@ -4,14 +4,14 @@ import { SubCategoria } from "src/sub-categoria/entities/sub-categoria.entity";
 @Entity("categoria", { schema: "sarcos_db" })
 export class Categoria {
   @PrimaryGeneratedColumn({ type: "int", name: "id_categoria" })
-  idCategoria: number;
+  idCategoria!: number;
 
   @Column("varchar", { name: "nombre", nullable: true, length: 25 })
-  nombre: string | null;
+  nombre!: string | null;
 
   @Column("boolean", { name: "estado", default: () => "'1'" })
-  estado: boolean | null;
+  estado!: boolean | null;
 
   @OneToMany(() => SubCategoria, (subCategoria) => subCategoria.idCategoria2)
-  subCategorias: SubCategoria[];
+  subCategorias!: SubCategoria[];
 }

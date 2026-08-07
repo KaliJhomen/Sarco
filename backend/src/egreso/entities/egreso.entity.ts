@@ -7,26 +7,26 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Tienda } from "../../tienda/entities/tienda.entity";
-import { Usuario } from "../../usuario/entities/usuario.entity";
+import { User } from "../../user/entities/user.entity";
 
-@Index("fk_egreso_usuario_1", ["idUsuario"], {})
+@Index("fk_egreso_user", ["idUser"], {})
 @Index("fk_egreso_tienda", ["idTienda"], {})
 @Entity("egreso", { schema: "sarcos_db" })
 export class Egreso {
   @PrimaryGeneratedColumn({ type: "int", name: "id_egreso" })
-  idEgreso: number;
+  idEgreso!: number;
 
   @Column("int", { name: "id_usuario", nullable: true })
-  idUsuario: number | null;
+  idUsuario!: number | null;
 
   @Column("int", { name: "id_tienda", nullable: true })
-  idTienda: number | null;
+  idTienda!: number | null;
 
   @Column("varchar", { name: "nombre", nullable: true, length: 255 })
-  nombre: string | null;
+  nombre!: string | null;
 
   @Column("varchar", { name: "descripcion", nullable: true, length: 255 })
-  descripcion: string | null;
+  descripcion!: string | null;
 
   @Column("decimal", {
     name: "monto_egreso",
@@ -34,25 +34,25 @@ export class Egreso {
     precision: 20,
     scale: 2,
   })
-  montoEgreso: number | null;
+  montoEgreso!: number | null;
 
   @Column("date", { name: "fecha", nullable: true })
-  fecha: Date | null;
+  fecha!: Date | null;
 
   @Column("varchar", { name: "estado", nullable: true, length: 50 })
-  estado: string | null;
+  estado!: string | null;
 
   @ManyToOne(() => Tienda, (tienda) => tienda.egresos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_tienda", referencedColumnName: "idTienda" }])
-  idTienda2: Tienda;
+  tienda!: Tienda;
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.egresos, {
+  @ManyToOne(() => User, (user) => user.egresos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  idUsuario2: Usuario;
+  @JoinColumn([{ name: "id_user", referencedColumnName: "idUser" }])
+  user!: User;
 }

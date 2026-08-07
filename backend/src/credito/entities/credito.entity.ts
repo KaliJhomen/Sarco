@@ -12,7 +12,7 @@ import { Cliente } from "../../cliente/entities/cliente.entity";
 import { Comprobante } from "../../comprobante/entities/comprobante.entity";
 import { EstadoCredito } from "../../estado-credito/entities/estado-credito.entity";
 import { MetodoPago } from "../../metodo-pago/entities/metodo-pago.entity";
-import { Usuario } from "../../usuario/entities/usuario.entity";
+import { User } from "../../user/entities/user.entity";
 import { DetalleCredito } from "../../detalle-credito/entities/detalle-credito.entity";
 import { Penalidades } from "../../penalidades/entities/penalidade.entity";
 import { PlanPago } from "../../plan-pago/entities/plan-pago.entity";
@@ -130,12 +130,28 @@ export class Credito {
   @Column("varchar", { name: "justificacion", nullable: true, length: 255 })
   justificacion!: string | null;
 
+  @OneToMany(
+    () => DetalleCredito,
+    (detalleCredito) => detalleCredito.credito
+  )
+  detalleCreditos!: DetalleCredito[];
+
+  @OneToMany(() => Penalidades, (penalidades) => penalidades.credito)
+  penalidades!: Penalidades[];
+
+  @OneToMany(() => PlanPago, (planPago) => planPago.credito)
+  planPagos!: PlanPago[];
+
+  @OneToMany(() => TicketCredito, (ticketCredito) => ticketCredito.credito)
+  ticketCreditos!: TicketCredito[];
+
+  
   @ManyToOne(() => Tienda, (tienda) => tienda.creditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_tienda", referencedColumnName: "idTienda" }])
-  idTienda2!: Tienda;
+  tienda!: Tienda;
 
   @ManyToOne(() => Cliente, (cliente) => cliente.creditos, {
     onDelete: "NO ACTION",
@@ -144,14 +160,14 @@ export class Credito {
   @JoinColumn([
     { name: "id_cliente_garante", referencedColumnName: "idCliente" },
   ])
-  idClienteGarante2!: Cliente;
+  clienteGarante!: Cliente;
 
-  @ManyToOne(() => Cliente, (cliente) => cliente.creditos2, {
+  @ManyToOne(() => Cliente, (cliente) => cliente.creditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_cliente", referencedColumnName: "idCliente" }])
-  idCliente2!: Cliente;
+  cliente!: Cliente;
 
   @ManyToOne(() => Comprobante, (comprobante) => comprobante.creditos, {
     onDelete: "NO ACTION",
@@ -160,7 +176,7 @@ export class Credito {
   @JoinColumn([
     { name: "id_comprobante", referencedColumnName: "idComprobante" },
   ])
-  idComprobante2!: Comprobante;
+  comprobante!: Comprobante;
 
   @ManyToOne(() => EstadoCredito, (estadoCredito) => estadoCredito.creditos, {
     onDelete: "NO ACTION",
@@ -169,7 +185,7 @@ export class Credito {
   @JoinColumn([
     { name: "id_estado_credito", referencedColumnName: "idEstadoCredito" },
   ])
-  idEstadoCredito2!: EstadoCredito;
+  estadoCredito!: EstadoCredito;
 
   @ManyToOne(() => MetodoPago, (metodoPago) => metodoPago.creditos, {
     onDelete: "NO ACTION",
@@ -178,27 +194,12 @@ export class Credito {
   @JoinColumn([
     { name: "id_metodo_pago", referencedColumnName: "idMetodoPago" },
   ])
-  idMetodoPago2!: MetodoPago;
+  metodoPago!: MetodoPago;
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.creditos, {
+  @ManyToOne(() => User, (user) => user.creditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  idUsuario2!: Usuario;
-
-  @OneToMany(
-    () => DetalleCredito,
-    (detalleCredito) => detalleCredito.idCredito2
-  )
-  detalleCreditos!: DetalleCredito[];
-
-  @OneToMany(() => Penalidades, (penalidades) => penalidades.idCredito2)
-  penalidades!: Penalidades[];
-
-  @OneToMany(() => PlanPago, (planPago) => planPago.idCredito2)
-  planPagos!: PlanPago[];
-
-  @OneToMany(() => TicketCredito, (ticketCredito) => ticketCredito.idCredito2)
-  ticketCreditos!: TicketCredito[];
+  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
+  usuario!: User;
 }

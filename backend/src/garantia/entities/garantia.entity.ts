@@ -7,40 +7,42 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Producto } from "../../producto/entities/producto.entity";
-import { Cliente } from "./../../cliente/entities/cliente.entity";
 import { Tienda } from "./../../tienda/entities/tienda.entity";
-import { Usuario } from "./../../usuario/entities/usuario.entity";
 import { EstadoGarantia } from '../enums/estado-garantia.enum';
 
-@Index("FK_garantia_usuario", ["idUsuario"], {})
+
+import { User } from "./../../user/entities/user.entity";
+import { Cliente } from "./../../cliente/entities/cliente.entity";
+
+@Index("FK_garantia_user", ["idUser"], {})
 @Index("FK_garantia_cliente", ["idCliente"], {})
 @Index("FK_garantia_producto", ["idProducto"], {})
 @Index("FK_garantia_tienda", ["idTienda"], {})
 @Entity("garantia", { schema: "sarcos_db" })
 export class Garantia {
   @PrimaryGeneratedColumn({ type: "int", name: "id_garantia" })
-  idGarantia: number;
+  idGarantia!: number;
 
   @Column("int", { name: "id_usuario", nullable: true })
-  idUsuario: number | null;
+  idUsuario!: number | null;
 
   @Column("int", { name: "id_cliente", nullable: true })
-  idCliente: number | null;
+  idCliente!: number | null;
 
   @Column("int", { name: "id_producto", nullable: true })
-  idProducto: number | null;
+  idProducto!: number | null;
 
   @Column("int", { name: "id_tienda", nullable: true })
-  idTienda: number | null;
+  idTienda!: number | null;
 
   @Column("text", { name: "descripcion", nullable: true })
-  descripcion: string | null;
+  descripcion!: string | null;
 
   @Column("date", { name: "fecha_ingreso" })
-  fechaIngreso: string;
+  fechaIngreso!: string;
 
   @Column("date", { name: "fecha_devolucion", nullable: true })
-  fechaDevolucion: string | null;
+  fechaDevolucion!: string | null;
 
   @Column("enum", {
     name: "estado",
@@ -48,33 +50,33 @@ export class Garantia {
     enum: EstadoGarantia,
     default: EstadoGarantia.PENDIENTE,  
   })
-  estado: EstadoGarantia | null;
+  estado!: EstadoGarantia | null;
 
   @ManyToOne(() => Producto, (producto) => producto.detalleVentas, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_producto", referencedColumnName: "idProducto" }])
-  idProducto2: Producto;
+  producto!: Producto;
 
   @ManyToOne(() => Cliente, (cliente) => cliente.garantias, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_cliente", referencedColumnName: "idCliente" }])
-  idCliente2: Cliente;
+  cliente!: Cliente;
 
   @ManyToOne(() => Tienda, (tienda) => tienda.garantias, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_tienda", referencedColumnName: "idTienda" }])
-  idTienda2: Tienda;
+  tienda!: Tienda;
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.garantias, {
+  @ManyToOne(() => User, (user) => user.garantias, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  idUsuario2: Usuario;
+  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
+  user!: User;
 }

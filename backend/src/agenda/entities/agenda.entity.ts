@@ -20,42 +20,42 @@ export class Agenda {
   idAgenda!: number;
 
   @Column("int", { name: "id_usuario", nullable: true })
-  idUser!: number | null;
+  idUsuario!: number | null;
   
   @Column("varchar", { name: "titulo", nullable: true, length: 255 })
-  title!: string | null;
+  titulo!: string | null;
 
   @Column("text", { name: "descripcion", nullable: true })
-  description!: string | null;
+  descripcion!: string | null;
 
   @Column("varchar", { name: "tipo_tarea", nullable: true, length: 50 })
-  taskType!: string | null;
+  tipoTarea!: string | null;
 
   @Column("int", {name: "estado", nullable: true, width: 1, default: 1})
-  state!: number | null;
+  estado!: number | null;
 
   @Column("varchar", {name: "color", nullable: true, length: 7, default: "'#007bff'"})
   color!: string | null;
   
   @Column("date", { name: "fecha", nullable: true })
-  date!: Date | null;
+  fecha!: Date | null;
 
   @Column("time", { name: "hora", nullable: true })
-  hour!: string | null;
+  hora!: string | null;
 
   @Column("timestamp", {
     name: "fecha_creacion",
     nullable: true,
     default: () => "CURRENT_TIMESTAMP",
   })
-  createdAt!: Date | null;
+  fechaCreacion!: Date | null;
 
   @Column("timestamp", {
     name: "fecha_actualizacion",
     nullable: true,
     default: () => "CURRENT_TIMESTAMP",
   })
-  updatedAt!: Date | null;
+  fechaActualizacion!: Date | null;
 
   
   @ManyToOne(() => User, (user) => user.agendas, {

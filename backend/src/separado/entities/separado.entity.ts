@@ -10,10 +10,11 @@ import {
 import { DetalleSeparado } from "../../detalle-separado/entities/detalle-separado.entity";
 import { PagoSeparado } from "../../pago-separado/entities/pago-separado.entity";
 import { Comprobante } from "../../comprobante/entities/comprobante.entity";
-import { Cliente } from "../../cliente/entities/cliente.entity";
 import { MetodoPago } from "../../metodo-pago/entities/metodo-pago.entity";
-import { Usuario } from "../../usuario/entities/usuario.entity";
 import { Tienda } from "../../tienda/entities/tienda.entity";
+
+import { User } from "../../user/entities/user.entity";
+import { Cliente } from "../../cliente/entities/cliente.entity";
 
 @Index("fk_credito_cliente_4", ["idCliente"], {})
 @Index("id_usuario", ["idUsuario"], {})
@@ -23,19 +24,19 @@ import { Tienda } from "../../tienda/entities/tienda.entity";
 @Entity("separado", { schema: "sarcos_db" })
 export class Separado {
   @PrimaryGeneratedColumn({ type: "int", name: "id_separado" })
-  idSeparado: number;
+  idSeparado!: number;
 
   @Column("int", { name: "id_usuario", nullable: true })
-  idUsuario: number | null;
+  idUsuario!: number | null;
 
   @Column("int", { name: "id_cliente", nullable: true })
-  idCliente: number | null;
+  idCliente!: number | null;
 
   @Column("int", { name: "id_metodo_pago", nullable: true })
-  idMetodoPago: number | null;
+  idMetodoPago!: number | null;
 
   @Column("date", { name: "fecha_inicio", nullable: true })
-  fechaInicio: string | null;
+  fechaInicio!: string | null;
 
   @Column("decimal", {
     name: "deuda_total",
@@ -43,7 +44,7 @@ export class Separado {
     precision: 20,
     scale: 2,
   })
-  deudaTotal: string | null;
+  deudaTotal!: string | null;
 
   @Column("decimal", {
     name: "deuda_pagada",
@@ -51,7 +52,7 @@ export class Separado {
     precision: 20,
     scale: 2,
   })
-  deudaPagada: string | null;
+  deudaPagada!: string | null;
 
   @Column("decimal", {
     name: "deuda_restante",
@@ -59,31 +60,32 @@ export class Separado {
     precision: 20,
     scale: 2,
   })
-  deudaRestante: string | null;
+  deudaRestante!: string | null;
 
   @Column("tinyint", { name: "estado", nullable: true })
-  estado: number | null;
+  estado!: number | null;
 
   @Column("varchar", { name: "descripcion", nullable: true, length: 250 })
-  descripcion: string | null;
+  descripcion!: string | null;
 
   @Column("int", { name: "id_comprobante", nullable: true })
-  idComprobante: number | null;
+  idComprobante!: number | null;
 
   @Column("int", { name: "registrar", nullable: true })
-  registrar: number | null;
+  registrar!: number | null;
 
   @Column("int", { name: "id_tienda", nullable: true })
-  idTienda: number | null;
+  idTienda!: number | null;
 
+  
   @OneToMany(
     () => DetalleSeparado,
-    (detalleSeparado) => detalleSeparado.idSeparado2
-  )
-  detalleSeparados: DetalleSeparado[];
+    (detalleSeparado) => detalleSeparado.separado)
+  detalleSeparados!: DetalleSeparado[];
 
-  @OneToMany(() => PagoSeparado, (pagoSeparado) => pagoSeparado.idSeparado2)
-  pagoSeparados: PagoSeparado[];
+  @OneToMany(() => PagoSeparado, (pagoSeparado) => pagoSeparado.separado)
+  pagoSeparados!: PagoSeparado[];
+
 
   @ManyToOne(() => Comprobante, (comprobante) => comprobante.separados, {
     onDelete: "NO ACTION",
@@ -92,14 +94,14 @@ export class Separado {
   @JoinColumn([
     { name: "id_comprobante", referencedColumnName: "idComprobante" },
   ])
-  idComprobante2: Comprobante;
+  idComprobante2!: Comprobante;
 
   @ManyToOne(() => Cliente, (cliente) => cliente.separados, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_cliente", referencedColumnName: "idCliente" }])
-  idCliente2: Cliente;
+  idCliente2!: Cliente;
 
   @ManyToOne(() => MetodoPago, (metodoPago) => metodoPago.separados, {
     onDelete: "NO ACTION",
@@ -108,19 +110,19 @@ export class Separado {
   @JoinColumn([
     { name: "id_metodo_pago", referencedColumnName: "idMetodoPago" },
   ])
-  idMetodoPago2: MetodoPago;
+  metodoPago!: MetodoPago;
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.separados, {
+  @ManyToOne(() => User, (user) => user.separados, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  idUsuario2: Usuario;
+  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
+  user!: User;
 
   @ManyToOne(() => Tienda, (tienda) => tienda.separados, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_tienda", referencedColumnName: "idTienda" }])
-  idTienda2: Tienda;
+  tienda!: Tienda;
 }

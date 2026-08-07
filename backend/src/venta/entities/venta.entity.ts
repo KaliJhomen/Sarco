@@ -8,12 +8,13 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { DetalleVenta } from "../../detalle-venta/entities/detalle-venta.entity";
-import { Cliente } from "../../cliente/entities/cliente.entity";
 import { Comprobante } from "../../comprobante/entities/comprobante.entity";
 import { EstadoVenta } from "../../estado-venta/entities/estado-venta.entity";
 import { MetodoPago } from "../../metodo-pago/entities/metodo-pago.entity";
-import { Usuario } from "../../usuario/entities/usuario.entity";
 import { Tienda } from "../../tienda/entities/tienda.entity";
+
+import { User } from "src/user/entities/user.entity";
+import { Cliente } from "../../cliente/entities/cliente.entity";
 
 @Index("fk_venta_estado_venta_1", ["idEstadoVenta"], {})
 @Index("fk_venta_usuario_2", ["idUsuario"], {})
@@ -24,25 +25,25 @@ import { Tienda } from "../../tienda/entities/tienda.entity";
 @Entity("venta", { schema: "sarcos_db" })
 export class Venta {
   @PrimaryGeneratedColumn({ type: "int", name: "id_venta" })
-  idVenta: number;
+  idVenta!: number;
 
   @Column("int", { name: "id_usuario", nullable: true })
-  idUsuario: number | null;
+  idUsuario!: number | null;
 
   @Column("int", { name: "id_cliente", nullable: true })
-  idCliente: number | null;
+  idCliente!: number | null;
 
   @Column("int", { name: "id_comprobante", nullable: true })
-  idComprobante: number | null;
+  idComprobante!: number | null;
 
   @Column("int", { name: "id_metodo_pago", nullable: true })
-  idMetodoPago: number | null;
+  idMetodoPago!: number | null;
 
   @Column("varchar", { name: "numero_comprobante", nullable: true, length: 50 })
-  numeroComprobante: string | null;
+  numeroComprobante!: string | null;
 
   @Column("datetime", { name: "fecha_hora", nullable: true })
-  fechaHora: Date | null;
+  fechaHora!: Date | null;
 
   @Column("decimal", {
     name: "impuesto",
@@ -50,7 +51,7 @@ export class Venta {
     precision: 20,
     scale: 2,
   })
-  impuesto: string | null;
+  impuesto!: string | null;
 
   @Column("decimal", {
     name: "total_venta",
@@ -58,32 +59,32 @@ export class Venta {
     precision: 20,
     scale: 2,
   })
-  totalVenta: string | null;
+  totalVenta!: string | null;
 
   @Column("int", { name: "id_estado_venta", nullable: true })
-  idEstadoVenta: number | null;
+  idEstadoVenta!: number | null;
 
   @Column("varchar", { name: "garantia_tienda", nullable: true, length: 50 })
-  garantiaTienda: string | null;
+  garantiaTienda!: string | null;
 
   @Column("varchar", { name: "descripcion", nullable: true, length: 50 })
-  descripcion: string | null;
+  descripcion!: string | null;
 
   @Column("int", { name: "registrar", nullable: true })
-  registrar: number | null;
+  registrar!: number | null;
 
   @Column("int", { name: "id_tienda", nullable: true })
-  idTienda: number | null;
+  idTienda!: number | null;
 
-  @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.idVenta2)
-  detalleVentas: DetalleVenta[];
+  @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.venta)
+  detalleVentas!: DetalleVenta[];
 
   @ManyToOne(() => Cliente, (cliente) => cliente.ventas, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_cliente", referencedColumnName: "idCliente" }])
-  idCliente2: Cliente;
+  cliente!: Cliente;
 
   @ManyToOne(() => Comprobante, (comprobante) => comprobante.ventas, {
     onDelete: "NO ACTION",
@@ -92,7 +93,7 @@ export class Venta {
   @JoinColumn([
     { name: "id_comprobante", referencedColumnName: "idComprobante" },
   ])
-  idComprobante2: Comprobante;
+  comprobante!: Comprobante;
 
   @ManyToOne(() => EstadoVenta, (estadoVenta) => estadoVenta.ventas, {
     onDelete: "NO ACTION",
@@ -101,7 +102,7 @@ export class Venta {
   @JoinColumn([
     { name: "id_estado_venta", referencedColumnName: "idEstadoVenta" },
   ])
-  idEstadoVenta2: EstadoVenta;
+  estadoVenta!: EstadoVenta;
 
   @ManyToOne(() => MetodoPago, (metodoPago) => metodoPago.ventas, {
     onDelete: "NO ACTION",
@@ -110,19 +111,19 @@ export class Venta {
   @JoinColumn([
     { name: "id_metodo_pago", referencedColumnName: "idMetodoPago" },
   ])
-  idMetodoPago2: MetodoPago;
+  metodoPago!: MetodoPago;
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.ventas, {
+  @ManyToOne(() => User, (user) => user.ventas, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  idUsuario2: Usuario;
+  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
+  user!: User;
 
   @ManyToOne(() => Tienda, (tienda) => tienda.ventas, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_tienda", referencedColumnName: "idTienda" }])
-  idTienda2: Tienda;
+  tienda!: Tienda;
 }

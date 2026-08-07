@@ -6,22 +6,22 @@ import { Carrito } from '../../carrito/entities/carrito.entity';
 @Unique('uq_carrito_producto', ['carrito', 'producto'])
 export class CarritoItem {
   @PrimaryGeneratedColumn({ name: 'id_carrito_item' })
-  idCartItem!: number;
+  idCarritoItem!: number;
 
   @ManyToOne(() => Carrito, (carrito) => carrito.items, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'id_carrito' })
-  cart!: Carrito;
+  carrito!: Carrito;
 
   @ManyToOne(() => Producto, (producto) => producto.carritoItems, { onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'id_producto' })
-  product!: Producto;
+  producto!: Producto;
 
   @Column("int", { name: 'cantidad', default: 1 })
-  quantity!: number;
+  cantidad!: number;
 
   @CreateDateColumn({name: 'created_at'})
-  createdAt!: Date;
+  fechaCreacion!: Date;
 
   @UpdateDateColumn({name: 'updated_at'})
-  updatedAt!: Date;
+  fechaActualizacion!: Date;
 }

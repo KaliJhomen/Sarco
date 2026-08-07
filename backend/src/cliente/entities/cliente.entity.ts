@@ -23,73 +23,76 @@ import { Venta } from "../../venta/entities/venta.entity";
 @Entity("cliente", { schema: "sarcos_db" })
 export class Cliente {
   @PrimaryGeneratedColumn({ type: "int", name: "id_cliente" })
-  idCliente: number;
+  idCliente!: number;
 
   @Column("varchar", { name: "nombre", nullable: true, length: 255 })
-  nombre: string | null;
+  nombre!: string | null;
 
   @Column("varchar", { name: "clave", nullable: true, length: 255 })
-  clave: string | null;
+  clave!: string | null;
 
   @Column("int", { name: "id_documento", nullable: true })
-  idDocumento: number | null;
+  idDocumento!: number | null;
 
   @Column("varchar", { name: "numero_documento", length: 255, unique: true })
-  numeroDocumento: string | null;
+  numeroDocumento!: string | null;
 
   @Column("varchar", { name: "direccion", nullable: true, length: 255 })
-  direccion: string | null;
+  direccion!: string | null;
 
   @Column("varchar", { name: "referencia", nullable: true, length: 255 })
-  referencia: string | null;
+  referencia!: string | null;
 
   @Column("varchar", { name: "direccion_dni", nullable: true, length: 255 })
-  direccionDni: string | null;
+  direccionDni!: string | null;
 
   @Column("varchar", { name: "telefono", nullable: true, length: 255 })
-  telefono: string | null;
+  telefono!: string | null;
 
   @Column("varchar", { name: "email", nullable: true, length: 255 })
-  email: string | null;
+  email!: string | null;
 
   @Column("int", { name: "id_estado_cliente", nullable: true })
-  idEstadoCliente: number | null;
+  idEstadoCliente!: number | null;
+
+  @OneToMany(() => Favoritos, (favoritos) => favoritos.cliente)
+  favoritos!: Favoritos[];
+
+  @OneToMany(() => Credito, (credito) => credito.clienteGarante)
+  creditos!: Credito[];
+
+  @OneToMany(() => Credito, (credito) => credito.cliente)
+  creditos!: Credito[];
+
+  @OneToMany(() => Garantia, (garantia) => garantia.idCliente2)
+  garantias!: Garantia[];
+
+  @OneToMany(() => Separado, (separado) => separado.idCliente2)
+  separados!: Separado[];
+
+  @OneToMany(() => Servicio, (servicio) => servicio.idCliente2)
+  servicios!: Servicio[];
+
+  @OneToMany(() => Venta, (venta) => venta.idCliente2)
+  ventas!: Venta[];
+
 
   @ManyToOne(() => Documento, (documento) => documento.clientes, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_documento", referencedColumnName: "idDocumento" }])
-  idDocumento2: Documento;
+  documento!: Documento;
 
   @OneToOne(() => Carrito, (carrito) => carrito.cliente)
-  carrito: Carrito;
+  carrito!: Carrito;
 
-  @OneToMany(() => Favoritos, (favoritos) => favoritos.cliente)
-  favoritos: Favoritos[];
+
 
   @ManyToOne(() => EstadoCliente, (estadoCliente) => estadoCliente.clientes, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_estado_cliente", referencedColumnName: "idEstado" }])
-  idEstadoCliente2: EstadoCliente;
-
-  @OneToMany(() => Credito, (credito) => credito.idClienteGarante2)
-  creditos: Credito[];
-
-  @OneToMany(() => Credito, (credito) => credito.idCliente2)
-  creditos2: Credito[];
-
-  @OneToMany(() => Garantia, (garantia) => garantia.idCliente2)
-  garantias: Garantia[];
-
-  @OneToMany(() => Separado, (separado) => separado.idCliente2)
-  separados: Separado[];
-
-  @OneToMany(() => Servicio, (servicio) => servicio.idCliente2)
-  servicios: Servicio[];
-
-  @OneToMany(() => Venta, (venta) => venta.idCliente2)
-  ventas: Venta[];
+  estadoCliente!: EstadoCliente;
 }

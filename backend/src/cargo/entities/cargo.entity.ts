@@ -1,14 +1,14 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Usuario } from "../../usuario/entities/usuario.entity";
+import { User } from "../../user/entities/user.entity";
 
 @Entity("cargo", { schema: "sarcos_db" })
 export class Cargo {
   @PrimaryGeneratedColumn({ type: "int", name: "id_cargo" })
-  idCargo: number;
+  idCargo!: number;
 
   @Column("varchar", { name: "nombre", nullable: true, length: 255 })
-  nombre: string | null;
+  nombre!: string | null;
 
-  @OneToMany(() => Usuario, (usuario) => usuario.idCargo2)
-  usuarios: Usuario[];
+  @OneToMany(() => User, (user) => user.cargo)
+  users!: User[];
 }

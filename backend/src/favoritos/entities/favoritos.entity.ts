@@ -1,55 +1,56 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Cliente } from 'src/cliente/entities/cliente.entity';
+import { Usuario } from 'src/usuario/entities/usuario.entity';
 import { FavoritosItem } from 'src/favoritos-item/entities/favoritos-item.entity';
+import { Producto } from 'src/producto/entities/producto.entity';
 
 @Entity('favoritos')
 export class Favoritos {
-  @PrimaryGeneratedColumn({
-    name: 'id_favoritos' })
-  idFavoritos: number;
+  @PrimaryGeneratedColumn({ name: 'id_favoritos' })
+  idFavoritos!: number;
 
-  @ManyToOne(() => Cliente,{ nullable: true, onDelete: 'CASCADE' })
-  @JoinColumn({ 
-    name: 'id_cliente' })
-  cliente?: Cliente;
   //ITEMS
   @OneToMany(() => FavoritosItem, (item) => item.favoritos, { cascade: true })
-  items: FavoritosItem[];
+  items!: FavoritosItem[];
   //
-  @Column({ 
+  @Column("varchar",{ 
     name: 'session_token', 
-    type: 'varchar', 
     length: 36, 
     nullable: true, 
     unique: true })
   sessionToken?: string | null;
 
-  @Column({
+  @Column( "varchar", {
     name: 'share_token',
-    type: 'varchar',
     length: 36,
     nullable: true, 
     unique: true})
   shareToken?: string | null;
   
-  @Column({
+  @Column( "timestamp",{
     name: 'expires_at',
-    type: 'timestamp',
     nullable: true,})
-  expiresAt: Date | null;
+  expiresAt!: Date | null;
     
   @CreateDateColumn({name: 'created_at'})
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({name: 'updated_at'})
-  updatedAt: Date;
+  updatedAt!: Date;
 
-/*
-  @ManyToOne(() => Favoritos, favoritos => favoritos.items, { onDelete: 'CASCADE' })
+  
+  @ManyToOne(() => Usuario, (usuario) => usuario.favoritos, { nullable: true, 
+    onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_usuario' })
+  usuario?: Usuario;
+
+  @ManyToOne(() => Favoritos, (favoritos) => favoritos.items, { 
+    onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_favoritos' })
-  favoritos: Favoritos;
-  @ManyToOne(() => Producto)
+  favoritos!: Favoritos;
+  
+  @ManyToOne(() => Producto
+, (producto) => producto.favoritosItems, { 
+    onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_producto' })
-  producto: Producto;
-*/
+  producto!: Producto;
 }
