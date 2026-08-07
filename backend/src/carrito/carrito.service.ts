@@ -8,10 +8,9 @@ import { Repository } from 'typeorm';
 import { Carrito } from './entities/carrito.entity';
 import { CarritoItem } from '../carrito-item/entities/carrito-item.entity';
 import { Producto } from '../producto/entities/producto.entity';
-import { Cliente } from '../cliente/entities/cliente.entity';
-import { User } from '../user/entities/user.entity';
 import { randomUUID } from 'crypto';
-
+import { Usuario } from 'src/usuario/entities/usuario.entity';
+type CartIdent = { idUsuario?: number; sessionToken?: string };
 @Injectable()
 export class CarritoService {
   constructor(
@@ -21,246 +20,179 @@ export class CarritoService {
     private readonly cartItemRepository: Repository<CarritoItem>,
     @InjectRepository(Producto)
     private readonly productRepository: Repository<Producto>,
-    @InjectRepository(Cliente)
-    private readonly clientRepository: Repository<Cliente>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
   ) {}
-
-  private async findClienteByUserId(idUser: number): Promise<Cliente> {
-    const user = await this.userRepository.findOne({ where: { id: idUser } });
-    if (!user) throw new NotFoundException('Usuario no encontrado');
-
-    let cliente = await this.clientRepository.findOne({ where: { email: user.email } });
-    if (!cliente) {
-      cliente = this.clientRepository.create({
-        nombre: user.name,
-        email: user.email,
-      });
-      cliente = await this.clientRepository.save(cliente);
-    }
-    return cliente;
-  }
-
-  private async getOrCreateCart(idUser: number): Promise<Carrito> {
-    const cliente = await this.findClienteByUserId(idUser);
-
-    let cart = await this.cartRepository.findOne({
-      where: { cliente: { idCliente: cliente.idCliente } },
-      relations: ['items', 'items.producto'],
-    });
-    if (!cart) {
-      cart = this.cartRepository.create({
-        sessionToken: null,
-        expiresAt: null,
-        cliente,
-      });
-      cart = await this.cartRepository.save(cart);
-      cart.items = [];
-    }
-
-    return cart;
-  }
-
+  ///
+  ///PRIVADOS
+  ///
   private validateId(value: number, field: string) {
     if (!Number.isInteger(value) || value <= 0) {
       throw new BadRequestException(`${field} inválido`);
     }
   }
 
-  async findByUser(ident: { idUser?: number; sessionToken?: string }) {
-    const { idUser, sessionToken } = ident;
-    if (!idUser && !sessionToken) {
+  private async findCart(ident: CartIdent): Promise<Carrito | null> {
+    const { idUsuario, sessionToken } = ident;
+    if (idUsuario) return this.getCart(idUsuario);
+    if (sessionToken) return this.getCartBySession(sessionToken);
+      return null;
+    }
+
+  private async findOrCreateCart(ident: CartIdent): Promise<Carrito> {
+    const carrito = await this.findCart(ident);
+    if (carrito) return carrito;
+
+    const { idUsuario, sessionToken } = ident;
+    if (idUsuario) return this.createCart(idUsuario);
+    if (sessionToken) return this.createGuestCart(sessionToken);
+
+    throw new NotFoundException('No se pudo crear el carrito');
+  }
+
+  private async findCartItem(carrito: Carrito, idProducto: number): Promise<CarritoItem | null> {
+    return this.cartItemRepository.findOne({
+      where: {
+        carrito: { idCarrito: carrito.idCarrito },
+        producto: { idProducto },
+      },
+    });
+  }
+
+
+
+  private async createCart(idUsuario: number): Promise<Carrito> {
+      const carrito = this.cartRepository.create({
+          sessionToken: null,
+          shareToken: null,
+          expiresAt: null,
+          usuario: { idUsuario },
+          items: [],
+        });
+        return this.cartRepository.save(carrito) as Promise<Carrito>;
+    }
+
+  private async getCart(idUsuario: number): Promise<Carrito | null> {
+    return this.cartRepository.findOne({ 
+      where: { usuario: { idUsuario } }, 
+      relations: ['items', 'items.producto'] 
+    });
+  }
+
+  private async getCartBySession(sessionToken: string): Promise<Carrito | null> {
+    return this.cartRepository.findOne({
+      where: { sessionToken },
+      relations: ['items', 'items.producto'],
+    });
+  }
+
+  private async createGuestCart(sessionToken: string): Promise<Carrito> {
+    return this.cartRepository.save(
+      this.cartRepository.create({
+        sessionToken,
+        shareToken: null,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        items: [],
+      })
+    ) as Promise<Carrito>;
+  }
+
+
+  
+  ///
+  ///PUBLICOS 
+  ///
+
+  async updateCartItem(
+    ident: CartIdent,
+    idProducto: number,
+    cantidad: number,
+  ) {
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+      throw new BadRequestException('La cantidad debe ser mayor a 0');
+    }
+
+    const { idUsuario, sessionToken } = ident;
+    if (!idUsuario && !sessionToken) {
+      throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
+    }
+    //let carrito: Carrito | null = null;
+    const carrito = await this.findCart(ident);
+    if (!carrito) {
+      throw new NotFoundException('Carrito no encontrado');
+    }
+    const item = await this.findCartItem(carrito, idProducto);
+    if (!item) throw new NotFoundException(`El producto con ID ${idProducto} no está en el carrito`);
+    item.cantidad = cantidad;
+    return this.cartItemRepository.save(item);
+  }
+
+  async removeFromCart(ident: CartIdent, idProducto: number) {
+    const carrito = await this.findCart(ident); 
+    if (!carrito) {
+      throw new NotFoundException('Carrito no encontrado');
+    }
+    const item = await this.findCartItem(carrito, idProducto);
+    if (!item){throw new NotFoundException(`El producto con ID ${idProducto} no está en el carrito`);
+    }
+    return this.cartItemRepository.remove(item);
+  }
+  async findByUser(ident: CartIdent) {
+    //let carrito: Carrito | null = null;
+
+    const { idUsuario, sessionToken } = ident;
+    if (!idUsuario && !sessionToken) {
       throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
     }
 
-    let cart: Carrito | null = null;
-
-    if (idUser) {
-      const cliente = await this.findClienteByUserId(idUser);
-      this.validateId(cliente.idCliente, 'idCliente');
-      cart = await this.cartRepository.findOne({
-        where: { cliente: { idCliente: cliente.idCliente } },
-        relations: ['items', 'items.producto'],
-      });
-    } else if (sessionToken) {
-      cart = await this.cartRepository.findOne({
-        where: { sessionToken },
-        relations: ['items', 'items.producto'],
-      });
-    }
-
-    if (!cart) {
+    const carrito = await this.findCart(ident);
+    if (!carrito) {
       return {
-        idUser,
-        sessionToken,
+        idUsuario: ident.idUsuario,
+        sessionToken: ident.sessionToken,
         idCarrito: null,
         items: [],
         totalItems: 0,
       };
     }
-
-    const items = cart.items || [];
     return {
-      idUser,
-      sessionToken: cart.sessionToken,
-      idCarrito: cart.idCarrito,
-      items,
-      totalItems: items.reduce((acc, it) => acc + (Number(it.cantidad) || 0), 0),
+      idUsuario: ident.idUsuario,
+      sessionToken: carrito.sessionToken,
+      idCarrito: carrito.idCarrito,
+      items: carrito.items || [],
+      totalItems: (carrito.items || [] ).reduce((acc, it) => acc + (Number(it.cantidad) || 0), 0),
     };
   }
 
   async addToCart(
-    ident: { idUser?: number; sessionToken?: string },
+    ident: CartIdent,
     idProducto: number,
-    quantity: number,
+    cantidad: number,
   ) {
-    const { idUser, sessionToken } = ident;
-    if (!idUser && !sessionToken) {
-      throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
-    }
-
     this.validateId(idProducto, 'idProducto');
-    if (!Number.isInteger(quantity) || quantity <= 0) {
+    //let carrito: Carrito | null = null;
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
       throw new BadRequestException('La cantidad debe ser mayor a 0');
     }
-
-    const product = await this.productRepository.findOne({ where: { idProducto } });
-    if (!product) {
+    const producto = await this.productRepository.findOne({ where: { idProducto } });
+    if (!producto) {
       throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);
     }
-
-    let cart: Carrito | null = null;
-
-    if (idUser) {
-      cart = await this.getOrCreateCart(idUser);
-    } else if (sessionToken) {
-      cart = await this.cartRepository.findOne({
-        where: { sessionToken },
-        relations: ['items', 'items.producto'],
-      });
-      if (!cart) {
-        cart = this.cartRepository.create({
-          sessionToken,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        });
-        cart = await this.cartRepository.save(cart);
-        cart.items = [];
-      }
-    }
-
-    if (!cart) throw new NotFoundException('No se pudo obtener o crear el carrito');
-
-    const existingItem = await this.cartItemRepository.findOne({
-      where: {
-        carrito: { idCarrito: cart.idCarrito },
-        producto: { idProducto },
-      },
-      relations: ['producto'],
-    });
+    const carrito = await this.findOrCreateCart(ident);
+    const existingItem = await this.findCartItem(carrito, idProducto);
 
     if (existingItem) {
-      existingItem.cantidad += quantity;
+      existingItem.cantidad += cantidad;
       return this.cartItemRepository.save(existingItem);
     }
-
-    const newItem = this.cartItemRepository.create({
-      carrito: cart,
-      producto: product,
-      cantidad: quantity,
-    });
-
-    return this.cartItemRepository.save(newItem);
+    return this.cartItemRepository.save(
+      this.cartItemRepository.create({
+        carrito,
+        producto: producto,
+        cantidad: cantidad
+      })
+    );
   }
 
-  async updateCartItem(
-    ident: { idUser?: number; sessionToken?: string },
-    idProducto: number,
-    quantity: number,
-  ) {
-    if (!Number.isInteger(quantity) || quantity <= 0) {
-      throw new BadRequestException('La cantidad debe ser mayor a 0');
-    }
-
-    const { idUser, sessionToken } = ident;
-    if (!idUser && !sessionToken) {
-      throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
-    }
-
-    let cart: Carrito | null = null;
-
-    if (idUser) {
-      const cliente = await this.findClienteByUserId(idUser);
-      cart = await this.cartRepository.findOne({
-        where: { cliente: { idCliente: cliente.idCliente } },
-      });
-    } else if (sessionToken) {
-      cart = await this.cartRepository.findOne({
-        where: { sessionToken },
-      });
-    }
-
-    if (!cart) {
-      throw new NotFoundException('Carrito no encontrado');
-    }
-
-    const existingItem = await this.cartItemRepository.findOne({
-      where: {
-        carrito: { idCarrito: cart.idCarrito },
-        producto: { idProducto },
-      },
-      relations: ['producto'],
-    });
-
-    if (!existingItem) {
-      throw new NotFoundException(`El producto con ID ${idProducto} no está en el carrito`);
-    }
-
-    existingItem.cantidad = quantity;
-    return this.cartItemRepository.save(existingItem);
-  }
-
-  async removeFromCart(
-    ident: { idUser?: number; sessionToken?: string },
-    idProducto: number,
-  ) {
-    const { idUser, sessionToken } = ident;
-    if (!idUser && !sessionToken) {
-      throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
-    }
-
-    let cart: Carrito | null = null;
-
-    if (idUser) {
-      const cliente = await this.findClienteByUserId(idUser);
-      cart = await this.cartRepository.findOne({
-        where: { cliente: { idCliente: cliente.idCliente } },
-      });
-    } else if (sessionToken) {
-      cart = await this.cartRepository.findOne({
-        where: { sessionToken },
-      });
-    }
-
-    if (!cart) {
-      throw new NotFoundException('Carrito no encontrado');
-    }
-
-    const existingItem = await this.cartItemRepository.findOne({
-      where: {
-        carrito: { idCarrito: cart.idCarrito },
-        producto: { idProducto },
-      },
-    });
-
-    if (!existingItem) {
-      throw new NotFoundException(`El producto con ID ${idProducto} no está en el carrito`);
-    }
-
-    return this.cartItemRepository.remove(existingItem);
-  }
-
-  async mergeGuestCart(idUser: number, sessionToken: string) {
+  async mergeGuestCart(idUsuario: number, sessionToken: string) {
     const guestCart = await this.cartRepository.findOne({
       where: { sessionToken },
       relations: ['items', 'items.producto'],
@@ -268,14 +200,13 @@ export class CarritoService {
 
     if (!guestCart) return;
 
-    const cliente = await this.findClienteByUserId(idUser);
     const userCart = await this.cartRepository.findOne({
-      where: { cliente: { idCliente: cliente.idCliente } },
+      where: { usuario: { idUsuario } },
       relations: ['items', 'items.producto'],
     });
 
     if (!userCart) {
-      guestCart.cliente = cliente;
+      guestCart.usuario = { idUsuario } as any;
       guestCart.sessionToken = null;
       guestCart.expiresAt = null;
       await this.cartRepository.save(guestCart);
@@ -299,52 +230,36 @@ export class CarritoService {
     await this.cartRepository.remove(guestCart);
   }
 
-  async generateShareCartLink(ident: { idUser?: number; sessionToken?: string }) {
-    const { idUser, sessionToken } = ident;
-    let cart: Carrito | null = null;
-
-    if (idUser) {
-      const cliente = await this.findClienteByUserId(idUser);
-      cart = await this.cartRepository.findOne({
-        where: { cliente: { idCliente: cliente.idCliente } },
-        relations: ['items', 'items.producto'],
-      });
-    } else if (sessionToken) {
-      cart = await this.cartRepository.findOne({
-        where: { sessionToken },
-        relations: ['items', 'items.producto'],
-      });
-    }
-
-    if (!cart) {
+  async generateShareCartLink(ident: CartIdent) {
+    const carrito = await this.findCart(ident);
+    if (!carrito) {
       throw new NotFoundException('Carrito no encontrado');
     }
-
-    if (!cart.items.length) {
+    if (!carrito.items.length) {
       throw new BadRequestException('El carrito está vacío');
     }
 
-    if (!cart.shareToken) {
-      cart.shareToken = randomUUID();
-      await this.cartRepository.save(cart);
+    if (!carrito.shareToken) {
+      carrito.shareToken = randomUUID();
+      await this.cartRepository.save(carrito);
     }
-    return { url: cart.shareToken };
+    return { url: carrito.shareToken };
   }
 
   async findByShareToken(shareToken: string) {
-    const cart = await this.cartRepository.findOne({
+    const carrito = await this.cartRepository.findOne({
       where: { shareToken },
       relations: ['items', 'items.producto'],
     });
 
-    if (!cart) {
+    if (!carrito) {
       throw new NotFoundException('Carrito compartido no encontrado');
     }
 
     return {
-      idCarrito: cart.idCarrito,
-      items: cart.items,
-      totalItems: cart.items.reduce(
+      idCarrito: carrito.idCarrito,
+      items: carrito.items,
+      totalItems: carrito.items.reduce(
         (acc, it) => acc + (Number(it.cantidad) || 0),
         0,
       ),

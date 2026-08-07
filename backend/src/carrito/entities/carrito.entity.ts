@@ -7,39 +7,38 @@ export class Carrito {
   @PrimaryGeneratedColumn({ name: 'id_carrito' })
   idCarrito!: number;
 
-  @ManyToOne(() => Usuario, { nullable: true, onDelete:'CASCADE' })
-  @JoinColumn({ name: 'id_usuario' })
-  usuario?: Usuario;
-
-    //ITEMS
-  @OneToMany(() => CarritoItem, (item) => item.cart, {cascade: true})
-  items!: CarritoItem[];
-
-  @Column({ 
+  @Column( "varchar", { 
     name: 'session_token', 
-    type: 'varchar', 
     length: 36, 
     nullable: true, 
     unique: true })
-  tokenSesion?: string | null;
+  sessionToken!: string | null;
 
-  @Column({
+  @Column( "varchar", {
     name: 'share_token',
-    type: 'varchar',
     length: 36,
     nullable: true, 
     unique: true})
-  tokenCompartir?: string | null;
+  shareToken!: string | null;
   
-  @Column({
+  @Column( "timestamp",{
     name: 'expires_at',
-    type: 'timestamp',
     nullable: true,})
-  fechaExpiracion!: Date | null;
+  expiresAt!: Date | null;
     
   @CreateDateColumn({name: 'created_at'})
-  fechaCreacion!: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({name: 'updated_at'})
-  fechaActualizacion!: Date;
+  updatedAt!: Date;
+
+
+    //ITEMS
+  @OneToMany(() => CarritoItem, (item) => item.carrito, {cascade: true})
+  items!: CarritoItem[];
+
+
+  @ManyToOne(() => Usuario, { nullable: true, onDelete:'CASCADE' })
+  @JoinColumn({ name: 'id_usuario' })
+  usuario!: Usuario | null;
 }

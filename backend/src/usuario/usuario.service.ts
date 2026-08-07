@@ -15,29 +15,29 @@ export class UsuarioService {
 
   async create(createUsuarioDto: CreateUsuarioDto) {
       const newUser: Usuario = Object.assign(new Usuario(), createUsuarioDto as any);
-    if (createUsuarioDto.password) {
-      newUser.password = await bcryptjs.hash(createUsuarioDto.password, 10);
+    if (createUsuarioDto.clave) {
+      newUser.clave= await bcryptjs.hash(createUsuarioDto.clave, 10);
     }
     return await this.usuarioRepository.save(newUser);
   }
-  async findOne(idUser: number) {
-    const user = await this.usuarioRepository.findOne({
-      where: { idUser: idUser },
-      relations: ['idCargo2', 'idTienda2'],
+  async findOne(id: number) {
+    const usuario = await this.usuarioRepository.findOne({
+      where: { idUsuario: id },
+      relations: ['cargo', 'tienda'],
     });
-    if (!user) throw new NotFoundException(`Usuario ${idUser} no encontrado`);
-    return user;
+    if (!usuario) throw new NotFoundException(`Usuario ${usuario} no encontrado`);
+    return usuario;
   }
   
   findAll() {
     return this.usuarioRepository.find({
-      relations: ['idCargo2', 'idTienda2'],
+      relations: ['cargo', 'tienda'],
     });
   }
   findOneByLogin(login: string) {
     return this.usuarioRepository.findOne({
       where: { login },
-      relations: ['idCargo2'],
+      relations: ['cargo'],
     });
   }
 
@@ -45,9 +45,9 @@ export class UsuarioService {
     return this.usuarioRepository.findOneBy({ email });
   }
 
-  findByImagen(image: string) {
+  findByImagen(imagen: string) {
     return this.usuarioRepository.findOne({
-      where: { image },
+      where: { imagen },
     });
   }
 
@@ -55,13 +55,13 @@ export class UsuarioService {
 
 
   async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    const usuario = await this.usuarioRepository.findOne({ where: { idUser: id } });
+    const usuario = await this.usuarioRepository.findOne({ where: { idUsuario: id } });
     if (!usuario) throw new NotFoundException(`Usuario ${id} no encontrado`);
 
     const toSave = { ...usuario, ...updateUsuarioDto } as any;
 
-    if (updateUsuarioDto.password) {
-      toSave.password = await bcryptjs.hash(updateUsuarioDto.password, 10);
+    if (updateUsuarioDto.clave) {
+      toSave.clave = await bcryptjs.hash(updateUsuarioDto.clave, 10);
     }
 
     await this.usuarioRepository.save(toSave);
@@ -69,7 +69,7 @@ export class UsuarioService {
   }
 
   async remove(id: number) {
-    const res = await this.usuarioRepository.delete({ idUser: id });
+    const res = await this.usuarioRepository.delete({ idUsuario: id });
     if (res.affected === 0) throw new NotFoundException(`Usuario ${id} no encontrado`);
     return { success: true };
   }

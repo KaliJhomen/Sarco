@@ -4,22 +4,22 @@ import { IsEmail, IsString, MinLength } from "class-validator";
 export class RegisterDto {
     @IsString()
     @MinLength(1)
-    name?: string;
+    nombre!: string;
 
     @IsEmail()
     email!: string;
-    /*
+
     @IsString()
     @MinLength(9)
-    phone!: string;
+    telefono?: string | null;
 
     @IsString()
     @MinLength(1)
-    document!: string;
-    */
+    documento?: string | null;
+    
     @Transform(({value}) => value.trim())
     @IsString()
     @MinLength(8)
-    password!: string;
+    clave!: string;
 
 }

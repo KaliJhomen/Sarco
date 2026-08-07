@@ -4,8 +4,7 @@ import { Repository } from 'typeorm';
 import { CarritoItem } from './entities/carrito-item.entity';
 import { Carrito } from '../carrito/entities/carrito.entity';
 import { Producto } from '../producto/entities/producto.entity';
-import { Cliente } from '../cliente/entities/cliente.entity';
-import { User } from '../user/entities/user.entity';
+import { Usuario } from '../usuario/entities/usuario.entity';
 
 @Injectable()
 export class CarritoItemService {
@@ -15,26 +14,25 @@ export class CarritoItemService {
     @InjectRepository(Carrito)
     private readonly cartRepository: Repository<Carrito>,
     @InjectRepository(Producto)
-    private readonly productRepository: Repository<Producto>,
-    @InjectRepository(Cliente)
-    private readonly clientRepository: Repository<Cliente>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly productoRepository: Repository<Producto>,
+
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
   ) {}
 
-  private async findClienteByUserId(idUser: number): Promise<Cliente> {
-    const user = await this.userRepository.findOne({ where: { id: idUser } });
-    if (!user) throw new NotFoundException('Usuario no encontrado');
+  private async findClienteByUserId(idUsuario: number): Promise<Cliente> {
+    const usuario = await this.usuarioRepository.findOne({ where: { idUsuario } });
+    if (!usuario) throw new NotFoundException('Usuario no encontrado');
 
-    let cliente = await this.clientRepository.findOne({ where: { email: user.email } });
-    if (!cliente) {
-      cliente = this.clientRepository.create({
-        nombre: user.name,
-        email: user.email,
+    let usuario = await this.usuarioRepository.findOne({ where: { email: usuario.email } });
+    if (!usuario) {
+      usuario = this.usuarioRepository.create({
+        nombre: usuario.nombre,
+        email: usuario.email,
       });
-      cliente = await this.clientRepository.save(cliente);
+      usuario = await this.usuarioRepository.save(usuario);
     }
-    return cliente;
+    return usuario;
   }
 
   private async getOrCreateCart({ idUser, sessionToken }: { idUser?: number, sessionToken?: string }): Promise<Carrito> {

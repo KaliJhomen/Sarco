@@ -16,7 +16,7 @@ import { CarritoItemService } from './carrito-item.service';
 import { CreateCarritoDto } from '../carrito/dto/create-carrito.dto';
 
 class UpdateCartDto {
-  quantity: number;
+  cantidad: number;
 }
 
 @ApiTags('CarritoItem')
@@ -44,7 +44,7 @@ export class CarritoItemController {
     return this.carritoItemService.addToCart(
       { idUser, sessionToken },
       Number(body.idProducto),
-      Number(body.quantity ?? 1),
+      Number(body.cantidad ?? 1),
     );
   }
 
@@ -60,11 +60,11 @@ export class CarritoItemController {
   ) {
     const idUser = req.user?.id;
     if (!idUser && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
-    if (!body?.quantity) throw new BadRequestException('La cantidad es requerida');
+    if (!body?.cantidad) throw new BadRequestException('La cantidad es requerida');
     return this.carritoItemService.updateCartItem(
       { idUser, sessionToken },
       idProducto,
-      Number(body.quantity),
+      Number(body.cantidad),
     );
   }
 

@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth.guard';
 import type { Response } from 'express';
 
-import { UserService } from '../user/user.service';
+import { UsuarioService } from '../usuario/usuario.service';
 
 import { CarritoService } from '../carrito/carrito.service';
 
@@ -15,7 +15,7 @@ import { CarritoService } from '../carrito/carrito.service';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UserService,
+    private readonly userService: UsuarioService,
     private readonly carritoService: CarritoService,
   ) {}
 
@@ -24,10 +24,10 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   async login(@Body() body: LoginDto, @Res() res: Response) {
     const { token, user } = await this.authService.login(body);
-    const userDB = await this.userService.findOne(user.idUser);
-
+    const userDB = await this.userService.findOne(user.idUsuario);
+    
     if (body.sessionToken) {
-      await this.carritoService.mergeGuestCart(user.idUser, body.sessionToken);
+      await this.carritoService.mergeGuestCart(user.idUsuario, body.sessionToken);
     }
 
     res.cookie('token', token, {
@@ -41,8 +41,8 @@ export class AuthController {
     return res.json({
       token,
       user: {
-        id: userDB.idUser,
-        name: userDB.name,
+        id: userDB.idUsuario,
+        name: userDB.nombre,
         email: userDB.email,
       },
     });
@@ -75,8 +75,8 @@ export class AuthController {
     const user = await this.userService.findOne(userId);
     return {
       user: {
-        id: user.idUser,
-        name: user.name,
+        id: user.idUsuario,
+        name: user.nombre,
         email: user.email,
       },
     };

@@ -6,10 +6,12 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Cliente } from "../../cliente/entities/cliente.entity";
 import { Comprobante } from "../../comprobante/entities/comprobante.entity";
 import { MetodoPago } from "../../metodo-pago/entities/metodo-pago.entity";
+
+
 import { Usuario } from "../../usuario/entities/usuario.entity";
+import { Cliente } from "../../cliente/entities/cliente.entity";
 
 @Index("fk_servicio_usuario_1", ["idUsuario"], {})
 @Index("fk_servicio_cliente_2", ["idCliente"], {})
@@ -18,28 +20,28 @@ import { Usuario } from "../../usuario/entities/usuario.entity";
 @Entity("servicio", { schema: "sarcos_db" })
 export class Servicio {
   @PrimaryGeneratedColumn({ type: "int", name: "id_servicio" })
-  idServicio: number;
+  idServicio!: number;
 
   @Column("int", { name: "id_usuario", nullable: true })
-  idUsuario: number | null;
+  idUsuario!: number | null;
 
   @Column("int", { name: "id_cliente", nullable: true })
-  idCliente: number | null;
+  idCliente!: number | null;
 
   @Column("varchar", { name: "nombre", nullable: true, length: 255 })
-  nombre: string | null;
+  nombre!: string | null;
 
   @Column("varchar", { name: "descripcion", nullable: true, length: 255 })
-  descripcion: string | null;
+  descripcion!: string | null;
 
   @Column("date", { name: "fecha", nullable: true })
-  fecha: string | null;
+  fecha!: string | null;
 
   @Column("int", { name: "id_comprobante", nullable: true })
-  idComprobante: number | null;
+  idComprobante!: number | null;
 
   @Column("int", { name: "id_metodo_pago", nullable: true })
-  idMetodoPago: number | null;
+  idMetodoPago!: number | null;
 
   @Column("decimal", {
     name: "precio",
@@ -47,20 +49,20 @@ export class Servicio {
     precision: 20,
     scale: 2,
   })
-  precio: string | null;
+  precio!: string | null;
 
   @Column("int", { name: "estado", nullable: true })
-  estado: number | null;
+  estado!: number | null;
 
   @Column("varchar", { name: "numero_comprobante", nullable: true, length: 50 })
-  numeroComprobante: string | null;
+  numeroComprobante!: string | null;
 
   @ManyToOne(() => Cliente, (cliente) => cliente.servicios, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_cliente", referencedColumnName: "idCliente" }])
-  idCliente2: Cliente;
+  cliente!: Cliente;
 
   @ManyToOne(() => Comprobante, (comprobante) => comprobante.servicios, {
     onDelete: "NO ACTION",
@@ -69,7 +71,7 @@ export class Servicio {
   @JoinColumn([
     { name: "id_comprobante", referencedColumnName: "idComprobante" },
   ])
-  idComprobante2: Comprobante;
+  comprobante!: Comprobante;
 
   @ManyToOne(() => MetodoPago, (metodoPago) => metodoPago.servicios, {
     onDelete: "NO ACTION",
@@ -78,12 +80,12 @@ export class Servicio {
   @JoinColumn([
     { name: "id_metodo_pago", referencedColumnName: "idMetodoPago" },
   ])
-  idMetodoPago2: MetodoPago;
+  metodoPago!: MetodoPago;
 
   @ManyToOne(() => Usuario, (usuario) => usuario.servicios, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  idUsuario2: Usuario;
+  usuario!: Usuario;
 }

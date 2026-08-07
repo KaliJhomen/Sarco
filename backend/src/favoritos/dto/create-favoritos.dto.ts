@@ -7,10 +7,10 @@ export class CreateFavoritosDto {
   @ApiProperty({description: 'ID del producto a agregar' })
   @Type(() => Number)
   @IsInt()
-  idProducto: number;
+  idProducto!: number;
 
   @ApiPropertyOptional({description: 'Token de sesión para carritos de invitados' })
   @IsString()
   @IsOptional()
-  sessionToken?: string;
+  sessionToken!: string | null;
 }

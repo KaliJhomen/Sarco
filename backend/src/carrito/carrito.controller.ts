@@ -14,29 +14,23 @@ import {
 import { ApiTags, ApiOperation, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { CarritoService } from './carrito.service';
 import { CreateCarritoDto } from './dto/create-carrito.dto';
+import { UpdateCarritoDto } from './dto/update-carrito.dto';
 import { IsInt, Min } from 'class-validator';
 import { UseGuards } from '@nestjs/common';
 import { GuestGuard } from '../auth/guard/guest.guard';
-
-class UpdateCartDto {
-  @IsInt()
-  @Min(1)
-  quantity: number;
-}
 
 @ApiTags('Carrito')
 @Controller('carrito')
 export class CarritoController {
   constructor(private readonly carritoService: CarritoService) {}
-
   @UseGuards(GuestGuard)
   @Get()
   @ApiOperation({ summary: 'Obtener carrito del usuario o invitado' })
   @ApiQuery({ name: 'sessionToken', required: false, type: String })
-  getCart(@Req() req: any, @Query('sessionToken') sessionToken?: string) {
-    const idUser = req.user?.id;
-    if (!idUser && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
-    return this.carritoService.findByUser({ idUser, sessionToken });
+  async getCart(@Req() req: any, @Query('sessionToken') sessionToken?: string) {
+    const idUsuario = req.usuario?.id;
+    if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
+    return this.carritoService.findByUser({ idUsuario, sessionToken });
   }
 
   @UseGuards(GuestGuard)
@@ -44,13 +38,13 @@ export class CarritoController {
   @ApiOperation({ summary: 'Agregar producto al carrito (usuario o invitado)' })
   @ApiBody({ type: CreateCarritoDto })
   async addToCart(@Req() req: any, @Body() body: CreateCarritoDto) {
-    const idUser = req.user?.id;
-    const sessionToken = idUser ? undefined : body.sessionToken;
-    if (!idUser && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
+    const idUsuario = req.usuario?.id;
+    const sessionToken = req.query.sessionToken ?? undefined;
+    if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
     return this.carritoService.addToCart(
-      { idUser, sessionToken },
+      { idUsuario, sessionToken },
       body.idProducto,
-      body.quantity ?? 1,
+      body.cantidad,
     );
   }
 
@@ -61,12 +55,12 @@ export class CarritoController {
     schema: {
       type: 'object',
       properties: {
-        idUser: { type: 'number' },
+        idUsuario: { type: 'number' },
         sessionToken: { type: 'string' },
       },
     },
   })
-  async generateShareLink(@Body() ident: { idUser?: number; sessionToken?: string }) {
+  async generateShareLink(@Body() ident: { idUsuario?: number; sessionToken?: string }) {
     return this.carritoService.generateShareCartLink(ident);
   }
 
@@ -74,20 +68,20 @@ export class CarritoController {
   @Put(':idProducto')
   @ApiOperation({ summary: 'Actualizar cantidad de un producto del carrito (usuario o invitado)' })
   @ApiParam({ name: 'idProducto', type: Number })
-  @ApiBody({ type: UpdateCartDto })
+  @ApiBody({ type: UpdateCarritoDto })
   async updateCartItem(
     @Req() req: any,
     @Param('idProducto', ParseIntPipe) idProducto: number,
-    @Body() body: UpdateCartDto,
+    @Body() body: UpdateCarritoDto,
     @Query('sessionToken') sessionToken?: string,
   ) {
-    const idUser = req.user?.id;
-    if (!idUser && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
-    if (!body?.quantity) throw new BadRequestException('La cantidad es requerida');
+    const idUsuario = req.usuario?.id;
+    if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
+    if (!body?.cantidad) throw new BadRequestException('La cantidad es requerida');
     return this.carritoService.updateCartItem(
-      { idUser, sessionToken },
+      { idUsuario, sessionToken },
       idProducto,
-      Number(body.quantity),
+      Number(body.cantidad),
     );
   }
 
@@ -100,10 +94,10 @@ export class CarritoController {
     @Param('idProducto', ParseIntPipe) idProducto: number,
     @Query('sessionToken') sessionToken?: string,
   ) {
-    const idUser = req.user?.id;
-    if (!idUser && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
+    const idUsuario = req.usuario?.id;
+    if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
     return this.carritoService.removeFromCart(
-      { idUser, sessionToken },
+      { idUsuario, sessionToken },
       idProducto,
     );
   }

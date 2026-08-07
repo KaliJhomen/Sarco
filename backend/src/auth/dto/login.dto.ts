@@ -13,7 +13,7 @@ export class LoginDto {
     @Transform(({value}) => value.trim())
     @IsString()
     @MinLength(1)
-    password!: string;
+    clave!: string;
 
     @IsOptional()
     @IsString()

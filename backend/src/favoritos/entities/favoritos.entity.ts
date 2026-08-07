@@ -17,14 +17,14 @@ export class Favoritos {
     length: 36, 
     nullable: true, 
     unique: true })
-  sessionToken?: string | null;
+  sessionToken!: string | null;
 
   @Column( "varchar", {
     name: 'share_token',
     length: 36,
     nullable: true, 
     unique: true})
-  shareToken?: string | null;
+  shareToken!: string | null;
   
   @Column( "timestamp",{
     name: 'expires_at',

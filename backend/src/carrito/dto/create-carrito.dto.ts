@@ -4,16 +4,17 @@ import { IsInt, Min, IsOptional, IsString } from "class-validator";
 export class CreateCarritoDto {
   @ApiProperty({description: 'ID del producto a agregar' })
   @IsInt()
-  idProducto: number;
+  @Min(1)
+  idProducto!: number;
 
   @ApiPropertyOptional({description: 'Cantidad del producto' })
   @IsInt()
   @Min(1)
   @IsOptional()
-  quantity?: number = 1;
+  cantidad!: number;
 
   @ApiPropertyOptional({description: 'Token de sesión para carritos de invitados' })
   @IsString()
   @IsOptional()
-  sessionToken?: string;
+  sessionToken!: string | null;
 }
