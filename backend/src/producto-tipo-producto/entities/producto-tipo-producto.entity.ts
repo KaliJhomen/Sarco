@@ -5,23 +5,21 @@ import { Producto } from "src/producto/entities/producto.entity";
 @Entity("producto_tipo_producto", { schema: "sarcos_db" })
 export class ProductoTipoProducto {
   @PrimaryGeneratedColumn({ type: "int", name: "id_producto_tipo_producto" })
-  idProductoTipoProducto: number;
+  idProductoTipoProducto!: number;
 
   
-  @ManyToOne(() => Producto, producto => producto.productoTipoProducto, { 
+  @ManyToOne(() => Producto, producto => producto.productoTipoProductos, { 
     onDelete: 'CASCADE',
     onUpdate: 'NO ACTION' 
   })
   @JoinColumn({ name: 'id_producto' })
-  idProducto: Producto;
+  producto!: Producto;
 
 
-  @ManyToOne(
-    () => TipoProducto,
-    tipo => tipo.productoTipoProducto,
+  @ManyToOne(() => TipoProducto, tipoProducto => tipoProducto.productoTipoProductos,
     { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
   )
   @JoinColumn({ name: "id_tipo_producto" })
-  idTipoProducto: TipoProducto;
+  tipoProducto!: TipoProducto;
 }
 

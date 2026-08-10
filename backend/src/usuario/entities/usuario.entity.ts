@@ -10,6 +10,8 @@ import {
 import { Cargo } from "../../cargo/entities/cargo.entity";
 import { Documento } from "../../documento/entities/documento.entity";
 import { Tienda } from "../../tienda/entities/tienda.entity";
+import { Favoritos } from "src/favoritos/entities/favoritos.entity";
+import { PagoCredito } from "src/pago-credito/entities/pago-credito.entity";
 @Index("fk_usuario_cargo_1", ["idCargo"], {})
 @Index("fk_usuario_documento_2", ["idDocumento"], {})
 @Index("id_tienda", ["idTienda"], {})
@@ -56,6 +58,10 @@ export class Usuario {
 
   @Column("int", { name: "id_carrito", nullable: true })
   idCarrito!: number | null;
+
+
+  @OneToMany(() => Favoritos, (favoritos) => favoritos.usuario)
+  favoritos!: Favoritos[];
 
   /*
   @ManyToOne(() => Cargo, (cargo) => cargo.usuarios, {

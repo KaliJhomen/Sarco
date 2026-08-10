@@ -1,30 +1,29 @@
 import { Categoria } from "src/categoria/entities/categoria.entity";
-import { TipoProductoSubCategoria } from "src/TipoProductoSubCategoria/entities/tipo-producto-sub-categoria.entity";
+import { TipoProductoSubCategoria } from "src/tipo-producto-sub-categoria/entities/tipo-producto-sub-categoria.entity";
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Index("fk_sub_categoria_categoria_1", ["idCategoria"], {})
 @Entity("sub_categoria", { schema: "sarcos_db" })
 export class SubCategoria {
     @PrimaryGeneratedColumn({ type: "int", name: "id_sub_categoria" })
-    idSubCategoria: number;
+    idSubCategoria!: number;
 
     @Column("varchar", { name: "nombre", nullable: true, length: 25 })
-    nombre: string | null;
+    nombre!: string | null;
 
     @Column("int", { name: "id_categoria", nullable: true })
-    idCategoria: number | null;
+    idCategoria!: number | null;
 
-    @Column("boolean", { name: "estado", default: () => "'1'" })
-    estado: boolean | null;
+    @Column("boolean", { name: "estado", default: 1})
+    estado!: boolean | null;
 
     @ManyToOne(() => Categoria, (categoria) => categoria.subCategorias, {
         onDelete: "NO ACTION",
         onUpdate: "NO ACTION",
     })
-    
     @JoinColumn([{ name: "id_categoria", referencedColumnName: "idCategoria" }])
-    idCategoria2: Categoria;
+    categoria!: Categoria;
 
-    @OneToMany(() => TipoProductoSubCategoria, (tipoProductoSubCategoria) => tipoProductoSubCategoria.idSubCategoria)
-    tipoProductoSubCategoria: TipoProductoSubCategoria[];
+    @OneToMany(() => TipoProductoSubCategoria, (tipoProductoSubCategoria) => tipoProductoSubCategoria.subCategoria)
+    tipoProductoSubCategorias!: TipoProductoSubCategoria[];
 }

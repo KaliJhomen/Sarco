@@ -11,11 +11,11 @@ export class TipoProductoSubCategoriaService {
       @InjectRepository(TipoProductoSubCategoria)
       private tipoProductoSubCategoriaRepository: Repository<TipoProductoSubCategoria>,
     ) { }
-    async create(createTipoProductoSubCategoriaDto: CreateTipoProductoSubCategoriaDto) {
+    async create(dtoCreate: CreateTipoProductoSubCategoriaDto) {
       try {
         const entity = this.tipoProductoSubCategoriaRepository.create({
-          idTipoProducto: { idTipoProducto: createTipoProductoSubCategoriaDto.idTipoProducto },
-          idSubCategoria: { idSubCategoria: createTipoProductoSubCategoriaDto.idSubCategoria },
+          tipoProducto: { idTipoProducto: dtoCreate.idTipoProducto },
+          subCategoria: { idSubCategoria: dtoCreate.idSubCategoria },
         });
         return await this.tipoProductoSubCategoriaRepository.save(entity);
       } catch (error) {
@@ -62,15 +62,15 @@ export class TipoProductoSubCategoriaService {
       );
     }  }
 
-  async update(id: number, updateTipoProductoSubCategoriaDto: UpdateTipoProductoSubCategoriaDto) {
+  async update(id: number, dtoUpdate: UpdateTipoProductoSubCategoriaDto) {
     try {
       const entity = await this.tipoProductoSubCategoriaRepository.preload({
         idTipoProductoSubCategoria: id,
-        idTipoProducto: updateTipoProductoSubCategoriaDto.idTipoProducto
-          ? { idTipoProducto: updateTipoProductoSubCategoriaDto.idTipoProducto }
+        tipoProducto: dtoUpdate.idTipoProducto
+          ? { idTipoProducto: dtoUpdate.idTipoProducto }
           : undefined,
-        idSubCategoria: updateTipoProductoSubCategoriaDto.idSubCategoria
-          ? { idSubCategoria: updateTipoProductoSubCategoriaDto.idSubCategoria }
+        subCategoria: dtoUpdate.idSubCategoria
+          ? { idSubCategoria: dtoUpdate.idSubCategoria }
           : undefined,
       });
       if (!entity) {

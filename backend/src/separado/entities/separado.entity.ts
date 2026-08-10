@@ -78,6 +78,7 @@ export class Separado {
   idTienda!: number | null;
 
   
+
   @OneToMany(
     () => DetalleSeparado,
     (detalleSeparado) => detalleSeparado.separado)
@@ -87,6 +88,21 @@ export class Separado {
   pagoSeparados!: PagoSeparado[];
 
 
+
+  @ManyToOne(() => User, (user) => user.separados, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
+  user!: User;
+
+  @ManyToOne(() => Cliente, (cliente) => cliente.separados, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "id_cliente", referencedColumnName: "idCliente" }])
+  cliente!: Cliente;
+
   @ManyToOne(() => Comprobante, (comprobante) => comprobante.separados, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
@@ -94,14 +110,9 @@ export class Separado {
   @JoinColumn([
     { name: "id_comprobante", referencedColumnName: "idComprobante" },
   ])
-  idComprobante2!: Comprobante;
+  comprobante!: Comprobante;
 
-  @ManyToOne(() => Cliente, (cliente) => cliente.separados, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_cliente", referencedColumnName: "idCliente" }])
-  idCliente2!: Cliente;
+
 
   @ManyToOne(() => MetodoPago, (metodoPago) => metodoPago.separados, {
     onDelete: "NO ACTION",
@@ -112,12 +123,7 @@ export class Separado {
   ])
   metodoPago!: MetodoPago;
 
-  @ManyToOne(() => User, (user) => user.separados, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
-  user!: User;
+
 
   @ManyToOne(() => Tienda, (tienda) => tienda.separados, {
     onDelete: "NO ACTION",

@@ -65,6 +65,8 @@ export class User {
 
   @DeleteDateColumn({ name: 'deleted_at' })
   fechaEliminacion!: Date;  
+
+
   
   @OneToMany(() => Agenda, (agenda) => agenda.user)
   agendas!: Agenda[];
@@ -105,7 +107,8 @@ export class User {
   @OneToMany(() => UsuarioRol, (usuarioRol) => usuarioRol.user)
   usuarioRoles!: UsuarioRol[];
 
-
+  @OneToMany(() => PagoCredito, (pagoCredito) => pagoCredito.user)
+  pagoCredito!: PagoCredito[];
 
   @ManyToOne(() => Cargo, (cargo) => cargo.users, {
     onDelete: "NO ACTION",
@@ -121,7 +124,7 @@ export class User {
   @JoinColumn([{ name: "id_documento", referencedColumnName: "idDocumento" }])
   documento!: Documento;
 
-  @ManyToOne(() => Tienda, (tienda) => tienda.users, {
+  @ManyToOne(() => Tienda, (tienda) => tienda.user, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })

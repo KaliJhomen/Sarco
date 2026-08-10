@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Usuario } from 'src/usuario/entities/usuario.entity';
-import { FavoritosItem } from 'src/favoritos-item/entities/favoritos-item.entity';
+import { FavoritosItem } from './favoritos-item.entity';
 import { Producto } from 'src/producto/entities/producto.entity';
 
 @Entity('favoritos')

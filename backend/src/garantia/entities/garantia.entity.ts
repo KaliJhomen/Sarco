@@ -3,6 +3,7 @@ import {
   Entity,
   Index,
   JoinColumn,
+  OneToOne,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -52,13 +53,14 @@ export class Garantia {
   })
   estado!: EstadoGarantia | null;
 
-  @ManyToOne(() => Producto, (producto) => producto.detalleVentas, {
+  @OneToOne(() => Producto, (producto) => producto.garantia, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_producto", referencedColumnName: "idProducto" }])
   producto!: Producto;
 
+  
   @ManyToOne(() => Cliente, (cliente) => cliente.garantias, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",

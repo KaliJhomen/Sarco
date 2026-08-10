@@ -9,6 +9,7 @@ import { PagoSeparado } from "../../pago-separado/entities/pago-separado.entity"
 import { Separado } from "../../separado/entities/separado.entity";
 import { TicketCredito } from "../../ticket-credito/entities/ticket-credito.entity";
 import { Venta } from "../../venta/entities/venta.entity";
+import { User } from "src/user/entities/user.entity";
 
 @Entity("tienda", { schema: "sarcos_db" })
 export class Tienda {
@@ -24,6 +25,12 @@ export class Tienda {
   @Column("bigint", { name: "condicion", nullable: true })
   condicion!: string | null;
 
+
+
+  @OneToMany(() => User, (user) => user.idTienda)
+  user!: User[];
+
+  
   @OneToMany(() => ProductoTienda, (productoTienda) => productoTienda.idTienda)
   productoTiendas!: ProductoTienda[];
 

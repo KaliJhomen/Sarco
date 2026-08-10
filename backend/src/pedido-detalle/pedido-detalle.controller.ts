@@ -16,10 +16,6 @@ import { PedidoDetalleService } from './pedido-detalle.service';
 import { AuthGuard } from '../auth/guard/auth.guard';
 import { AddPedidoDetalleDto } from './dto/add-pedido-detalle.dto';
 
-class UpdatePedidoDetalleDto {
-  quantity: number;
-}
-
 @ApiTags('PedidoDetalle')
 @Controller('pedido-detalle')
 export class PedidoDetalleController {
@@ -30,12 +26,12 @@ export class PedidoDetalleController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async getOrder(@Req() req: any) {
-    const userId = req.user?.id;
+    const idUsuario = req.usuario?.id;
     // Para usuarios no registrados, pueden pasar sessionToken en query
-    if (!userId && !req.query?.sessionToken) {
+    if (!idUsuario && !req.query?.sessionToken) {
       throw new BadRequestException('Usuario no autenticado o sessionToken requerido');
     }
-    return this.pedidoDetalleService.findByUser(userId, req.query?.sessionToken);
+    return this.pedidoDetalleService.findByUser(idUsuario, req.query?.sessionToken);
   }
 
   @Post()
@@ -44,47 +40,47 @@ export class PedidoDetalleController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async addToOrder(@Req() req: any, @Body() body: AddPedidoDetalleDto) {
-    const userId = req.user?.id;
+    const idUsuario = req.usuario?.id;
     const sessionToken = body.sessionToken;
 
-    if (!userId && !sessionToken) {
+    if (!idUsuario && !sessionToken) {
       throw new BadRequestException('Usuario no autenticado o sessionToken requerido');
     }
     if (!body?.idProducto) throw new BadRequestException('idProducto es requerido');
-    if (!body?.quantity) throw new BadRequestException('quantity es requerido');
+    if (!body?.cantidad) throw new BadRequestException('Cantidad es requerido');
 
     return this.pedidoDetalleService.addToOrder(
       Number(body.idProducto),
-      Number(body.quantity),
-      userId,
-      sessionToken,
+      Number(body.cantidad),
+      idUsuario,
+      sessionToken ?? undefined,
     );
   }
 
   @Put(':idProducto')
   @ApiOperation({ summary: 'Actualizar cantidad del item del carrito' })
   @ApiParam({ name: 'idProducto', type: Number })
-  @ApiBody({ type: UpdatePedidoDetalleDto })
+  @ApiBody({ type: AddPedidoDetalleDto })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async updateOrderItem(
     @Req() req: any,
     @Param('idProducto', ParseIntPipe) idProducto: number,
-    @Body() body: UpdatePedidoDetalleDto,
+    @Body() body: AddPedidoDetalleDto,
   ) {
-    const userId = req.user?.id;
+    const idUsuario = req.usuario?.id;
     const sessionToken = body['sessionToken'];
 
-    if (!userId && !sessionToken) {
+    if (!idUsuario && !sessionToken) {
       throw new BadRequestException('Usuario no autenticado o sessionToken requerido');
     }
-    if (!body?.quantity) throw new BadRequestException('quantity es requerido');
+    if (!body?.cantidad) throw new BadRequestException('quantity es requerido');
 
     return this.pedidoDetalleService.updateOrderItem(
       idProducto,
-      Number(body.quantity),
-      userId,
-      sessionToken,
+      Number(body.cantidad),
+      idUsuario,
+      sessionToken ?? undefined,
     );
   }
 
@@ -97,13 +93,13 @@ export class PedidoDetalleController {
     @Req() req: any,
     @Param('idProducto', ParseIntPipe) idProducto: number,
   ) {
-    const userId = req.user?.id;
+    const idUsuario = req.usuario?.id;
     const sessionToken = req.query?.sessionToken;
 
-    if (!userId && !sessionToken) {
+    if (!idUsuario && !sessionToken) {
       throw new BadRequestException('Usuario no autenticado o sessionToken requerido');
     }
 
-    return this.pedidoDetalleService.removeFromOrder(idProducto, userId, sessionToken);
+    return this.pedidoDetalleService.removeFromOrder(idProducto, idUsuario, sessionToken);
   }
 }

@@ -201,5 +201,5 @@ export class Credito {
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
-  usuario!: User;
+  user!: User;
 }

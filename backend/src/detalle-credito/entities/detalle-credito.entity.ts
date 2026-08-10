@@ -14,19 +14,19 @@ import { Credito } from "../../credito/entities/credito.entity";
 @Entity("detalle_credito", { schema: "sarcos_db" })
 export class DetalleCredito {
   @PrimaryGeneratedColumn({ type: "int", name: "id_detalle_credito" })
-  idDetalleCredito: number;
+  idDetalleCredito!: number;
 
   @Column("int", { name: "id_credito", nullable: true })
-  idCredito: number | null;
+  idCredito!: number | null;
 
   @Column("int", { name: "id_producto", nullable: true })
-  idProducto: number | null;
+  idProducto!: number | null;
 
   @Column("int", { name: "cantidad", nullable: true })
-  cantidad: number | null;
+  cantidad!: number | null;
 
   @Column("varchar", { name: "serie", nullable: true, length: 255 })
-  serie: string | null;
+  serie!: string | null;
 
   @Column("decimal", {
     name: "descuento",
@@ -34,7 +34,7 @@ export class DetalleCredito {
     precision: 20,
     scale: 2,
   })
-  descuento: number | null;
+  descuento!: string | null;
 
   @Column("decimal", {
     name: "monto_total",
@@ -42,19 +42,19 @@ export class DetalleCredito {
     precision: 20,
     scale: 2,
   })
-  montoTotal: number | null;
+  montoTotal!: string | null;
 
   @ManyToOne(() => Producto, (producto) => producto.detalleCreditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_producto", referencedColumnName: "idProducto" }])
-  idProducto2: Producto;
+  producto!: Producto;
 
   @ManyToOne(() => Credito, (credito) => credito.detalleCreditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_credito", referencedColumnName: "idCredito" }])
-  idCredito2: Credito;
+  credito!: Credito;
 }

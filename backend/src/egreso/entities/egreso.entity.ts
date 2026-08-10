@@ -34,7 +34,7 @@ export class Egreso {
     precision: 20,
     scale: 2,
   })
-  montoEgreso!: number | null;
+  montoEgreso!: string | null;
 
   @Column("date", { name: "fecha", nullable: true })
   fecha!: Date | null;

@@ -13,15 +13,15 @@ export class DetalleSeparadoService {
     private detalleSeparadoRepository: Repository<DetalleSeparado>,
   ) { }
 
-  async create(createDetalleSeparadoDto: CreateDetalleSeparadoDto) {
+  async create(dtoCreate: CreateDetalleSeparadoDto) {
     try {
-      if ((createDetalleSeparadoDto as any)?.idArticulo !== undefined) {
+      if ((dtoCreate as any)?.idArticulo !== undefined) {
         throw new BadRequestException('Campo idArticulo no permitido. Use idProducto.');
       }
-      if (createDetalleSeparadoDto?.idProducto === undefined || createDetalleSeparadoDto?.idProducto === null) {
+      if (dtoCreate?.idProducto === undefined || dtoCreate?.idProducto === null) {
         throw new BadRequestException('idProducto es requerido.');
       }
-      const newDetalleSeparado = this.detalleSeparadoRepository.create(createDetalleSeparadoDto);
+      const newDetalleSeparado = this.detalleSeparadoRepository.create(dtoCreate);
       return this.detalleSeparadoRepository.save(newDetalleSeparado);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al guardar el detalle de separado');
@@ -31,9 +31,9 @@ export class DetalleSeparadoService {
   async findAll() {
     try {
       return await this.detalleSeparadoRepository.find({
-        relations: ['idProducto2'],
+        relations: ['idProducto'],
         select: {
-          idProducto2: {
+          producto: {
             idProducto: true,
             nombre: true
           }
@@ -48,13 +48,7 @@ export class DetalleSeparadoService {
     try {
       const found = await this.detalleSeparadoRepository.findOne({
         where: { idDetalleSeparado: id },
-        relations: ['idProducto2'],
-        select: {
-          idProducto2: {
-            idProducto: true,
-            nombre: true
-          }
-        },
+        relations: ['idProducto'],
       });
       if (!found) {
         throw new NotFoundException('Detalle de separado no encontrado');
@@ -66,28 +60,28 @@ export class DetalleSeparadoService {
   }
 
 
-  async update(id: number, updateDetalleSeparadoDto: UpdateDetalleSeparadoDto) {
+  async update(id: number, dtoUpdate: UpdateDetalleSeparadoDto) {
     try {
       const found = await this.detalleSeparadoRepository.findOneBy({ idDetalleSeparado: id });
       if (!found) {
         throw new NotFoundException('Detalle de separado no encontrado');
       }
-      if ((updateDetalleSeparadoDto as any)?.idArticulo !== undefined) {
+      if ((dtoUpdate as any)?.idArticulo !== undefined) {
         throw new BadRequestException('Campo idArticulo no permitido. Use idProducto.');
       }
-      if ('idProducto' in (updateDetalleSeparadoDto as any) && (updateDetalleSeparadoDto as any).idProducto == null) {
+      if ('idProducto' in (dtoUpdate as any) && (dtoUpdate as any).idProducto == null) {
         throw new BadRequestException('Si envía idProducto debe ser un valor válido.');
       }
-      const updated = Object.assign(found, updateDetalleSeparadoDto);
+      const updated = Object.assign(found, dtoUpdate);
       return await this.detalleSeparadoRepository.save(updated);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al actualizar el detalle de separado');
     }
   }
 
-  async remove(id: number) {
+  async remove(idDetalleSeparado: number) {
     try {
-      const deleted = await this.detalleSeparadoRepository.delete(id);
+      const deleted = await this.detalleSeparadoRepository.delete(idDetalleSeparado);
       if (deleted.affected === 0) {
         throw new NotFoundException('Detalle de separado no encontrado');
       }

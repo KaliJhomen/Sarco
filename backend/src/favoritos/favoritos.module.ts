@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Favoritos } from './entities/favoritos.entity';
-import { FavoritosItem } from '../favoritos-item/entities/favoritos-item.entity';
+import { FavoritosItem } from './entities/favoritos-item.entity';
 import { Cliente } from '../cliente/entities/cliente.entity';
 import { Producto } from '../producto/entities/producto.entity';
 import { User } from '../user/entities/user.entity';

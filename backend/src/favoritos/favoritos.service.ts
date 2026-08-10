@@ -2,11 +2,11 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Favoritos } from './entities/favoritos.entity';
-import { FavoritosItem } from '../favoritos-item/entities/favoritos-item.entity';
+import { FavoritosItem } from './entities/favoritos-item.entity';
 import { randomUUID } from 'crypto';
 import { Producto } from '../producto/entities/producto.entity';
-import { Cliente } from '../cliente/entities/cliente.entity';
-import { User } from '../user/entities/user.entity';
+
+type FavoritesIdent = { idUsuario?: number; sessionToken?: string | null };
 
 @Injectable()
 export class FavoritosService {
@@ -17,186 +17,116 @@ export class FavoritosService {
     private readonly favoritesItemRepository: Repository<FavoritosItem>,
     @InjectRepository(Producto)
     private readonly productRepository: Repository<Producto>,
-    @InjectRepository(Cliente)
-    private readonly clientRepository: Repository<Cliente>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
   ) {}
 
-  private async findClienteByUserId(idUser: number): Promise<Cliente> {
-    const user = await this.userRepository.findOne({ where: { id: idUser } });
-    if (!user) throw new NotFoundException('Usuario no encontrado');
-
-    let cliente = await this.clientRepository.findOne({ where: { email: user.email } });
-    if (!cliente) {
-      cliente = this.clientRepository.create({
-        nombre: user.name,
-        email: user.email,
-      });
-      cliente = await this.clientRepository.save(cliente);
-    }
-    return cliente;
+  ///
+  /// PRIVADOS
+  ///
+  private async findFavorites(ident: FavoritesIdent): Promise<Favoritos | null> {
+    const { idUsuario, sessionToken } = ident;
+    if (idUsuario) return this.getFavoritesByUser(idUsuario);
+    if (sessionToken) return this.getFavoritesBySession(sessionToken);
+    return null;
   }
 
-  private async getOrCreateFavorites(idUser: number) {
-    const cliente = await this.findClienteByUserId(idUser);
+  private async findOrCreateFavorites(ident: FavoritesIdent): Promise<Favoritos> {
+    const favoritos = await this.findFavorites(ident);
+    if (favoritos) return favoritos;
 
-    let favoritos = await this.favoritesRepository.findOne({
-      where: { cliente: { idCliente: cliente.idCliente } },
-      relations: ['items'],
+    const { idUsuario, sessionToken } = ident;
+    if (idUsuario) return this.createFavorites(idUsuario);
+    if (sessionToken) return this.createGuestFavorites(sessionToken);
+
+    throw new NotFoundException('No se pudo crear los favoritos');
+  }
+
+  private async findFavoritesItem(favoritos: Favoritos, idProducto: number): Promise<FavoritosItem | null> {
+    return this.favoritesItemRepository.findOne({
+      where: {
+        favoritos: { idFavoritos: favoritos.idFavoritos },
+        producto: { idProducto },
+      },
     });
-
-    if (!favoritos) {
-      favoritos = this.favoritesRepository.create({
-        cliente,
-        items: [],
-      });
-      favoritos = await this.favoritesRepository.save(favoritos);
-    }
-
-    return favoritos;
   }
 
-  async findByUserId({
-    idUser,
-    sessionToken,
-  }: {
-    idUser?: number;
-    sessionToken?: string;
-  }) {
-    if (!idUser && !sessionToken) {
-      throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
-    }
+  private async getFavoritesByUser(idUsuario: number): Promise<Favoritos | null> {
+    return this.favoritesRepository.findOne({
+      where: { usuario: { idUsuario } },
+      relations: ['items', 'items.producto'],
+    });
+  }
 
-    let favoritos: Favoritos | null = null;
+  private async getFavoritesBySession(sessionToken: string): Promise<Favoritos | null> {
+    return this.favoritesRepository.findOne({
+      where: { sessionToken },
+      relations: ['items', 'items.producto'],
+    });
+  }
 
-    if (idUser) {
-      const cliente = await this.findClienteByUserId(idUser);
-      favoritos = await this.favoritesRepository.findOne({
-        where: { cliente: { idCliente: cliente.idCliente } },
-        relations: ['items', 'items.producto'],
-      });
-    } else if (sessionToken) {
-      favoritos = await this.favoritesRepository.findOne({
-        where: { sessionToken },
-        relations: ['items', 'items.producto'],
-      });
-    }
+  private async createFavorites(idUsuario: number): Promise<Favoritos> {
+    return this.favoritesRepository.save(
+      this.favoritesRepository.create({
+        sessionToken: null,
+        shareToken: null,
+        expiresAt: null,
+        usuario: { idUsuario },
+        items: [],
+      })
+    ) as Promise<Favoritos>;
+  }
 
-    if (!favoritos) {
-      return [];
-    }
+  private async createGuestFavorites(sessionToken: string): Promise<Favoritos> {
+    return this.favoritesRepository.save(
+      this.favoritesRepository.create({
+        sessionToken,
+        shareToken: null,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        items: [],
+      })
+    ) as Promise<Favoritos>;
+  }
 
+  ///
+  /// PÚBLICOS
+  ///
+  async findByUserId(ident: FavoritesIdent) {
+    const favoritos = await this.findFavorites(ident);
+    if (!favoritos) return [];
     return favoritos.items.map(item => item.producto);
   }
 
-  async addToFavorites(
-    ident: { idUser?: number, sessionToken?: string },
-    idProducto: number
-  ) {
-    const { idUser, sessionToken } = ident;
-    if (!idUser && !sessionToken) {
-      throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
-    }
-
+  async addToFavorites(ident: FavoritesIdent, idProducto: number) {
     const product = await this.productRepository.findOne({ where: { idProducto } });
     if (!product) {
       throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);
     }
 
-    let favorites: Favoritos | null = null;
+    const favoritos = await this.findOrCreateFavorites(ident);
+    const existingItem = await this.findFavoritesItem(favoritos, idProducto);
 
-    if (idUser) {
-      favorites = await this.getOrCreateFavorites(idUser);
-    } else if (sessionToken) {
-      favorites = await this.favoritesRepository.findOne({
-        where: { sessionToken },
-        relations: ['items', 'items.producto'],
-      });
-      if (!favorites) {
-        favorites = this.favoritesRepository.create({
-          sessionToken,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        });
-        favorites = await this.favoritesRepository.save(favorites);
-        favorites.items = [];
-      }
-    }
+    if (existingItem) return existingItem;
 
-    if (!favorites) throw new NotFoundException('No se pudo obtener o crear los favoritos');
-
-    const existingItem = await this.favoritesItemRepository.findOne({
-      where: {
-        favoritos: { idFavoritos: favorites.idFavoritos },
-        producto: { idProducto },
-      },
-      relations: ['producto'],
-    });
-
-    if (existingItem) {
-      return existingItem;
-    }
-
-    const newItem = this.favoritesItemRepository.create({
-      favoritos: favorites,
-      producto: product,
-    });
-
-    return this.favoritesItemRepository.save(newItem);
+    return this.favoritesItemRepository.save(
+      this.favoritesItemRepository.create({
+        favoritos,
+        producto: product,
+      })
+    );
   }
 
-  async removeFromFavorites(
-    ident: { idUser?: number, sessionToken?: string },
-    idProducto: number
-  ) {
-    const { idUser, sessionToken } = ident;
-    if (!idUser && !sessionToken) {
-      throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
-    }
+  async removeFromFavorites(ident: FavoritesIdent, idProducto: number) {
+    const favoritos = await this.findFavorites(ident);
+    if (!favoritos) throw new NotFoundException('Favoritos no encontrados');
 
-    let favorites: Favoritos | null = null;
+    const item = await this.findFavoritesItem(favoritos, idProducto);
+    if (!item) throw new NotFoundException(`El producto con ID ${idProducto} no está en favoritos`);
 
-    if (idUser) {
-      const cliente = await this.findClienteByUserId(idUser);
-      favorites = await this.favoritesRepository.findOne({
-        where: { cliente: { idCliente: cliente.idCliente } },
-      });
-    } else if (sessionToken) {
-      favorites = await this.favoritesRepository.findOne({
-        where: { sessionToken },
-      });
-    }
-
-    if (!favorites) {
-      throw new NotFoundException('Favoritos no encontrados');
-    }
-
-    const existingItem = await this.favoritesItemRepository.findOne({
-      where: {
-        favoritos: { idFavoritos: favorites.idFavoritos },
-        producto: { idProducto },
-      },
-    });
-
-    if (!existingItem) {
-      throw new NotFoundException(`El producto con ID ${idProducto} no está en favoritos`);
-    }
-
-    return this.favoritesItemRepository.remove(existingItem);
+    return this.favoritesItemRepository.remove(item);
   }
 
-  async clearFavorites(idUser: number) {
-    const cliente = await this.findClienteByUserId(idUser);
-
-    let favoritos = await this.favoritesRepository.findOne({
-      where: { cliente: { idCliente: cliente.idCliente } },
-      relations: ['items'],
-    });
-
-    if (!favoritos) {
-      favoritos = this.favoritesRepository.create({ cliente, items: [] });
-      favoritos = await this.favoritesRepository.save(favoritos);
-    }
+  async clearFavorites(ident: FavoritesIdent) {
+    const favoritos = await this.findFavorites(ident);
+    if (!favoritos) throw new NotFoundException('Favoritos no encontrados');
 
     await this.favoritesItemRepository.delete({
       favoritos: { idFavoritos: favoritos.idFavoritos },
@@ -205,23 +135,14 @@ export class FavoritosService {
     return { message: 'Favoritos limpiados' };
   }
 
-  async mergeGuestFavorites(idUser: number, sessionToken: string) {
-    const guestFavorites = await this.favoritesRepository.findOne({
-      where: { sessionToken },
-      relations: ['items', 'items.producto'],
-    });
-
+  async mergeGuestFavorites(idUsuario: number, sessionToken: string) {
+    const guestFavorites = await this.getFavoritesBySession(sessionToken);
     if (!guestFavorites) return;
 
-    const cliente = await this.findClienteByUserId(idUser);
-
-    const userFavorites = await this.favoritesRepository.findOne({
-      where: { cliente: { idCliente: cliente.idCliente } },
-      relations: ['items', 'items.producto'],
-    });
+    const userFavorites = await this.getFavoritesByUser(idUsuario);
 
     if (!userFavorites) {
-      guestFavorites.cliente = cliente;
+      guestFavorites.usuario = { idUsuario } as any;
       guestFavorites.sessionToken = null;
       guestFavorites.expiresAt = null;
       await this.favoritesRepository.save(guestFavorites);
@@ -233,9 +154,7 @@ export class FavoritosService {
         i => i.producto.idProducto === item.producto.idProducto,
       );
 
-      if (existingItem) {
-        await this.favoritesItemRepository.save(existingItem);
-      } else {
+      if (!existingItem) {
         item.favoritos = userFavorites;
         await this.favoritesItemRepository.save(item);
       }
@@ -244,53 +163,30 @@ export class FavoritosService {
     await this.favoritesRepository.remove(guestFavorites);
   }
 
-  async generateShareFavoritesLink(
-    ident: { idUser?: number; sessionToken?: string },
-  ) {
-    const { idUser, sessionToken } = ident;
-    let favorites: Favoritos | null = null;
+  async generateShareFavoritesLink(ident: FavoritesIdent) {
+    const favoritos = await this.findFavorites(ident);
+    if (!favoritos) throw new NotFoundException('Favoritos no encontrados');
+    if (!favoritos.items.length) throw new BadRequestException('Los favoritos están vacíos');
 
-    if (idUser) {
-      const cliente = await this.findClienteByUserId(idUser);
-      favorites = await this.favoritesRepository.findOne({
-        where: { cliente: { idCliente: cliente.idCliente } },
-        relations: ['items', 'items.producto'],
-      });
-    } else if (sessionToken) {
-      favorites = await this.favoritesRepository.findOne({
-        where: { sessionToken },
-        relations: ['items', 'items.producto'],
-      });
+    if (!favoritos.shareToken) {
+      favoritos.shareToken = randomUUID();
+      await this.favoritesRepository.save(favoritos);
     }
 
-    if (!favorites) {
-      throw new NotFoundException('Favoritos no encontrados');
-    }
-
-    if (!favorites.items.length) {
-      throw new BadRequestException('Los favoritos están vacíos');
-    }
-
-    if (!favorites.shareToken) {
-      favorites.shareToken = randomUUID();
-      await this.favoritesRepository.save(favorites);
-    }
-    return { url: favorites.shareToken };
+    return { url: favoritos.shareToken };
   }
 
   async findByShareToken(shareToken: string) {
-    const favorites = await this.favoritesRepository.findOne({
+    const favoritos = await this.favoritesRepository.findOne({
       where: { shareToken },
       relations: ['items', 'items.producto'],
     });
 
-    if (!favorites) {
-      throw new NotFoundException('Favoritos compartidos no encontrados');
-    }
+    if (!favoritos) throw new NotFoundException('Favoritos compartidos no encontrados');
 
     return {
-      idFavorites: favorites.idFavoritos,
-      items: favorites.items,
+      idFavoritos: favoritos.idFavoritos,
+      items: favoritos.items,
     };
   }
 }

@@ -38,13 +38,13 @@ export class ClienteService {
   async findAll() {
     try {
       return await this.clienteRepository.find({
-        relations: ['idDocumento2','idEstadoCliente2' ],
+        relations: ['documento','estadoCliente' ],
         select: {
-          idDocumento2: {
+          documento: {
             idDocumento: true,
             nombre: true
           },
-          idEstadoCliente2: {
+          estadoCliente: {
             nombre: true
           },
         },
@@ -70,7 +70,7 @@ export class ClienteService {
         where: { idCliente: id },
         relations: ["idDocumento2"],
         select: {
-          idDocumento2: {
+          documento: {
             idDocumento: true,
             nombre: true
           },

@@ -23,15 +23,15 @@ export class ProductoService {
     private tipoProductoRepository: Repository<TipoProducto>,
   ) { }
 
-  async create(createProductoDto: CreateProductoDto) {
+  async create(dtoCreate: CreateProductoDto) {
     try {
-      const {idTiposProducto, ...productoData}= createProductoDto;
+      const {idTiposProducto, ...productoData}= dtoCreate;
       const producto = this.productoRepository.create(productoData);
       const productoGuardado = await this.productoRepository.save(producto);
       if (idTiposProducto && Array.isArray(idTiposProducto)) {
         const relaciones = idTiposProducto.map(id => ({
-          idProducto: productoGuardado,
-          idTipoProducto: { idTipoProducto: id }
+          producto: productoGuardado,
+          tipoProducto: { idTipoProducto: id }
         })) as DeepPartial<ProductoTipoProducto>[];
       return await this.productoTipoProductoRepository.save(relaciones);
       }
@@ -47,19 +47,19 @@ export class ProductoService {
     try {
       const productos = await this.productoRepository
         .createQueryBuilder('producto')
-        .leftJoinAndSelect('producto.idMarca2', 'marca')
-        .leftJoinAndSelect('producto.productoTipoProducto', 'ptp')
-        .leftJoinAndSelect('ptp.idTipoProducto', 'tipoProducto')
-        .leftJoinAndSelect('tipoProducto.tipoProductoSubCategoria', 'tpsc')
-        .leftJoinAndSelect('tpsc.idSubCategoria', 'subCategoria')
-        .leftJoinAndSelect('subCategoria.idCategoria2', 'categoria')
+        .leftJoinAndSelect('producto.marca', 'm')
+        .leftJoinAndSelect('producto.productoTipoProductos', 'ptp')
+        .leftJoinAndSelect('ptp.tipoProducto', 'tp')
+        .leftJoinAndSelect('tp.tipoProductoSubCategoria', 'tpsc')
+        .leftJoinAndSelect('tpsc.subCategoria', 'sc')
+        .leftJoinAndSelect('sc.categoria', 'c')
         .leftJoinAndSelect('producto.productoTiendas', 'pt')
-        .leftJoinAndSelect('pt.idTienda2', 'tienda')
+        .leftJoinAndSelect('pt.tienda', 't')
         .getMany();
-
-      const getCategoriaNombre = (p: Producto) => {
-        if (!p.productoTipoProducto) return null;
-        for (const ptp of p.productoTipoProducto) {
+      /*
+      const getCategoriaNombre = (producto: Producto) => {
+        if (!producto.productoTipoProductos) return null;
+        for (const ptp of producto.productoTipoProductos) {
           const tipo = ptp.idTipoProducto as any;
           if (!tipo || !tipo.tipoProductoSubCategoria) continue;
           for (const tpsc of tipo.tipoProductoSubCategoria) {
@@ -70,11 +70,12 @@ export class ProductoService {
         }
         return null;
       };
+      */
 
-      return productos.map(p => ({
+      return productos.map(p  => ({
         ...p,
-        marca: p.idMarca2?.nombre ?? null,
-        categoria: getCategoriaNombre(p),
+        marca: p.marca?.nombre ?? null,
+        categoria: p.productoTipoProductos?.[0]?.tipoProducto?.tipoProductoSubCategorias?.[0]?.subCategoria?.categoria?.nombre ?? null,
       }));
     } catch (error) {
       console.error('Error en findAll:', error);
@@ -193,14 +194,14 @@ export class ProductoService {
   private buildProductoQuery(filtros: any): SelectQueryBuilder<Producto> {
     const query = this.productoRepository
       .createQueryBuilder('producto')
-      .leftJoinAndSelect('producto.idMarca2', 'marca')
-      .leftJoinAndSelect('producto.productoTipoProducto', 'ptp')
-      .leftJoinAndSelect('ptp.idTipoProducto', 'tipoProducto')
-      .leftJoinAndSelect('tipoProducto.tipoProductoSubCategoria', 'tpsc')
-      .leftJoinAndSelect('tpsc.idSubCategoria', 'subCategoria')
-      .leftJoinAndSelect('subCategoria.idCategoria2', 'categoria')
+      .leftJoinAndSelect('producto.marca', 'marca')
+      .leftJoinAndSelect('producto.productoTipoProductos', 'ptp')
+      .leftJoinAndSelect('ptp.tipoProducto', 'tp')
+      .leftJoinAndSelect('tp.tipoProductoSubCategoria', 'tpsc')
+      .leftJoinAndSelect('tpsc.subCategoria', 'sc')
+      .leftJoinAndSelect('sc.categoria', 'categoria')
       .leftJoinAndSelect('producto.productoTiendas', 'pt')
-      .leftJoinAndSelect('pt.idTienda2', 'tienda');
+      .leftJoinAndSelect('pt.tienda', 'tienda');
 
     this.applyFilters(query, filtros);
     this.applySearchFilter(query, filtros);
@@ -303,16 +304,16 @@ export class ProductoService {
       const producto = await this.productoRepository.findOne({
         where: { idProducto: id },
         relations: [
-          'idMarca2',
+          'marca',
           'productoColores',
           'productoColores.color',
-          'productoTipoProducto',
-          'productoTipoProducto.idTipoProducto',
-          'productoTipoProducto.idTipoProducto.tipoProductoSubCategoria',
-          'productoTipoProducto.idTipoProducto.tipoProductoSubCategoria.idSubCategoria',
-          'productoTipoProducto.idTipoProducto.tipoProductoSubCategoria.idSubCategoria.idCategoria2',
+          'productoTipoProductos',
+          'productoTipoProducto.tipoProducto',
+          'productoTipoProducto.tipoProducto.tipoProductoSubCategoria',
+          'productoTipoProducto.tipoProducto.tipoProductoSubCategoria.subCategoria',
+          'productoTipoProducto.tipoProducto.tipoProductoSubCategoria.subCategoria.categoria',
           'productoTiendas',
-          'productoTiendas.idTienda2',
+          'productoTiendas.tienda',
         ],
       });
 
@@ -334,19 +335,19 @@ export class ProductoService {
     }
   }
 
-  async update(id: number, updateProductoDto: UpdateProductoDto) {
+  async update(idProducto: number, dtoUpdate: UpdateProductoDto) {
     try {
       const producto = await this.productoRepository.preload({
-        idProducto: id,
-        ...updateProductoDto,
+        idProducto,
+        ...dtoUpdate,
       });
       if (!producto) {
-        throw new NotFoundException(`Producto con ID ${id} no encontrado`);
+        throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);
       }
       return await this.productoRepository.save(producto);
     } catch (error) {
       throw new InternalServerErrorException(
-        `Error al actualizar el producto con ID ${id}`,
+        `Error al actualizar el producto con ID ${idProducto}`,
       );
     }
   }

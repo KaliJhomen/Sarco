@@ -13,15 +13,15 @@ export class DetalleVentaService {
     private detalleVentaRepository: Repository<DetalleVenta>,
   ) { }
 
-  async create(createDetalleVentaDto: CreateDetalleVentaDto) {
+  async create(dtoCreate: CreateDetalleVentaDto) {
     try {
-      if ((createDetalleVentaDto as any)?.idArticulo !== undefined) {
+      if ((dtoCreate as any)?.idArticulo !== undefined) {
         throw new BadRequestException('Campo idArticulo no permitido. Use idProducto.');
       }
-      if (createDetalleVentaDto?.idProducto === undefined || createDetalleVentaDto?.idProducto === null) {
+      if (dtoCreate?.idProducto === undefined || dtoCreate?.idProducto === null) {
         throw new BadRequestException('idProducto es requerido.');
       }
-      const newDetalleVenta = this.detalleVentaRepository.create(createDetalleVentaDto);
+      const newDetalleVenta = this.detalleVentaRepository.create(dtoCreate);
       return this.detalleVentaRepository.save(newDetalleVenta);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al guardar el detalle de venta');
@@ -31,30 +31,18 @@ export class DetalleVentaService {
   async findAll() {
     try {
       return await this.detalleVentaRepository.find({
-        relations: ['idProducto2'],
-        select: {
-          idProducto2: {
-            idProducto: true,
-            nombre: true
-          }
-        },
+        relations: ['idProducto'],
       });
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al obtener los detalles de venta');
     }
   }
 
-  async findOne(id: number) {
+  async findOne(idDetalleVenta: number) {
     try {
       const found = await this.detalleVentaRepository.findOne({
-        where: { idDetalleVenta: id },
-        relations: ['idProducto2'],
-        select: {
-          idProducto2: {
-            idProducto: true,
-            nombre: true
-          }
-        },
+        where: { idDetalleVenta },
+        relations: ['idProducto'],
       });
       if (!found) {
         throw new NotFoundException('Detalle de venta no encontrado');

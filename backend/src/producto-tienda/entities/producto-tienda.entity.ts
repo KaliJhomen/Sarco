@@ -14,16 +14,16 @@ import { Tienda } from "../../tienda/entities/tienda.entity";
 @Entity("producto_tienda", { schema: "sarcos_db" })
 export class ProductoTienda {
   @PrimaryGeneratedColumn({ type: "int", name: "id_producto_tienda" })
-  idProductoTienda: number;
+  idProductoTienda!: number;
 
   @Column("int", { name: "id_producto", nullable: true })
-  idProducto: number | null;
+  idProducto!: number | null;
 
   @Column("int", { name: "id_tienda", nullable: true })
-  idTienda: number | null;
+  idTienda!: number | null;
 
   @Column("int", { name: "cantidad", nullable: true })
-  cantidad: number | null;
+  cantidad!: number | null;
 
   
   @ManyToOne(() => Producto, (producto) => producto.productoTiendas, {
@@ -31,12 +31,12 @@ export class ProductoTienda {
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_producto", referencedColumnName: "idProducto" }])
-  idProducto2: Producto;
+  producto!: Producto;
 
   @ManyToOne(() => Tienda, (tienda) => tienda.productoTiendas, {
     onDelete: "CASCADE",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_tienda", referencedColumnName: "idTienda" }])
-  idTienda2: Tienda;
+  tienda!: Tienda;
 }

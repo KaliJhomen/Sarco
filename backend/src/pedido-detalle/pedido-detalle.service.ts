@@ -4,7 +4,7 @@ import { Repository, FindOptionsWhere } from 'typeorm';
 import { PedidoDetalle } from './entities/pedido-detalle.entity';
 import { EstadoPedido, Pedido } from '../pedido/entities/pedido.entity';
 import { Producto } from '../producto/entities/producto.entity';
-import { User } from '../user/entities/user.entity';
+import { Usuario } from '../usuario/entities/usuario.entity';
 
 @Injectable()
 export class PedidoDetalleService {
@@ -15,27 +15,27 @@ export class PedidoDetalleService {
     private readonly pedidoRepository: Repository<Pedido>,
     @InjectRepository(Producto)
     private readonly productRepository: Repository<Producto>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
   ) {}
 
   // Obtener o crear pedido para usuario registrado O invitado
-  private async getOrCreateOrder(idUser?: number, sessionToken?: string): Promise<Pedido> {
+  private async getOrCreateOrder(idUsuario?: number, sessionToken?: string): Promise<Pedido> {
     let pedido: Pedido | null;
 
-    if (idUser) {
-      const user = await this.userRepository.findOne({ where: { id: idUser } });
-      if (!user) throw new NotFoundException(`Usuario con ID ${idUser} no encontrado`);
+    if (idUsuario) {
+      const usuario = await this.usuarioRepository.findOne({ where:  {idUsuario } });
+      if (!usuario) throw new NotFoundException(`Usuario con ID ${idUsuario} no encontrado`);
 
       pedido = await this.pedidoRepository.findOne({
         where: {
-          usuario: { id: idUser },
+          usuario: { idUsuario },
           estado: EstadoPedido.PENDIENTE
 }      });
 
       if (!pedido) {
         pedido = this.pedidoRepository.create({
-          usuario: user,
+          usuario
         });
         pedido = await this.pedidoRepository.save(pedido);
       }
@@ -62,24 +62,24 @@ export class PedidoDetalleService {
   }
 
   // Construir where clause dinámicamente
-  private buildWhereClause(idUser?: number, sessionToken?: string): FindOptionsWhere<Pedido> {
-    if (idUser) {
-      return { usuario: { id: idUser } };
+  private buildWhereClause(idUsuario?: number, sessionToken?: string): FindOptionsWhere<Pedido> {
+    if (idUsuario) {
+      return { idUsuario};
     }
     return { sessionToken };
   }
 
   // Obtener pedido/carrito del usuario
-  async findByUser(idUser?: number, sessionToken?: string) {
-    const where = this.buildWhereClause(idUser, sessionToken);
+  async findByUser(idUsuario?: number, sessionToken?: string) {
+    const where = this.buildWhereClause(idUsuario, sessionToken);
     const pedido = await this.pedidoRepository.findOne({
       where,
-      relations: ['items', 'items.producto'],
+      relations: ['pedidoDetalles'],
     });
 
     if (!pedido) {
       return {
-        userId: idUser || null,
+        idUsuario: idUsuario || null,
         sessionToken: sessionToken || null,
         idPedido: null,
         items: [],
@@ -88,12 +88,12 @@ export class PedidoDetalleService {
       };
     }
 
-    const items = pedido.items || [];
+    const items = pedido.pedidoDetalles || [];
     const totalItems = items.reduce((acc, it) => acc + (Number(it.cantidad) || 0), 0);
-    const total = items.reduce((acc, it) => acc + (Number(it.cantidad) * Number(it.precioVenta) || 0), 0);
+    const total = items.reduce((acc, it) => acc + (Number(it.cantidad) * Number(it.montoTotal) || 0), 0);
 
     return {
-      userId: idUser || null,
+      idUsuario: idUsuario || null,
       sessionToken: sessionToken || null,
       idPedido: pedido.idPedido,
       items,
@@ -103,20 +103,20 @@ export class PedidoDetalleService {
   }
 
   // Agregar producto al pedido
-  async addToOrder(idProducto: number, quantity: number, idUser?: number, sessionToken?: string) {
-    if (!Number.isInteger(quantity) || quantity <= 0) {
+  async addToOrder(idProducto: number, cantidad: number, idUsuario?: number, sessionToken?: string) {
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
       throw new BadRequestException('La cantidad debe ser mayor a 0');
     }
 
-    const product = await this.productRepository.findOne({ where: { idProducto } });
-    if (!product) throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);
+    const producto = await this.productRepository.findOne({ where: { idProducto } });
+    if (!producto) throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);
 
-    const stock = Number(product.stock) || 0;
-    if (quantity > stock) {
+    const stock = Number(producto.stock) || 0;
+    if (cantidad > stock) {
       throw new BadRequestException(`Solo hay ${stock} unidades disponibles`);
     }
 
-    const pedido = await this.getOrCreateOrder(idUser, sessionToken);
+    const pedido = await this.getOrCreateOrder(idUsuario, sessionToken);
 
     const existingItem = await this.pedidoDetalleRepository.findOne({
       where: {
@@ -127,29 +127,27 @@ export class PedidoDetalleService {
     });
 
     if (existingItem) {
-      const newQuantity = existingItem.cantidad + quantity;
-      if (newQuantity > stock) {
+      const nuevaCantidad = existingItem.cantidad + cantidad;
+      if (nuevaCantidad> stock) {
         throw new BadRequestException(`Solo hay ${stock} unidades disponibles`);
       }
-      existingItem.cantidad = newQuantity;
-      existingItem.subtotal = newQuantity * Number(existingItem.precioVenta);
+      existingItem.cantidad =nuevaCantidad;
+      existingItem.subtotal = String(nuevaCantidad * Number(existingItem.montoTotal));
       return this.pedidoDetalleRepository.save(existingItem);
     }
 
-    const newItem = this.pedidoDetalleRepository.create({
-      pedido,
-      producto: product,
-      cantidad: quantity,
-      precioVenta: Number(product.precioVenta),
-      subtotal: quantity * Number(product.precioVenta),
-    });
-
+    const newItem = this.pedidoDetalleRepository.create();
+    newItem.pedido = pedido;
+    newItem.producto = producto;   
+    newItem.cantidad=  cantidad;
+    newItem.montoTotal= String(producto.precioVenta);
+    newItem.subtotal= String(cantidad * Number(producto.precioVenta));
     return this.pedidoDetalleRepository.save(newItem);
   }
 
   // Actualizar cantidad de item
-  async updateOrderItem(idProducto: number, quantity: number, idUser?: number, sessionToken?: string) {
-    if (!Number.isInteger(quantity) || quantity <= 0) {
+  async updateOrderItem(idProducto: number, cantidad: number, idUsuario?: number, sessionToken?: string) {
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
       throw new BadRequestException('La cantidad debe ser mayor a 0');
     }
 
@@ -157,11 +155,11 @@ export class PedidoDetalleService {
     if (!product) throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);
 
     const stock = Number(product.stock) || 0;
-    if (quantity > stock) {
+    if (cantidad> stock) {
       throw new BadRequestException(`Solo hay ${stock} unidades disponibles`);
     }
 
-    const where = this.buildWhereClause(idUser, sessionToken);
+    const where = this.buildWhereClause(idUsuario, sessionToken);
     const pedido = await this.pedidoRepository.findOne({ where });
     if (!pedido) throw new NotFoundException('Pedido no encontrado');
 
@@ -176,8 +174,8 @@ export class PedidoDetalleService {
       throw new NotFoundException(`El producto con ID ${idProducto} no está en el pedido`);
     }
 
-    existingItem.cantidad = quantity;
-    existingItem.subtotal = quantity * Number(existingItem.precioVenta);
+    existingItem.cantidad = cantidad;
+    existingItem.subtotal = String(cantidad * Number(existingItem.montoTotal));
     return this.pedidoDetalleRepository.save(existingItem);
   }
 

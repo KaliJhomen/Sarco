@@ -40,7 +40,6 @@ export class Pedido {
   @Column("enum", { name: 'estado',enum: EstadoPedido, default: EstadoPedido.PENDIENTE })
   estado!: EstadoPedido;
 
-  @Column()
   @Column('varchar', { name: 'session_token', nullable: true, length: 32 })
   sessionToken!: string | null;
 
@@ -51,7 +50,8 @@ export class Pedido {
   updatedAt!: Date;
 
 //Relaciones 
-  @OneToMany(() => PedidoDetalle, (detalle) => detalle.pedido, { cascade: true })
+  @OneToMany(() => PedidoDetalle, (pedidoDetalle) => pedidoDetalle.pedido, 
+  { cascade: true })
   pedidoDetalles!: PedidoDetalle[];
 
   @ManyToOne(() => Usuario, { 

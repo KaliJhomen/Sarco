@@ -8,35 +8,35 @@ export class CreateEgresoDto {
         example: 1
     })
     @IsNumber()
-    idUsuario: number;
+    idUsuario!: number | null;
 
     @ApiProperty({
         description: 'ID de la tienda asociada al egreso',
         example: 1
     })
     @IsNumber()
-    idTienda: number;
+    idTienda!: number | null;
 
     @ApiProperty({
         description: 'Nombre del egreso',
         example: 'Compra de suministros'
     }) 
     @IsString()
-    nombre: string;
+    nombre!: string | null;
 
     @ApiProperty({
         description: 'Descripción del egreso',
         example: 'Compra de materiales de oficina'
     })
     @IsString()
-    descripcion: string;
+    descripcion!: string | null;
 
     @ApiProperty({
         description: 'Monto del egreso',
         example: '150.75'
     })
     @IsNumber()
-    montoEgreso: number;
+    montoEgreso!: string | null;
 
     @ApiProperty({
         description: 'Fecha del egreso',
@@ -44,12 +44,12 @@ export class CreateEgresoDto {
     })
     @Type(() => Date)
     @IsDate()
-    fecha: string;
+    fecha!: string | null;
 
     @ApiProperty({
         description: 'Estado del egreso',
         example: 'PENDIENTE'
     })
     @IsString()
-    estado: string;
+    estado!: string | null;
 }

@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CarritoService } from './carrito.service';
 import { CarritoController } from './carrito.controller';
 import { Carrito } from './entities/carrito.entity';
-import { CarritoItem } from '../carrito-item/entities/carrito-item.entity';
+import { CarritoItem } from './entities/carrito-item.entity';
 import { Producto } from '../producto/entities/producto.entity';
 import { Cliente } from '../cliente/entities/cliente.entity';
 import { User } from '../user/entities/user.entity';

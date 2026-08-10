@@ -4,68 +4,71 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreateProductoDto {
   @ApiProperty()
   @IsString()
-  nombre: string;
+  nombre!: string;
 
   @ApiProperty()
   @IsString()
-  modelo: string;
+  modelo!: string;
   
   @ApiProperty()
   @IsNumber()
-  idMarca: number;
+  idMarca!: number;
 
   @ApiPropertyOptional({ required: false })
   @IsString()
   @IsOptional()
-  descripcion?: string | null;
+  descripcion!: string | null;
 
   @ApiProperty({default:0})
   @IsNumber()
   @Min(0)
-  stock: number;
+  stock!: number;
 
   @ApiPropertyOptional({ required:false })
   @IsString()
   @IsOptional()
-  imagen?: string | null; 
+  imagen!: string | null; 
 
   @ApiPropertyOptional({ required:false })
   @IsNumber()
   @Min(0)
   @IsOptional()
-  precioTope?: number | null; 
+  precioTope!: string | null; 
 
   @ApiPropertyOptional({ required: false })
   @IsNumber()
   @Min(0)
   @IsOptional()
-  precioVenta?: number | null;
+  precioVenta!: string | null;
 
   @ApiPropertyOptional({ required: false })
   @IsBoolean()
   @IsOptional()
-  estado?: boolean | null; 
+  estado!: boolean | null; 
 
   @ApiPropertyOptional({ required: false, type: String, format: 'date' })
   @IsOptional()
   @IsDateString()
-  fechaIngreso?: string | null;
+  fechaIngreso!: string | null;
 
   @ApiPropertyOptional({ required: false, type: Number })
   @IsOptional()
   @IsNumber()
-  garantiaFabrica?: number | null; 
+  garantiaFabrica!: number | null; 
 
   @ApiPropertyOptional({required:false})
   @IsNumber()
   @IsOptional()
-  descuento?: number | null;
+  descuento!: number | null;
 
   //Relacion
   @ApiProperty({ type: [Number] })
+  @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
   @IsInt({each:true})
-  idTiposProducto: number[];
+  @Min(1, { each: true })
+  idTiposProducto!: number[];
+
 }
 

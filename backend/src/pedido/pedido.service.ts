@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { Pedido } from './entities/pedido.entity';
 import { PedidoDetalle } from '../pedido-detalle/entities/pedido-detalle.entity';
 import { Producto } from '../producto/entities/producto.entity';
-import { User } from '../user/entities/user.entity';
+import { Usuario } from '../usuario/entities/usuario.entity';
 import { EstadoPedido } from './entities/pedido.entity';
 
 @Injectable()
@@ -20,12 +20,14 @@ export class PedidoService {
     private readonly pedidoDetalleRepository: Repository<PedidoDetalle>,
     @InjectRepository(Producto)
     private readonly productRepository: Repository<Producto>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
   ) {}
 
+
+
   async createPedido(
-    userId: number,
+    idUsuario: number,
     shippingData: {
       nombre: string;
       email: string | undefined;
@@ -35,8 +37,8 @@ export class PedidoService {
     },
     items: Array<{ idProducto: number; cantidad: number }>,
   ) {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) throw new NotFoundException('Usuario no encontrado');
+    const usuario = await this.usuarioRepository.findOne({ where: { idUsuario } });
+    if (!usuario) throw new NotFoundException('Usuario no encontrado');
 
     let total = 0;
     const detalles: PedidoDetalle[] = [];
@@ -47,30 +49,30 @@ export class PedidoService {
       if (item.cantidad > producto.stock) throw new BadRequestException(`Stock insuficiente para producto ${producto.nombre}`);
 
       const detalle = this.pedidoDetalleRepository.create({
-        producto,
+        producto: producto,
         cantidad: item.cantidad,
-        precioVenta: Number(producto.precioVenta),
-        subtotal: item.cantidad * Number(producto.precioVenta),
+        montoTotal: String(Number(producto.precioVenta)),
+        subtotal: String(item.cantidad * Number(producto.precioVenta)),
       });
 
-      total += detalle.subtotal ?? 0;
+      total += Number(detalle.subtotal) || 0;
       detalles.push(detalle);
     }
 
     const pedido = this.pedidoRepository.create({
-      usuario: user,
+      usuario,
       ...shippingData,
-      total,
+      total: String(total),
       estado: EstadoPedido.PENDIENTE,
-      items: detalles,
+      pedidoDetalles: detalles,
     });
 
     return this.pedidoRepository.save(pedido);
   }
 
-  async findByUserId(userId: number) {
+  async findByUserId(idUsuario: number) {
     return this.pedidoRepository.find({
-      where: { usuario: { id: userId } },
+      where: { idUsuario },
       relations: ['items', 'items.producto'],
       order: { createdAt: 'DESC' },
     });

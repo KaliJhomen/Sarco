@@ -13,15 +13,15 @@ export class DetalleCreditoService {
     private detalleCreditoRepository: Repository<DetalleCredito>,
   ) { }
 
-  async create(createDetalleCreditoDto: CreateDetalleCreditoDto) {
+  async create(dtoCreate: CreateDetalleCreditoDto) {
     try {
-      if ((createDetalleCreditoDto as any)?.idArticulo !== undefined) {
+      if ((dtoCreate as any)?.idArticulo !== undefined) {
         throw new BadRequestException('Campo idArticulo no permitido. Use idProducto.');
       }
-      if (createDetalleCreditoDto?.idProducto === undefined || createDetalleCreditoDto?.idProducto === null) {
+      if (dtoCreate?.idProducto === undefined || dtoCreate?.idProducto === null) {
         throw new BadRequestException('idProducto es requerido.');
       }
-      const newDetalleCredito = this.detalleCreditoRepository.create(createDetalleCreditoDto);
+      const newDetalleCredito = this.detalleCreditoRepository.create(dtoCreate);
       return this.detalleCreditoRepository.save(newDetalleCredito);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al guardar el detalle de crédito');
@@ -31,9 +31,9 @@ export class DetalleCreditoService {
   async findAll() {
     try {
       return await this.detalleCreditoRepository.find({
-        relations: ['idProducto2'],
+        relations: ['producto'],
         select: {
-          idProducto2: {
+          producto: {
             idProducto: true,
             nombre: true
           }
@@ -44,17 +44,11 @@ export class DetalleCreditoService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(idDetalleCredito: number) {
     try {
       const found = await this.detalleCreditoRepository.findOne({
-        where: { idDetalleCredito: id },
-        relations: ['idProducto2'],
-        select: {
-          idProducto2: {
-            idProducto: true,
-            nombre: true
-          }
-        },
+        where: { idDetalleCredito },
+        relations: ['producto'],
       });
       if (!found) {
         throw new NotFoundException('Detalle de crédito no encontrado');

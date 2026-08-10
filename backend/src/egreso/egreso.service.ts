@@ -12,9 +12,9 @@ export class EgresoService {
     @InjectRepository(Egreso)
     private readonly egresoRepository: Repository<Egreso>,
   ) { }
-  async create(createEgresoDto: CreateEgresoDto) {
+  async create(dtoCreate: CreateEgresoDto) {
     try {
-      const newEgreso = this.egresoRepository.create(createEgresoDto);
+      const newEgreso = this.egresoRepository.create(dtoCreate);
       return this.egresoRepository.save(newEgreso);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al guardar el Egreso');
@@ -24,28 +24,18 @@ export class EgresoService {
   async findAll() {
     try {
       return await this.egresoRepository.find({
-        relations: ['idUsuario2'],
-        select: {
-          idUsuario2: {
-            nombre: true
-          }
-        },
+        relations: ['idUsuario'],
       });
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al obtener los detalles de separado');
     }
   }
 
-  async findOne(id: number) {
+  async findOne(idEgreso: number) {
     try {
       const found = await this.egresoRepository.findOne({
-        where: { idEgreso: id },
-        relations: ['idUsuario2'],
-        select: {
-          idUsuario2: {
-            nombre: true
-          }
-        },
+        where: { idEgreso },
+        relations: ['idUsuario'],
       });
       if (!found) {
         throw new NotFoundException('Egreso no encontrado');

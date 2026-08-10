@@ -10,6 +10,7 @@ import { Credito } from "../../credito/entities/credito.entity";
 import { MetodoPago } from "../../metodo-pago/entities/metodo-pago.entity";
 import { Tienda } from "../../tienda/entities/tienda.entity";
 import { Usuario } from "../../usuario/entities/usuario.entity";
+import { User } from "src/user/entities/user.entity";
 
 @Index("FK_ticket_credito_usuario", ["idUsuario"], {})
 @Index("FK_ticket_credito_credito", ["idCredito"], {})
@@ -18,22 +19,22 @@ import { Usuario } from "../../usuario/entities/usuario.entity";
 @Entity("ticket_credito", { schema: "sarcos_db" })
 export class TicketCredito {
   @PrimaryGeneratedColumn({ type: "int", name: "id_ticket_credito" })
-  idTicketCredito: number;
+  idTicketCredito!: number;
 
   @Column("int", { name: "id_usuario", nullable: true })
-  idUsuario: number | null;
+  idUsuario!: number | null;
 
   @Column("int", { name: "id_tienda", nullable: true })
-  idTienda: number | null;
+  idTienda!: number | null;
 
   @Column("int", { name: "id_credito", nullable: true })
-  idCredito: number | null;
+  idCredito!: number | null;
 
   @Column("int", { name: "id_metodo_pago", nullable: true })
-  idMetodoPago: number | null;
+  idMetodoPago!: number | null;
 
   @Column("datetime", { name: "fecha_pago", nullable: true })
-  fechaPago: Date | null;
+  fechaPago!: Date | null;
 
   @Column("decimal", {
     name: "monto_pago",
@@ -42,10 +43,10 @@ export class TicketCredito {
     scale: 2,
     default: () => "'0.00'",
   })
-  montoPago: string | null;
+  montoPago!: string | null;
 
   @Column("char", { name: "num_comprobante", nullable: true, length: 24 })
-  numComprobante: string | null;
+  numComprobante!: string | null;
 
   @Column("decimal", {
     name: "deuda_restante",
@@ -54,14 +55,14 @@ export class TicketCredito {
     scale: 2,
     default: () => "'0.00'",
   })
-  deudaRestante: string | null;
+  deudaRestante!: string | null;
 
   @ManyToOne(() => Credito, (credito) => credito.ticketCreditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_credito", referencedColumnName: "idCredito" }])
-  idCredito2: Credito;
+  credito!: Credito;
 
   @ManyToOne(() => MetodoPago, (metodoPago) => metodoPago.ticketCreditos, {
     onDelete: "NO ACTION",
@@ -70,19 +71,19 @@ export class TicketCredito {
   @JoinColumn([
     { name: "id_metodo_pago", referencedColumnName: "idMetodoPago" },
   ])
-  idMetodoPago2: MetodoPago;
+  metodoPago!: MetodoPago;
 
   @ManyToOne(() => Tienda, (tienda) => tienda.ticketCreditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_tienda", referencedColumnName: "idTienda" }])
-  idTienda2: Tienda;
+  tienda!: Tienda;
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.ticketCreditos, {
+  @ManyToOne(() => User, (user) => user.ticketCreditos, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  idUsuario2: Usuario;
+  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
+  user!: User;
 }

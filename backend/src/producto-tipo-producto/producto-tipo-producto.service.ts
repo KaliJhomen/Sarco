@@ -11,14 +11,14 @@ export class ProductoTipoProductoService {
     @InjectRepository(ProductoTipoProducto)
     private productoTipoProductoRepository: Repository<ProductoTipoProducto>,
   ) { }
-  async create(createProductoTipoProductoDto: CreateProductoTipoProductoDto) {
+  async create(dtoCreate: CreateProductoTipoProductoDto) {
     try {
       const entity = this.productoTipoProductoRepository.create({
-        idProducto: { idProducto: createProductoTipoProductoDto.idProducto },
-        idTipoProducto: { idTipoProducto: createProductoTipoProductoDto.idTipoProducto },
+        producto: { idProducto: dtoCreate.idProducto },
+        tipoProducto: { idTipoProducto: dtoCreate.idTipoProducto },
       });
       return await this.productoTipoProductoRepository.save(entity);
-    } catch (error) {
+    } catch (error : any) {
       if (
         error.code === 'ER_DUP_ENTRY' ||
         (error.message && error.message.includes('Duplicate entry'))
@@ -35,10 +35,10 @@ export class ProductoTipoProductoService {
   async findAll() {
     try {
       return await this.productoTipoProductoRepository.find({
-        relations:['idProducto', 'idTipoProducto']
+        relations:['producto', 'tipoProducto']
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw new InternalServerErrorException(
         'Ocurrió un error al obtener las categorías',
       );
@@ -47,7 +47,7 @@ export class ProductoTipoProductoService {
   //Por ID Producto
   async findByProductId(idProducto: number) {
     try {
-      const entity = await this.productoTipoProductoRepository.find({ where: { idProducto: { idProducto: idProducto } } });
+      const entity = await this.productoTipoProductoRepository.find({ where: { producto: {idProducto}} });
       if (!entity) {
         throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${idProducto}`);
       }
@@ -62,7 +62,7 @@ export class ProductoTipoProductoService {
   // Por ID TipoProducto 
   async findByProductTypeId(idTipoProducto: number) {
     try {
-      const entity = await this.productoTipoProductoRepository.find({ where: { idTipoProducto: { idTipoProducto: idTipoProducto } } });
+      const entity = await this.productoTipoProductoRepository.find({ where: { tipoProducto: { idTipoProducto: idTipoProducto } } });
       if (!entity) {
         throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${idTipoProducto}`);
       }
@@ -74,56 +74,57 @@ export class ProductoTipoProductoService {
       );
     }
   }
-  async findOne(id: number) {
+  async findOne(idProductoTipoProducto: number) {
     try {
-      const entity = await this.productoTipoProductoRepository.findOne({ where: { idProductoTipoProducto: id } });
+      const entity = await this.productoTipoProductoRepository.findOne({ where: { idProductoTipoProducto} });
       if (!entity) {
-        throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${id}`);
+        throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${idProductoTipoProducto}`);
       }
       return entity;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(
-        `Ocurrió un error al obtener el producto-tipo-producto con ID ${id}`,
+        `Ocurrió un error al obtener el producto-tipo-producto con ID ${idProductoTipoProducto}`,
       );
     }
   }
 
-  async update(id: number, updateProductoTipoProductoDto: UpdateProductoTipoProductoDto) {
+  async update(idProductoTipoProducto: number, dtoUpdate: UpdateProductoTipoProductoDto) {
     try {
       const entity = await this.productoTipoProductoRepository.preload({
-        idProductoTipoProducto: id,
-        idProducto: updateProductoTipoProductoDto.idProducto
-          ? { idProducto: updateProductoTipoProductoDto.idProducto }
+        tipoProducto: dtoUpdate.idTipoProducto
+          ? { idTipoProducto: dtoUpdate.idTipoProducto,
+           }
           : undefined,
-        idTipoProducto: updateProductoTipoProductoDto.idTipoProducto
-          ? { idTipoProducto: updateProductoTipoProductoDto.idTipoProducto }
+        producto: dtoUpdate.idProducto
+          ? { idProducto: dtoUpdate.idProducto
+          }
           : undefined,
       });
       if (!entity) {
-        throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${id}`);
+        throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${idProductoTipoProducto}`);
       }
       return await this.productoTipoProductoRepository.save(entity);
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(
-        `Ocurrió un error al actualizar el producto-tipo-producto con ID ${id}`,
+        `Ocurrió un error al actualizar el producto-tipo-producto con ID ${idProductoTipoProducto}`,
       );
     }
   }
 
-  async remove(id: number) {
+  async remove(idProductoTipoProducto: number) {
     try {
-      const entity = await this.productoTipoProductoRepository.findOne({ where: { idProductoTipoProducto: id } });
+      const entity = await this.productoTipoProductoRepository.findOne({ where: { idProductoTipoProducto } });
       if (!entity) {
-        throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${id}`);
+        throw new NotFoundException(`No se encontró el producto-tipo-producto con ID ${idProductoTipoProducto}`);
       }
       await this.productoTipoProductoRepository.remove(entity);
-      return { message: `Producto-tipo-producto con ID ${id} eliminado correctamente` };
+      return { message: `Producto-tipo-producto con ID ${idProductoTipoProducto} eliminado correctamente` };
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(
-        `Ocurrió un error al eliminar el producto-tipo-producto con ID ${id}`,
+        `Ocurrió un error al eliminar el producto-tipo-producto con ID ${idProductoTipoProducto}`,
       );
     }
   }

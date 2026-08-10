@@ -10,30 +10,30 @@ import { Accion } from "../../accion/entities/accion.entity";
 @Entity("rol_permiso", { schema: "sarcos_db" })
 export class RolPermiso {
     @PrimaryGeneratedColumn({ type: "int", name: "id_rol_permiso" })
-    idRolPermiso: number;
+    idRolPermiso!: number;
 
     @Column("int", { name: "id_rol", nullable: true })
-    idRol: number;
+    idRol!: number;
 
     @Column("int", { name: "id_modulo", nullable: true })
-    idModulo: number;
+    idModulo!: number;
 
     @Column("int", { name: "id_accion", nullable: true })
-    idAccion: number;
+    idAccion!: number;
 
 
     @Column("boolean", { name: "permitido", default: () => "true" })
-    permitido: boolean;
+    permitido!: boolean;
 
     @ManyToOne(() => Rol, (rol) => rol.permisos, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_rol", referencedColumnName: "idRol" })
-    rol: Rol;
+    rol!: Rol;
 
-    @ManyToOne(() => Modulo, (modulo) => modulo.permisos, { onDelete: "CASCADE" })
+    @ManyToOne(() => Modulo, (modulo) => modulo.rolPermisos, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_modulo", referencedColumnName: "idModulo" })
-    modulo: Modulo;
+    modulo!: Modulo;
 
-    @ManyToOne(() => Accion, (accion) => accion.permisos, { onDelete: "CASCADE" })
+    @ManyToOne(() => Accion, (accion) => accion.rolPermisos, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_accion", referencedColumnName: "idAccion" })
-    accion: Accion;
+    accion!: Accion;
 }

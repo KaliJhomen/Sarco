@@ -13,26 +13,28 @@ import { ProductoTienda } from "src/producto-tienda/entities/producto-tienda.ent
 import { DetalleCredito } from "../../detalle-credito/entities/detalle-credito.entity";
 import { DetalleSeparado } from "../../detalle-separado/entities/detalle-separado.entity";
 import { DetalleVenta } from "../../detalle-venta/entities/detalle-venta.entity";
+import { PedidoDetalle } from "../../pedido-detalle/entities/pedido-detalle.entity";
+
 import { Garantia } from "../../garantia/entities/garantia.entity";
 import { ProductoTipoProducto } from "src/producto-tipo-producto/entities/producto-tipo-producto.entity";
 import { ProductoColor } from "src/producto-color/entities/producto-color.entity";
-import { CarritoItem } from "../../carrito-item/entities/carrito-item.entity"; 
-import { FavoritosItem } from "src/favoritos-item/entities/favoritos-item.entity";
+import { CarritoItem } from "../../carrito/entities/carrito-item.entity"; 
+import { FavoritosItem } from "src/favoritos/entities/favoritos-item.entity";
 
 @Index("fk_producto_marca_2", ["idMarca"], {})
 @Entity("producto", { schema: "sarcos_db" })
 export class Producto {
   @PrimaryGeneratedColumn({ type: "int", name: "id_producto" })
-  idProducto: number;
+  idProducto!: number;
 
   @Column("varchar", { name: "nombre", length: 255 })
-  nombre: string ;
+  nombre!: string ;
   
   @Column("varchar", { name: "modelo", length: 255 })
-  modelo: string ;
+  modelo!: string ;
 
   @Column("int", { name: "id_marca" })
-  idMarca: number;
+  idMarca!: number;
 
   @Column("varchar", {
     name: "descripcion",
@@ -40,13 +42,13 @@ export class Producto {
     comment: " ",
     length: 1024,
   })
-  descripcion: string | null;
+  descripcion!: string | null;
 
   @Column("int", { name: "stock", default:0, nullable: false })
-  stock: number;
+  stock!: number;
 
   @Column("varchar", { name: "imagen", nullable: true, length: 255 })
-  imagen: string | null;
+  imagen!: string | null;
 
   @Column("decimal", {
     name: "precio_tope",
@@ -54,7 +56,7 @@ export class Producto {
     precision: 20,
     scale: 2,
   })
-  precioTope: number | null;
+  precioTope!: string | null;
 
   @Column("decimal", {
     name: "precio_venta",
@@ -62,65 +64,60 @@ export class Producto {
     precision: 20,
     scale: 2,
   })
-  precioVenta: number | null;
+  precioVenta!: string | null;
 
   @Column("tinyint", { name: "estado", nullable: true, default: () => "'1'" })
-  estado: boolean | null;
+  estado!: boolean | null;
 
   @Column("date", { name: "fecha_ingreso", nullable: true })
-  fechaIngreso: string | null;
+  fechaIngreso!: string | null;
 
   @Column("int", { name: "garantia_fabrica", nullable: true })
-  garantiaFabrica: number | null;
+  garantiaFabrica!: number | null;
 
   @Column("int", { name: "descuento", nullable: true })
-  descuento: number | null;
+  descuento!: number | null;
 
-  @OneToMany(
-    () => ProductoTipoProducto,
-    (productoTipoProducto) => productoTipoProducto.idProducto,
+
+  @OneToOne(() => Garantia, (garantia) => garantia.producto)
+  garantia!: Garantia;
+
+  @OneToMany(() => CarritoItem, (carritoItem) => carritoItem.producto)
+  carritoItems!: CarritoItem[];
+
+  // Relación con Favorito
+  @OneToMany(() => FavoritosItem, (favoritosItem) => favoritosItem.producto)
+  favoritosItems!: FavoritosItem[];
+
+  @OneToMany(() => ProductoTipoProducto, (productoTipoProducto) => productoTipoProducto.producto,
     { cascade: true }
   )
-  productoTipoProducto: ProductoTipoProducto[];  
+  productoTipoProductos!: ProductoTipoProducto[];  
+
+  @OneToMany(() => ProductoColor, (productoColor) => productoColor.producto)
+  productoColores!: ProductoColor[];
+
+  @OneToMany(() => ProductoTienda, (productoTienda) => productoTienda.producto)
+  productoTiendas!: ProductoTienda[];
+
+  @OneToMany(() => PedidoDetalle, (pedidoDetalle) => pedidoDetalle.producto)
+  pedidoDetalles!: PedidoDetalle[];
+
+  @OneToMany(() => DetalleCredito, (detalleCredito) => detalleCredito.producto)
+  detalleCreditos!: DetalleCredito[];
+
+  @OneToMany(() => DetalleSeparado, (detalleSeparado) => detalleSeparado.producto)
+  detalleSeparados!: DetalleSeparado[];
+
+  @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.producto)
+  detalleVentas!: DetalleVenta[];
+
+
 
   @ManyToOne(() => Marca, (marca) => marca.productos, {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",
   })
   @JoinColumn([{ name: "id_marca", referencedColumnName: "idMarca" }])
-  idMarca2: Marca;
-
-  @OneToMany(() => ProductoColor, (productoColor) => productoColor.producto)
-  productoColores: ProductoColor[];
-
-  @OneToMany(
-    () => ProductoTienda,
-    (productoTienda) => productoTienda.idProducto2
-  )
-  productoTiendas: ProductoTienda[];
-
-  @OneToMany(
-    () => DetalleCredito,
-    (detalleCredito) => detalleCredito.idProducto2
-  )
-  detalleCreditos: DetalleCredito[];
-
-  @OneToMany(
-    () => DetalleSeparado,
-    (detalleSeparado) => detalleSeparado.idProducto2
-  )
-  detalleSeparados: DetalleSeparado[];
-
-  @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.idProducto2)
-  detalleVentas: DetalleVenta[];
-
-  @OneToOne(() => Garantia, (garantia) => garantia.idProducto2)
-  garantia: Garantia;
-
-  @OneToMany(() => CarritoItem, (carritoItem) => carritoItem.producto)
-  carritoItems: CarritoItem[];
-
-  // Relación con Favorito
-  @OneToMany(() => FavoritosItem, (favoritosItem) => favoritosItem.producto)
-  favoritosItems: FavoritosItem[];
+  marca!: Marca;
 }

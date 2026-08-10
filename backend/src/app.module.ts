@@ -45,16 +45,14 @@ import { UserModule } from './user/user.module';
 import { SubCategoriaModule } from './sub-categoria/sub-categoria.module';
 import { TipoProductoModule } from './tipo-producto/tipo-producto.module';
 import { ProductoTipoProductoModule } from './producto-tipo-producto/producto-tipo-producto.module';
-import { TipoProductoSubCategoriaModule } from './TipoProductoSubCategoria/tipo-producto-sub-categoria.module';
+import { TipoProductoSubCategoriaModule } from './tipo-producto-sub-categoria/tipo-producto-sub-categoria.module';
 import { ProductoModule } from './producto/producto.module';
 import { ProductoTiendaModule } from './producto-tienda/producto-tienda.module';
 import { UploadModule } from './upload/upload.module';
 import { ProductoColorModule } from './producto-color/producto-color.module';
 import { ColorModule } from './color/color.module';
 import { CarritoModule } from './carrito/carrito.module';
-import { CarritoItemModule } from './carrito-item/carrito-item.module';
 import { FavoritosModule } from './favoritos/favoritos.module';
-import { FavoritosItemModule } from './favoritos-item/favoritos-item.module';
 import { PedidoModule} from './pedido/pedido.module';
 import { PedidoDetalleModule } from './pedido-detalle/pedido-detalle.module';
 import { ConfigModule} from './config/config.module'
@@ -124,9 +122,7 @@ import { ConfigModule} from './config/config.module'
     ProductoColorModule,
     ColorModule,
     CarritoModule,
-    CarritoItemModule,
     FavoritosModule,
-    FavoritosItemModule,
     PedidoModule,
     PedidoDetalleModule,
     ConfigModule,

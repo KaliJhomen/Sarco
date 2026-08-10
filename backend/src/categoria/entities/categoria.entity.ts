@@ -12,6 +12,6 @@ export class Categoria {
   @Column("boolean", { name: "estado", default: () => "'1'" })
   estado!: boolean | null;
 
-  @OneToMany(() => SubCategoria, (subCategoria) => subCategoria.idCategoria2)
+  @OneToMany(() => SubCategoria, (subCategoria) => subCategoria.categoria)
   subCategorias!: SubCategoria[];
 }

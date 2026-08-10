@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateCol
 
 @Entity('anuncio', {schema: 'sarcos_db'})
 export class Anuncio {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({name: 'id_anuncio'})
   idAnuncio!: number;
 
   @Column("varchar", { length: 255 })
@@ -10,7 +10,7 @@ export class Anuncio {
 
   @Column("varchar", { length: 500 })
   imagen!: string; 
-  @Column("varchar", { length: 255, nullable: true })
+  @Column("varchar", { name: 'url_destino', length: 255, nullable: true })
   urlDestino!: string;
 
   @Column("int", { default: 0 })
@@ -20,8 +20,8 @@ export class Anuncio {
   estado!: boolean;
 
   @CreateDateColumn({name: 'created_at'})
-  fechaCreacion!: Date;
-
+  createdAt!: Date;
+  
   @UpdateDateColumn({name: 'updated_at'})
-  fechaActualizacion!: Date;
+  updatedAt!: Date;
 }

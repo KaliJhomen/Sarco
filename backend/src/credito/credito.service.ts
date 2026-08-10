@@ -25,30 +25,7 @@ export class CreditoService {
   async findAll() {
     try {
       return await this.creditoRepository.find({
-        relations: ['idCliente2', 'idTienda2', 'idUsuario2', 'idMetodoPago2', 'idEstadoCredito2', 'idComprobante2', 'idClienteGarante2'],
-        select: {
-          idCliente2: {
-            nombre: true
-          },
-          idTienda2: {
-            nombre: true
-          },
-          idUsuario2: {
-            nombre: true
-          },
-          idMetodoPago2: {
-            nombre: true
-          },
-          idEstadoCredito2: {
-            nombre: true
-          },
-          idComprobante2: {
-            nombre: true
-          },
-          idClienteGarante2: {
-            nombre: true
-          },
-        },
+        relations: ['cliente', 'tienda', 'usuario', 'metodoPago', 'estadoCredito', 'comprobante', 'clienteGarante'],
       });
     }
     catch (error) {
@@ -56,40 +33,16 @@ export class CreditoService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(idCredito: number) {
     try {
       const found = await this.creditoRepository.findOne({
-        where: { idCredito: id },
-        relations: ['idCliente2', 'idTienda2', 'idUsuario2', 'idMetodoPago2', 'idEstadoCredito2', 'idComprobante2', 'idClienteGarante2'],
-        select: {
-          idCliente2: {
-            nombre: true
-          },
-          idTienda2: {
-            nombre: true
-          },
-          idUsuario2: {
-            nombre: true
-          },
-          idMetodoPago2: {
-            nombre: true
-          },
-          idEstadoCredito2: {
-            nombre: true
-          },
-          idComprobante2: {
-            nombre: true
-          },
-          idClienteGarante2: {
-            nombre: true
-          },
-        },
+        where: { idCredito },
+        relations: ['cliente', 'tienda', 'usuario', 'metodoPago', 'estadoCredito', 'comprobante', 'clienteGarante'],
       });
       if (!found) {
         throw new NotFoundException('Crédito no encontrado');
       }
       return found;
-
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al obtener el crédito');
     }

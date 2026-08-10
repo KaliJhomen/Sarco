@@ -12,6 +12,7 @@ import { MetodoPago } from "../../metodo-pago/entities/metodo-pago.entity";
 
 import { Usuario } from "../../usuario/entities/usuario.entity";
 import { Cliente } from "../../cliente/entities/cliente.entity";
+import { User } from "src/user/entities/user.entity";
 
 @Index("fk_servicio_usuario_1", ["idUsuario"], {})
 @Index("fk_servicio_cliente_2", ["idCliente"], {})
@@ -82,10 +83,10 @@ export class Servicio {
   ])
   metodoPago!: MetodoPago;
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.servicios, {
+  @ManyToOne(() => User, (user) => user.servicios, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
-  usuario!: Usuario;
+  user!: User;
 }

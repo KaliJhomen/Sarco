@@ -14,19 +14,19 @@ import { Separado } from "../../separado/entities/separado.entity";
 @Entity("detalle_separado", { schema: "sarcos_db" })
 export class DetalleSeparado {
   @PrimaryGeneratedColumn({ type: "int", name: "id_detalle_separado" })
-  idDetalleSeparado: number;
+  idDetalleSeparado!: number;
 
   @Column("int", { name: "id_separado", nullable: true })
-  idSeparado: number | null;
+  idSeparado!: number | null;
 
   @Column("int", { name: "id_producto", nullable: true })
-  idProducto: number | null;
+  idProducto!: number | null;
 
   @Column("int", { name: "cantidad", nullable: true })
-  cantidad: number | null;
+  cantidad!: number | null;
 
   @Column("varchar", { name: "serie", nullable: true, length: 255 })
-  serie: string | null;
+  serie!: string | null;
 
   @Column("decimal", {
     name: "descuento",
@@ -34,7 +34,7 @@ export class DetalleSeparado {
     precision: 20,
     scale: 2,
   })
-  descuento: number | null;
+  descuento!: string | null;
 
   @Column("decimal", {
     name: "monto_total",
@@ -42,22 +42,22 @@ export class DetalleSeparado {
     precision: 20,
     scale: 2,
   })
-  montoTotal: number | null;
+  montoTotal!: string | null;
 
   @Column("tinyint", { name: "despachado", nullable: true })
-  despachado: number | null;
+  despachado!: number | null;
 
   @ManyToOne(() => Producto, (producto) => producto.detalleSeparados, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_producto", referencedColumnName: "idProducto" }])
-  idProducto2: Producto;
+  producto!: Producto;
 
   @ManyToOne(() => Separado, (separado) => separado.detalleSeparados, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "id_separado", referencedColumnName: "idSeparado" }])
-  idSeparado2: Separado;
+  separado!: Separado;
 }

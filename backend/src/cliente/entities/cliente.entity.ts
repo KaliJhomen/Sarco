@@ -54,26 +54,26 @@ export class Cliente {
 
   @Column("int", { name: "id_estado_cliente", nullable: true })
   idEstadoCliente!: number | null;
-
+/*
   @OneToMany(() => Favoritos, (favoritos) => favoritos.cliente)
   favoritos!: Favoritos[];
-
-  @OneToMany(() => Credito, (credito) => credito.clienteGarante)
-  creditos!: Credito[];
-
+*/
   @OneToMany(() => Credito, (credito) => credito.cliente)
   creditos!: Credito[];
 
-  @OneToMany(() => Garantia, (garantia) => garantia.idCliente2)
+  @OneToMany(() => Credito, (credito) => credito.clienteGarante)
+  creditos2!: Credito[];
+  
+  @OneToMany(() => Garantia, (garantia) => garantia.cliente)
   garantias!: Garantia[];
 
-  @OneToMany(() => Separado, (separado) => separado.idCliente2)
+  @OneToMany(() => Separado, (separado) => separado.cliente)
   separados!: Separado[];
 
-  @OneToMany(() => Servicio, (servicio) => servicio.idCliente2)
+  @OneToMany(() => Servicio, (servicio) => servicio.cliente)
   servicios!: Servicio[];
 
-  @OneToMany(() => Venta, (venta) => venta.idCliente2)
+  @OneToMany(() => Venta, (venta) => venta.cliente)
   ventas!: Venta[];
 
 
@@ -83,11 +83,11 @@ export class Cliente {
   })
   @JoinColumn([{ name: "id_documento", referencedColumnName: "idDocumento" }])
   documento!: Documento;
-
+/*
   @OneToOne(() => Carrito, (carrito) => carrito.cliente)
   carrito!: Carrito;
 
-
+*/
 
   @ManyToOne(() => EstadoCliente, (estadoCliente) => estadoCliente.clientes, {
     onDelete: "NO ACTION",

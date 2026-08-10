@@ -4,11 +4,11 @@ import { Credito } from "../../credito/entities/credito.entity";
 @Entity("estado_credito", { schema: "sarcos_db" })
 export class EstadoCredito {
   @PrimaryGeneratedColumn({ type: "int", name: "id_estado_credito" })
-  idEstadoCredito: number;
+  idEstadoCredito!: number;
 
   @Column("varchar", { name: "nombre", nullable: true, length: 50 })
-  nombre: string | null;
+  nombre!: string | null;
 
-  @OneToMany(() => Credito, (credito) => credito.idEstadoCredito2)
-  creditos: Credito[];
+  @OneToMany(() => Credito, (credito) => credito.estadoCredito)
+  creditos!: Credito[];
 }

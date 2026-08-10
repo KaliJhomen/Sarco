@@ -5,7 +5,7 @@ import { TipoProducto } from './entities/tipo-producto.entity';
 import { CreateTipoProductoDto } from './dto/create-tipo-producto.dto';
 import { UpdateTipoProductoDto } from './dto/update-tipo-producto.dto';
 
-import { TipoProductoSubCategoria } from 'src/TipoProductoSubCategoria/entities/tipo-producto-sub-categoria.entity';
+import { TipoProductoSubCategoria } from 'src/tipo-producto-sub-categoria/entities/tipo-producto-sub-categoria.entity';
 import { SubCategoria } from 'src/sub-categoria/entities/sub-categoria.entity';
 
 import { DeepPartial, Repository } from 'typeorm';
@@ -54,7 +54,7 @@ export class TipoProductoService {
         relations: ['tipoProductoSubCategoria', 'tipoProductoSubCategoria.idSubCategoria']
       });
     } catch (error) {
-      console.log(error);
+      console.error('Error al obtener tipos de producto:',error);
       throw new InternalServerErrorException(
         'Ocurrió un error al obtener los tipos de producto',
       );
@@ -75,7 +75,7 @@ export class TipoProductoService {
         .leftJoinAndSelect('sctp.idSubCategoria', 'subcat');
 
       if (idSubCategoria && Number(idSubCategoria) > 0) {
-        qb.where('sctp.idSubCategoria = :subId', { subId: Number(idSubCategoria) });
+        qb.andWhere('sctp.idSubCategoria = :subId', { subId: Number(idSubCategoria) });
       }
 
       if (idProducto && Number(idProducto) > 0) {
@@ -83,7 +83,7 @@ export class TipoProductoService {
           .andWhere('ptprod.idProducto = :prodId', { prodId: Number(idProducto) });
       }
 
-      return await qb.getMany();
+      return qb.getMany();
     } catch (error) {
       console.error('❌ ERROR en findAllFiltered:', {
         message: error.message,
@@ -118,17 +118,17 @@ export class TipoProductoService {
     }
   }
 
-  async update(id: number, updateTipoProductoDto: UpdateTipoProductoDto) {
+  async update(idTipoProducto: number, dtoUpdate: UpdateTipoProductoDto) {
     try {
       const tipoProductoFound = await this.tipoProductoRepository.findOne({
-        where: { idTipoProducto: id }
+        where: { idTipoProducto}
       });
 
       if (!tipoProductoFound) {
         throw new NotFoundException('Tipo Producto no encontrado');
       }
 
-      const { idSubCategorias, ...tipoProductoData } = updateTipoProductoDto;
+      const { idSubCategorias, ...tipoProductoData } = dtoUpdate;
 
       // Actualizar datos básicos
       const updatedTipoProducto = Object.assign(tipoProductoFound, tipoProductoData);
@@ -138,7 +138,7 @@ export class TipoProductoService {
       if (idSubCategorias && Array.isArray(idSubCategorias)) {
         // Eliminar relaciones antiguas
         await this.tipoProductoSubCategoriaRepository.delete({
-          idTipoProducto: { idTipoProducto: id }
+          tipoProducto: { idTipoProducto }
         });
 
         // Crear nuevas relaciones
@@ -152,7 +152,7 @@ export class TipoProductoService {
         }
       }
 
-      return await this.findOne(id);
+      return await this.findOne(idTipoProducto);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -164,15 +164,15 @@ export class TipoProductoService {
     }
   }
 
-  async remove(id: number) {
+  async remove(idTipoProducto: number) {
     try {
       // Verificar que existe
       const tipoProductoFound = await this.tipoProductoRepository.findOne({
-        where: { idTipoProducto: id }
+        where: { idTipoProducto }
       });
 
       if (!tipoProductoFound) {
-        throw new NotFoundException(`Tipo Producto con ID ${id} no existe`);
+        throw new NotFoundException(`Tipo Producto con ID ${idTipoProducto} no existe`);
       }
 
       // Paso 1: Eliminar todas las relaciones en producto_tipo_producto
@@ -180,25 +180,25 @@ export class TipoProductoService {
         .createQueryBuilder()
         .delete()
         .from('producto_tipo_producto')
-        .where('id_tipo_producto = :id', { id })
+        .where('id_tipo_producto = :id', { idTipoProducto })
         .execute();
 
       // Paso 2: Eliminar todas las relaciones en tipo_producto_sub_categoria
       await this.tipoProductoSubCategoriaRepository.delete({
-        idTipoProducto: { idTipoProducto: id }
+        tipoProducto: { idTipoProducto }
       });
 
       // Paso 3: Eliminar el tipo de producto
       const deleteResult = await this.tipoProductoRepository.delete({
-        idTipoProducto: id
+        idTipoProducto
       });
 
       if (deleteResult.affected === 0) {
-        throw new NotFoundException(`Tipo Producto con ID ${id} no existe`);
+        throw new NotFoundException(`Tipo Producto con ID ${idTipoProducto} no existe`);
       }
 
-      return { message: `Tipo Producto con ID ${id} eliminado correctamente` };
-    } catch (error) {
+      return { message: `Tipo Producto con ID ${idTipoProducto} eliminado correctamente` };
+    } catch (error : any) {
       if (error instanceof HttpException) {
         throw error;
       }

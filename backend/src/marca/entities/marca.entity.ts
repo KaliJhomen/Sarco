@@ -4,14 +4,14 @@ import { Producto } from "src/producto/entities/producto.entity";
 @Entity("marca", { schema: "sarcos_db" })
 export class Marca {
   @PrimaryGeneratedColumn({ type: "int", name: "id_marca" })
-  idMarca: number;
+  idMarca!: number;
 
   @Column("varchar", { name: "nombre", length: 255 })
-  nombre: string;
+  nombre!: string;
 
   @Column("boolean", { name: "estado", default: () => "'1'" })
-  estado: boolean;
+  estado!: boolean;
 
-  @OneToMany(() => Producto, (producto) => producto.idMarca2)
-  productos: Producto[];
+  @OneToMany(() => Producto, (producto) => producto.marca)
+  productos!: Producto[];
 }

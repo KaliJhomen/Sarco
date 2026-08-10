@@ -5,17 +5,17 @@ import { UsuarioPermiso } from "../../usuario-permiso/entities/usuario-permiso.e
 @Entity("modulo", { schema: "sarcos_db" })
 export class Modulo {
   @PrimaryGeneratedColumn({ type: "int", name: "id_modulo" })
-  idModulo: number;
+  idModulo!: number;
 
   @Column("varchar", { name: "nombre", length: 100 })
-  nombre: string;
+  nombre!: string;
 
   @Column("text", { name: "descripcion", nullable: true })
-  descripcion: string | null;
+  descripcion!: string | null;
 
   @OneToMany(() => RolPermiso, (rolPermiso) => rolPermiso.modulo)
-  permisos: RolPermiso[];
+  rolPermisos!: RolPermiso[];
 
   @OneToMany(() => UsuarioPermiso, (usuarioPermiso) => usuarioPermiso.modulo)
-  permisosUsuarios: UsuarioPermiso[];
+  usuarioPermisos!: UsuarioPermiso[];
 }
