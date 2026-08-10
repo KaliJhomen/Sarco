@@ -15,7 +15,7 @@ import { EstadoGarantia } from '../enums/estado-garantia.enum';
 import { User } from "./../../user/entities/user.entity";
 import { Cliente } from "./../../cliente/entities/cliente.entity";
 
-@Index("FK_garantia_user", ["idUser"], {})
+@Index("FK_garantia_user", ["idUsuario"], {})
 @Index("FK_garantia_cliente", ["idCliente"], {})
 @Index("FK_garantia_producto", ["idProducto"], {})
 @Index("FK_garantia_tienda", ["idTienda"], {})
@@ -60,7 +60,7 @@ export class Garantia {
   @JoinColumn([{ name: "id_producto", referencedColumnName: "idProducto" }])
   producto!: Producto;
 
-  
+
   @ManyToOne(() => Cliente, (cliente) => cliente.garantias, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",

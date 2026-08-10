@@ -19,13 +19,10 @@ export class PedidoService {
     @InjectRepository(PedidoDetalle)
     private readonly pedidoDetalleRepository: Repository<PedidoDetalle>,
     @InjectRepository(Producto)
-    private readonly productRepository: Repository<Producto>,
+    private readonly productoRepository: Repository<Producto>,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
   ) {}
-
-
-
   async createPedido(
     idUsuario: number,
     shippingData: {
@@ -44,7 +41,7 @@ export class PedidoService {
     const detalles: PedidoDetalle[] = [];
 
     for (const item of items) {
-      const producto = await this.productRepository.findOne({ where: { idProducto: item.idProducto } });
+      const producto = await this.productoRepository.findOne({ where: { idProducto: item.idProducto } });
       if (!producto) throw new NotFoundException(`Producto ${item.idProducto} no encontrado`);
       if (item.cantidad > producto.stock) throw new BadRequestException(`Stock insuficiente para producto ${producto.nombre}`);
 

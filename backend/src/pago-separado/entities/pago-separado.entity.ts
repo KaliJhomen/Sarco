@@ -9,8 +9,7 @@ import {
 import { MetodoPago } from "../../metodo-pago/entities/metodo-pago.entity";
 import { Tienda } from "../../tienda/entities/tienda.entity";
 import { Separado } from "../../separado/entities/separado.entity";
-import { Usuario } from "../../usuario/entities/usuario.entity";
-import { User } from "src/user/entities/user.entity";
+import { User } from "../../user/entities/user.entity";
 
 @Index("id_separado", ["idSeparado"], {})
 @Index("id_usuario", ["idUsuario"], {})
@@ -75,6 +74,6 @@ export class PagoSeparado {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
+  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
   user!: User;
 }

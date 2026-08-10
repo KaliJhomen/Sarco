@@ -12,9 +12,8 @@ import { Documento } from "../../documento/entities/documento.entity";
 import { Tienda } from "../../tienda/entities/tienda.entity";
 import { Favoritos } from "src/favoritos/entities/favoritos.entity";
 import { PagoCredito } from "src/pago-credito/entities/pago-credito.entity";
-@Index("fk_usuario_cargo_1", ["idCargo"], {})
+import { PagoSeparado } from "src/pago-separado/entities/pago-separado.entity";
 @Index("fk_usuario_documento_2", ["idDocumento"], {})
-@Index("id_tienda", ["idTienda"], {})
 @Entity("usuario", { schema: "sarcos_db" })
 export class Usuario {
   @PrimaryGeneratedColumn({ name: "id_usuario" })
@@ -62,6 +61,7 @@ export class Usuario {
 
   @OneToMany(() => Favoritos, (favoritos) => favoritos.usuario)
   favoritos!: Favoritos[];
+
 
   /*
   @ManyToOne(() => Cargo, (cargo) => cargo.usuarios, {

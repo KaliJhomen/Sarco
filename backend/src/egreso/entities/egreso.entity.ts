@@ -9,7 +9,7 @@ import {
 import { Tienda } from "../../tienda/entities/tienda.entity";
 import { User } from "../../user/entities/user.entity";
 
-@Index("fk_egreso_user", ["idUser"], {})
+@Index("fk_egreso_user", ["idUsuario"], {})
 @Index("fk_egreso_tienda", ["idTienda"], {})
 @Entity("egreso", { schema: "sarcos_db" })
 export class Egreso {

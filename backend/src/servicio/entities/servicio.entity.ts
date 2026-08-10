@@ -87,6 +87,6 @@ export class Servicio {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUsuario" }])
+  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
   user!: User;
 }

@@ -9,7 +9,7 @@ import {
 import { User } from "../../user/entities/user.entity";
 
 @Index("idx_fecha", ["fecha"], {})
-@Index("idx_user", ["idUser"], {})
+@Index("idx_user", ["idUsuario"], {})
 @Index("idx_estado", ["estado"], {})
 @Index("idx_fecha_hora", ["fecha", "hora"], {})
 @Index("idx_tipo_tarea", ["tipoTarea"], {})
