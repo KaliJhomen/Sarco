@@ -122,12 +122,27 @@ export class ProductoService {
       const query = this.buildProductoQuery(filtros);
       this.applyPagination(query, filtros);
       const [productos] = await query.getManyAndCount();
-      return productos;
-    } catch (error) {
-      this.logger.error('Error en findProductosFiltros:', error);
-      throw new InternalServerErrorException('Error interno del servidor.');
-    }
+    return productos.map(p => ({
+      idProducto: p.idProducto,
+      nombre: p.nombre,
+      modelo: p.modelo,
+      descripcion: p.descripcion,
+      stock: p.stock,
+      imagen: p.imagen,
+      precioTope: p.precioTope,
+      precioVenta: p.precioVenta,
+      estado: p.estado,
+      fechaIngreso: p.fechaIngreso,
+      garantiaFabrica: p.garantiaFabrica,
+      descuento: p.descuento,
+      marca: p.marca?.nombre ?? null,
+      categoria: p.productoTipoProductos?.[0]?.tipoProducto?.tipoProductoSubCategorias?.[0]?.subCategoria?.categoria?.nombre ?? null,
+    }));
+  } catch (error) {
+    this.logger.error('Error en findProductosFiltros:', error);
+    throw new InternalServerErrorException('Error interno del servidor.');
   }
+}
 
   private buildProductoQuery(filtros: ProductoFiltros): SelectQueryBuilder<Producto> {
     const query = this.productoRepository

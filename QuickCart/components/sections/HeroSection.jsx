@@ -18,7 +18,7 @@ const HeroSection = () => {
   const categories = [
     { 
       id: 1, 
-      name: 'Ofertas', 
+      name: 'ofertas', 
       icon: Tag,
       image: '/articulos/65A6NA.jfif',
       color: 'from-gray-200 to-gray-600',
@@ -27,7 +27,7 @@ const HeroSection = () => {
     },
     { 
       id: 2, 
-      name: 'Tecnología', 
+      name: 'tecnología', 
       icon: Laptop,
       image: '/articulos/18M38H.png',
       color: 'from-gray-200 to-gray-600',
@@ -36,7 +36,7 @@ const HeroSection = () => {
     },
     { 
       id: 3, 
-      name: 'Mueblería', 
+      name: 'muebleria', 
       icon: Home,
       image: '/articulos/250-22.jpeg',
       color: 'from-gray-200 to-gray-600',
@@ -45,7 +45,7 @@ const HeroSection = () => {
     },
     { 
       id: 4, 
-      name: 'Movilidad', 
+      name: 'movilidad', 
       icon: Car,
       image: '/articulos/CASCO LS2.jpeg', 
       color: 'from-gray-200 to-gray-600',
