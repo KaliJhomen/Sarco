@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateTipoProductoSubCategoriaDto } from './dto/create-tipo-producto-sub-categoria.dto';
 import { UpdateTipoProductoSubCategoriaDto } from './dto/update-tipo-producto-sub-categoria.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class TipoProductoSubCategoriaService {
+  private readonly logger = new Logger(TipoProductoSubCategoriaService.name);
+
   constructor(
       @InjectRepository(TipoProductoSubCategoria)
       private tipoProductoSubCategoriaRepository: Repository<TipoProductoSubCategoria>,
@@ -27,7 +29,7 @@ export class TipoProductoSubCategoriaService {
             'Este tipo de producto ya está asociado a esa subcategoría.'
           );
         }
-        console.error(error);
+        this.logger.error(error);
         throw new InternalServerErrorException('Ocurrió un error al crear el tipo-producto-sub-categoria');
       }
   }
@@ -55,7 +57,7 @@ export class TipoProductoSubCategoriaService {
       }
       return entity;
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al obtener el tipo-producto-sub-categoria con ID ${id}`,
       );
@@ -77,7 +79,7 @@ export class TipoProductoSubCategoriaService {
       }
       return await this.tipoProductoSubCategoriaRepository.save(entity);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al actualizar el tipo-producto-sub-categoria con ID ${id}`,
       );
@@ -92,7 +94,7 @@ export class TipoProductoSubCategoriaService {
       await this.tipoProductoSubCategoriaRepository.remove(entity);
       return { message: `Tipo-producto-sub-categoria con ID ${id} eliminado correctamente` };
     } catch (error) {
-        console.error(error);
+        this.logger.error(error);
         throw new InternalServerErrorException(
         `Ocurrió un error al eliminar el tipo-producto-sub-categoria con ID ${id}`,
       );

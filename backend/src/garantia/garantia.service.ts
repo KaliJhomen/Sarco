@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateGarantiaDto } from './dto/create-garantia.dto';
 import { UpdateGarantiaDto } from './dto/update-garantia.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,8 @@ import { Garantia } from './entities/garantia.entity';
 
 @Injectable()
 export class GarantiaService {
+  private readonly logger = new Logger(GarantiaService.name);
+
   constructor(
     @InjectRepository(Garantia)
     private readonly garantiaRepository: Repository<Garantia>,
@@ -79,7 +81,7 @@ export class GarantiaService {
       await this.garantiaRepository.remove(garantia);
       return { message: `Garantia con ID ${id} eliminado correctamente` };
     } catch (error) {
-      console.error('Error en remove:', error);
+      this.logger.error('Error en remove:', error);
       throw new InternalServerErrorException(
         `Error al eliminar la garantia con ID ${id}`,
       );

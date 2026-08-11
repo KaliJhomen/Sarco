@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,8 @@ import { Marca } from './entities/marca.entity';
 
 @Injectable()
 export class MarcaService {
+  private readonly logger = new Logger(MarcaService.name);
+
   constructor(
     @InjectRepository(Marca)
     private marcaRepository: Repository<Marca>,
@@ -77,7 +79,7 @@ export class MarcaService {
       await this.marcaRepository.remove(marca);
       return { message: `Marca con ID ${id} eliminado correctamente` };
     } catch (error) {
-      console.error('Error en remove:', error);
+      this.logger.error('Error en remove:', error);
       throw new InternalServerErrorException(
         `Error al eliminar la marca con ID ${id}`,
       );

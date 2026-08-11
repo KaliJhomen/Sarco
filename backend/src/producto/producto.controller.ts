@@ -31,35 +31,6 @@ export class ProductoController {
     return this.productoService.findAll();
   }
 
-  //http://localhost:4000/api/producto/filtro?idCategoria=1&idSubCategoria=1&idTipoProducto=1&idMarca=1
-  //Asi debe ser la llamada con los query params opcionales
-  // @Get('filtro')
-  // @UseGuards(AuthGuard)
-  // @ApiOperation({ summary: 'Obtener productos filtrados dinámicamente' })
-  // @ApiResponse({ status: 200, description: 'Lista de productos filtrados correctamente' })
-
-  // @ApiQuery({ name: 'idCategoria', required: false, type: Number, description: 'Filtra por categoría' })
-  // @ApiQuery({ name: 'idSubCategoria', required: false, type: Number, description: 'Filtra por subcategoría' })
-  // @ApiQuery({ name: 'idTipoProducto', required: false, type: Number, description: 'Filtra por tipo de producto' })
-  // @ApiQuery({ name: 'idMarca', required: false, type: Number, description: 'Filtra por marca' })
-
-  // async findProductosFiltro(
-  //   @Query('idCategoria') idCategoria?: number,
-  //   @Query('idSubCategoria') idSubCategoria?: number,
-  //   @Query('idTipoProducto') idTipoProducto?: number,
-  //   @Query('idMarca') idMarca?: number,
-  // ) {
-
-  //   const filtros = {
-  //     idCategoria: idCategoria ? Number(idCategoria) : undefined,
-  //     idSubCategoria: idSubCategoria ? Number(idSubCategoria) : undefined,
-  //     idTipoProducto: idTipoProducto ? Number(idTipoProducto) : undefined,
-  //     idMarca: idMarca ? Number(idMarca) : undefined,
-  //   };
-
-  //   return this.productoService.findProductosFiltro(filtros);
-  // }
-
   @Get('filtro')
   @ApiOperation({ summary: 'Obtener productos filtrados dinámicamente (público)' })
   @ApiResponse({ status: 200, description: 'Lista de productos filtrados correctamente' })

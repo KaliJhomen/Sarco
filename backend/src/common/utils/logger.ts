@@ -6,17 +6,13 @@ export function writeLog(message: string) {
     const logDir = path.join(process.cwd(), 'logs');
     const logFile = path.join(logDir, 'errors.log');
 
-    console.error('🧭 Intentando escribir log en:', logFile);
-
     if (!fs.existsSync(logDir)) {
       fs.mkdirSync(logDir, { recursive: true });
-      console.error('📁 Carpeta logs creada');
     }
 
     const logMessage = `[${new Date().toISOString()}] ${message}\n`;
     fs.appendFileSync(logFile, logMessage, 'utf8');
-    console.error('✅ Log escrito correctamente');
   } catch (error) {
-    console.error('❌ Error al escribir log:', error);
+    process.stderr.write(`Error al escribir log: ${error}\n`);
   }
 }

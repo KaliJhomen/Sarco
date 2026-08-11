@@ -44,8 +44,8 @@ export const cartService = {
   /**
    * Vacía el carrito (fallback sin endpoint dedicado).
    */
-  async clear() {
-    const response = await this.get();
+  async clear(ident) {
+    const response = await this.get(ident);
     const payload = response?.data ?? response;
     const items = Array.isArray(payload?.items) ? payload.items : [];
 

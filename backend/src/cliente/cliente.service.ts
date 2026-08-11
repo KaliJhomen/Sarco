@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +8,8 @@ import { handleDBError } from '../common/exceptions/errors';
 
 @Injectable()
 export class ClienteService {
+  private readonly logger = new Logger(ClienteService.name);
+
   constructor(
     @InjectRepository(Cliente)
     private clienteRepository: Repository<Cliente>,
@@ -17,9 +19,9 @@ export class ClienteService {
     const existing = await this.clienteRepository.findOne({
       where:[
         {email: createClienteDto.email ?? undefined},
-        /*
+  
         {nombre: createClienteDto.nombre ?? undefined},
-        */
+        
         {numeroDocumento: createClienteDto.numeroDocumento}
       ]
     });
@@ -30,25 +32,24 @@ export class ClienteService {
       const newCliente = this.clienteRepository.create(createClienteDto);
       return await this.clienteRepository.save(newCliente);
     } catch (error) {
-      console.error(error); 
+      this.logger.error(error);
      throw handleDBError(error,'Ocurrió un error al guardar el cliente');
     }
   }
 
   async findAll() {
     try {
-      return await this.clienteRepository.find({
-        relations: ['documento','estadoCliente' ],
-        select: {
-          documento: {
-            idDocumento: true,
-            nombre: true
-          },
-          estadoCliente: {
-            nombre: true
-          },
-        },
-      });
+      return await this.clienteRepository
+          .createQueryBuilder('c')
+          .leftJoinAndSelect('c.documento', 'd')
+          .leftJoinAndSelect('c.estadoCliente', 'ec')
+          .select([
+            'c.idCliente', 'c.nombre', 'c.numeroDocumento',
+            'c.direccion', 'c.telefono', 'c.email',
+            'd.idDocumento', 'd.nombre',
+            'ec.nombre',
+          ])
+          .getMany();
     } catch (error) {
       handleDBError(error,'Ocurrió un error al obtener clientes');
     }

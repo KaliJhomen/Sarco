@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateProductoTipoProductoDto } from './dto/create-producto-tipo-producto.dto';
 import { UpdateProductoTipoProductoDto } from './dto/update-producto-tipo-producto.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,8 @@ import { ProductoTipoProducto } from './entities/producto-tipo-producto.entity';
 
 @Injectable()
 export class ProductoTipoProductoService {
+  private readonly logger = new Logger(ProductoTipoProductoService.name);
+
   constructor(
     @InjectRepository(ProductoTipoProducto)
     private productoTipoProductoRepository: Repository<ProductoTipoProducto>,
@@ -27,7 +29,7 @@ export class ProductoTipoProductoService {
           'Este producto ya está asociado a ese tipo de producto.'
         );
       }
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException('Ocurrió un error al crear el producto-tipo-producto');
     }
   }
@@ -38,7 +40,7 @@ export class ProductoTipoProductoService {
         relations:['producto', 'tipoProducto']
       });
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         'Ocurrió un error al obtener las categorías',
       );
@@ -53,7 +55,7 @@ export class ProductoTipoProductoService {
       }
       return entity;
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al obtener el producto-tipo-producto con Producto ID ${idProducto}`,
       );
@@ -68,7 +70,7 @@ export class ProductoTipoProductoService {
       }
       return entity;
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al obtener el producto-tipo-producto con Producto ID ${idTipoProducto}`,
       );
@@ -82,7 +84,7 @@ export class ProductoTipoProductoService {
       }
       return entity;
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al obtener el producto-tipo-producto con ID ${idProductoTipoProducto}`,
       );
@@ -106,7 +108,7 @@ export class ProductoTipoProductoService {
       }
       return await this.productoTipoProductoRepository.save(entity);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al actualizar el producto-tipo-producto con ID ${idProductoTipoProducto}`,
       );
@@ -122,7 +124,7 @@ export class ProductoTipoProductoService {
       await this.productoTipoProductoRepository.remove(entity);
       return { message: `Producto-tipo-producto con ID ${idProductoTipoProducto} eliminado correctamente` };
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al eliminar el producto-tipo-producto con ID ${idProductoTipoProducto}`,
       );

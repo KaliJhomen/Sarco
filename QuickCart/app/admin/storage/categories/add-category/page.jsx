@@ -24,9 +24,6 @@ const AddCategoryPage = () => {
   const handleSubmit = async (e) => {
     e?.preventDefault();
     
-    console.log('🔍 FormData:', categoryForm.formData);
-    console.log('🔍 Token:', token);
-    
     if (!categoryForm.validate()) {
       toast.error('Por favor completa todos los campos requeridos correctamente');
       return false;

@@ -26,7 +26,6 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60000 } }) 
   async login(@Body() body: LoginDto, @Res({passthrough: true}) res: Response) {
     const { token, usuario } = await this.authService.login(body);
-    //const userDB = await this.usuarioService.findOne(usuario.idUsuario);
     if (body.sessionToken) {
       await this.carritoService.mergeGuestCart(usuario.idUsuario, body.sessionToken);
     }

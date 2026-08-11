@@ -11,10 +11,6 @@ const withAuth = (WrappedComponent) => {
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
-      console.log('isAuthenticated:', isAuthenticated);
-      console.log('isLoading:', isLoading);
-      console.log('error:', error);
-
       if (!isLoading && !isAuthenticated) {
         setShowModal(true); // Show the modal if the user is not authenticated
       }

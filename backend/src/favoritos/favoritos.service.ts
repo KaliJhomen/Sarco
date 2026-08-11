@@ -72,7 +72,7 @@ export class FavoritosService {
         usuario: { idUsuario },
         items: [],
       })
-    ) as Promise<Favoritos>;
+    );
   }
 
   private async createGuestFavorites(sessionToken: string): Promise<Favoritos> {
@@ -83,7 +83,7 @@ export class FavoritosService {
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         items: [],
       })
-    ) as Promise<Favoritos>;
+    );
   }
 
   ///

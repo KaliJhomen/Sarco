@@ -42,13 +42,6 @@ export class UsuarioService {
   async findOneByEmail(email: string): Promise<Usuario | null> {
     return this.usuarioRepository.findOneBy({ email });
   }
-/*
-  findByImagen(imagen: string) {
-    return this.usuarioRepository.findOne({
-      where: { imagen },
-    });
-  }
-*/
   async update(idUsuario: number, updateUsuarioDto: UpdateUsuarioDto) {
     const usuario = await this.usuarioRepository.findOne({ where: { idUsuario} });
     if (!usuario) throw new NotFoundException(`Usuario con ID ${idUsuario} no encontrado`);

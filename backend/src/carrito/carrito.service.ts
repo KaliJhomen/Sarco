@@ -67,7 +67,7 @@ export class CarritoService {
           usuario: { idUsuario },
           items: [],
         });
-        return this.cartRepository.save(carrito) as Promise<Carrito>;
+        return this.cartRepository.save(carrito);
     }
 
   private async getCart(idUsuario: number): Promise<Carrito | null> {
@@ -92,7 +92,7 @@ export class CarritoService {
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         items: [],
       })
-    ) as Promise<Carrito>;
+    );
   }
 
 
@@ -114,7 +114,6 @@ export class CarritoService {
     if (!idUsuario && !sessionToken) {
       throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
     }
-    //let carrito: Carrito | null = null;
     const carrito = await this.findCart(ident);
     if (!carrito) {
       throw new NotFoundException('Carrito no encontrado');
@@ -136,8 +135,6 @@ export class CarritoService {
     return this.cartItemRepository.remove(item);
   }
   async findByUser(ident: CartIdent) {
-    //let carrito: Carrito | null = null;
-
     const { idUsuario, sessionToken } = ident;
     if (!idUsuario && !sessionToken) {
       throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
@@ -168,7 +165,6 @@ export class CarritoService {
     cantidad: number,
   ) {
     this.validateId(idProducto, 'idProducto');
-    //let carrito: Carrito | null = null;
     if (!Number.isInteger(cantidad) || cantidad <= 0) {
       throw new BadRequestException('La cantidad debe ser mayor a 0');
     }

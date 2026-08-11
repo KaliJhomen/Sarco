@@ -8,8 +8,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import {Carrito } from "../../carrito/entities/carrito.entity"
-import { Favoritos } from "../../favoritos/entities/favoritos.entity"
 import { Documento } from "../../documento/entities/documento.entity";
 import { EstadoCliente } from "../../estado-cliente/entities/estado-cliente.entity";
 import { Credito } from "../../credito/entities/credito.entity";
@@ -54,10 +52,7 @@ export class Cliente {
 
   @Column("int", { name: "id_estado_cliente", nullable: true })
   idEstadoCliente!: number | null;
-/*
-  @OneToMany(() => Favoritos, (favoritos) => favoritos.cliente)
-  favoritos!: Favoritos[];
-*/
+
   @OneToMany(() => Credito, (credito) => credito.cliente)
   creditos!: Credito[];
 
@@ -83,11 +78,6 @@ export class Cliente {
   })
   @JoinColumn([{ name: "id_documento", referencedColumnName: "idDocumento" }])
   documento!: Documento;
-/*
-  @OneToOne(() => Carrito, (carrito) => carrito.cliente)
-  carrito!: Carrito;
-
-*/
 
   @ManyToOne(() => EstadoCliente, (estadoCliente) => estadoCliente.clientes, {
     onDelete: "NO ACTION",

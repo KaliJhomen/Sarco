@@ -63,9 +63,6 @@ export default function CartPage() {
     : Array.isArray(cartData?.data?.items)
     ? cartData.data.items
     : [];
-  console.log("user:", user);
-  console.log("sessionToken:", sessionToken);
-  console.log( "CartData", cartData)  
 
   const totalPrice = cartItems.reduce((total, item) => {
     const precio = Number(item.producto?.precioVenta) || 0;

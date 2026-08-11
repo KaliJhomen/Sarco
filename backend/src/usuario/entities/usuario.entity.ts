@@ -54,28 +54,12 @@ export class Usuario {
 
   @Column("varchar", { name: "fondo", nullable: true, length: 255 })
   fondo!: string | null;
-/*
-  @Column("int", { name: "id_favoritos", nullable: true })
-  idFavoritos!: number | null;
-
-  @Column("int", { name: "id_carrito", nullable: true })
-  idCarrito!: number | null;
-*/
-
   @OneToOne(() => Favoritos, (favoritos) => favoritos.usuario)
   favoritos!: Favoritos;
   @OneToOne(() => Carrito, (carrito) => carrito.usuario)
   carrito!: Carrito;
 
 
-  /*
-  @ManyToOne(() => Cargo, (cargo) => cargo.usuarios, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_cargo", referencedColumnName: "idCargo" }])
-  cargo!: Cargo;
-*/
   @ManyToOne(() => Documento, (documento) => documento.usuarios, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
@@ -83,13 +67,4 @@ export class Usuario {
   @JoinColumn([{ name: "id_documento", referencedColumnName: "idDocumento" }])
   documento!: Documento;
 
-  
-/*
-  @ManyToOne(() => Tienda, (tienda) => tienda.usuarios, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_tienda", referencedColumnName: "idTienda" }])
-  tienda!: Tienda;
-*/
 }

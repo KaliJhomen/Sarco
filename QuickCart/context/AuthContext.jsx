@@ -22,7 +22,6 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token');
-      console.log("TOKEN:", token);
       if (!token) {
         setLoading(false);
         return;
@@ -67,7 +66,6 @@ export const AuthProvider = ({ children }) => {
 
       setUser(user);
 
-      console.log('Usuario almacenado en AuthContext después de login:', user); // Verifica los datos almacenados
       setIsAuthenticated(true);
 
       router.push('/');

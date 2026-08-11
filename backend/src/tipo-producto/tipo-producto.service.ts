@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { TipoProducto } from './entities/tipo-producto.entity';
@@ -12,6 +12,8 @@ import { DeepPartial, Repository } from 'typeorm';
 
 @Injectable()
 export class TipoProductoService {
+  private readonly logger = new Logger(TipoProductoService.name);
+
   constructor(
     @InjectRepository(TipoProducto)
     private tipoProductoRepository: Repository<TipoProducto>,
@@ -41,7 +43,7 @@ export class TipoProductoService {
       
       return tipoProductoGuardado;
     } catch (error) {
-      console.error('Error al crear tipo producto:', error);
+      this.logger.error('Error al crear tipo producto:', error);
       throw new InternalServerErrorException(
         'Ocurrió un error al crear el tipo producto',
       );
@@ -54,7 +56,7 @@ export class TipoProductoService {
         relations: ['tipoProductoSubCategoria', 'tipoProductoSubCategoria.idSubCategoria']
       });
     } catch (error) {
-      console.error('Error al obtener tipos de producto:',error);
+      this.logger.error('Error al obtener tipos de producto:', error);
       throw new InternalServerErrorException(
         'Ocurrió un error al obtener los tipos de producto',
       );
@@ -85,7 +87,7 @@ export class TipoProductoService {
 
       return qb.getMany();
     } catch (error) {
-      console.error('ERROR en findAllFiltered:', {
+      this.logger.error('ERROR en findAllFiltered:', {
         message: error.message,
         stack: error.stack,
         params: { idProducto, idSubCategoria }

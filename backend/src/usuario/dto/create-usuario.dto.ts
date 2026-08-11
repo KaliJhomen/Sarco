@@ -13,11 +13,6 @@ export class CreateUsuarioDto {
   @ApiPropertyOptional()
   @IsString()
   numeroDocumento?: string | null;
-/*
-  @ApiProperty()
-  @IsInt()
-  idRol!: number;
-*/
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
@@ -51,10 +46,4 @@ export class CreateUsuarioDto {
   @IsOptional()
   @IsString()
   fondo?: string | null;
-/*
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsInt()
-  condicion?: number;
-*/
 }

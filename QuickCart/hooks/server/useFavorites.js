@@ -10,7 +10,6 @@ export function useFavorites(payload) {
     queryKey: ["favorites", payload],
     queryFn: () => favoritesService.get(payload),
     staleTime: 30 * 1000,
-    enabled: !!payload,
   });
 }
 

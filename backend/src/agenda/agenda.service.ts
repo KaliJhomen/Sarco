@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateAgendaDto } from './dto/create-agenda.dto';
 import { UpdateAgendaDto } from './dto/update-agenda.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +8,8 @@ import { UpdateEstadoAgendaDto } from './dto/state-agenda.dto';
 
 @Injectable()
 export class AgendaService {
+  private readonly logger = new Logger(AgendaService.name);
+
   constructor(
     @InjectRepository(Agenda)
     private agendaRepository: Repository<Agenda>,
@@ -111,7 +113,7 @@ export class AgendaService {
         message: `Agenda con ID ${idAgenda} eliminada correctamente`,
       };
     } catch (error) {
-      console.error('Error al eliminar agenda:', error);
+      this.logger.error('Error al eliminar agenda:', error);
     }
   }
 }

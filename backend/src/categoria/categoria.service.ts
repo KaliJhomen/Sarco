@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +8,8 @@ import { SubCategoria } from '../sub-categoria/entities/sub-categoria.entity'; /
 
 @Injectable()
 export class CategoriaService {
+  private readonly logger = new Logger(CategoriaService.name);
+
   constructor(
     @InjectRepository(Categoria)
     private categoriaRepository: Repository<Categoria>,
@@ -20,7 +22,7 @@ export class CategoriaService {
       const newCategoria = this.categoriaRepository.create(createCategoriaDto);
       return await this.categoriaRepository.save(newCategoria);
     } catch (error) {
-      console.error('Error al crear categoría:', error);
+      this.logger.error('Error al crear categoría:', error);
       throw new InternalServerErrorException(
         'Ocurrió un error al guardar la categoría'
       );
@@ -34,7 +36,7 @@ export class CategoriaService {
         order: { nombre: 'ASC' }
       });
     } catch (error) {
-      console.error('Error al obtener categorías:', error);
+      this.logger.error('Error al obtener categorías:', error);
       throw new InternalServerErrorException(
         'Ocurrió un error al obtener las categorías',
       );

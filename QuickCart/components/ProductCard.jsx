@@ -34,7 +34,8 @@ const { user } = useAppContext();
   const addToCartMutation = useAddToCart();
 
   // Hooks de favoritos
-  const { data: favoritesData } = useFavorites();
+  const favoritesPayload = user ? {} : { sessionToken: getOrCreateSessionToken() };
+  const { data: favoritesData } = useFavorites(favoritesPayload);
   const addToFavoritesMutation = useAddToFavorites();
   const removeFromFavoritesMutation = useRemoveFromFavorites();
 
@@ -59,7 +60,6 @@ const { user } = useAppContext();
     if (!user) {
       payload.sessionToken = sessionToken;
     }
-    await addToFavoritesMutation.mutateAsync(payload);
     try {
       if (isFavorite) {
         await removeFromFavoritesMutation.mutateAsync(payload);
@@ -69,8 +69,6 @@ const { user } = useAppContext();
         addNotification("Agregado a favoritos", "success");
       }
     } catch (err) {
-          console.log(idProducto)
-
       addNotification("Error al actualizar favoritos", "error");
     } finally {
       setIsProcessingFavorite(false);

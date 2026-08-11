@@ -2,11 +2,13 @@ import { CreateProductoTiendaDto } from './dto/create-producto-tienda.dto';
 import { UpdateProductoTiendaDto } from './dto/update-producto-tienda.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { ProductoTienda } from './entities/producto-tienda.entity';
 
 @Injectable()
 export class ProductoTiendaService {
+  private readonly logger = new Logger(ProductoTiendaService.name);
+
   constructor(
     @InjectRepository(ProductoTienda)
     private productoTiendaRepository: Repository<ProductoTienda>,
@@ -24,7 +26,7 @@ export class ProductoTiendaService {
       if (error.code === 'ER_DUP_ENTRY'){
          throw new  InternalServerErrorException("Producto ya existe");
       }
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException('Ocurrió un error al crear la asociación producto-tienda');
     }
   }
@@ -91,7 +93,7 @@ export class ProductoTiendaService {
       }
       return await this.productoTiendaRepository.save(entity);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al actualizar el producto-tienda con ID ${idProductoTienda}`,
       );
@@ -108,7 +110,7 @@ export class ProductoTiendaService {
       await this.productoTiendaRepository.remove(entity);
       return { message: `Producto-tienda con ID ${idProductoTienda} eliminado correctamente` };
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(
         `Ocurrió un error al eliminar el producto-tienda con ID ${idProductoTienda}`,
       );

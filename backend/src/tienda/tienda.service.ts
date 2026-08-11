@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException} from '@nestjs/common';
 import { CreateTiendaDto } from './dto/create-tienda.dto';
 import { UpdateTiendaDto } from './dto/update-tienda.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,8 @@ import { Tienda } from './entities/tienda.entity';
 
 @Injectable()
 export class TiendaService {
+  private readonly logger = new Logger(TiendaService.name);
+
   constructor(
     @InjectRepository(Tienda)
     private readonly tiendaRepository: Repository<Tienda>,
@@ -82,7 +84,7 @@ export class TiendaService {
       await this.tiendaRepository.remove(tienda);
       return { message: `Tienda con ID ${id} eliminado correctamente` };
     } catch (error) {
-      console.error('Error en remove:', error);
+      this.logger.error('Error en remove:', error);
       throw new InternalServerErrorException(
         `Error al eliminar la tienda con ID ${id}`,
       );
