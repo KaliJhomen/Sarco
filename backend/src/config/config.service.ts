@@ -14,8 +14,8 @@ export class ConfigService {
     private configRepo: Repository<Config>,
   ) {}
 
-  create(dto: CreateConfigDto) {
-    const config = this.configRepo.create(dto);
+  create(createConfigDto: CreateConfigDto) {
+    const config = this.configRepo.create(createConfigDto);
     return this.configRepo.save(config);
   }
 
@@ -33,10 +33,10 @@ export class ConfigService {
     return config;
   }
 
-  async update(nombre: string, dto: UpdateConfigDto) {
+  async update(nombre: string, updateConfigDto: UpdateConfigDto) {
     const config = await this.findOne(nombre);
 
-    Object.assign(config, dto);
+    Object.assign(config, updateConfigDto);
 
     return this.configRepo.save(config);
   }

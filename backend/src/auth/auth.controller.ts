@@ -22,20 +22,18 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiBody({ type: LoginDto })
-  async login(@Body() body: LoginDto, @Res() res: Response) {
+  async login(@Body() body: LoginDto, @Res({passthrough: true}) res: Response) {
     const { token, usuario } = await this.authService.login(body);
-    const userDB = await this.usuarioService.findOne(usuario.idUsuario);
-    
+    //const userDB = await this.usuarioService.findOne(usuario.idUsuario);
     if (body.sessionToken) {
       await this.carritoService.mergeGuestCart(usuario.idUsuario, body.sessionToken);
     }
-
     res.cookie('token', token, {
       httpOnly: true,
       sameSite: 'lax',
       secure: false,
       path: '/',
-      maxAge: 60 * 1000 * 60,
+      maxAge: 30 * 1000 * 60,
     });
 
     return res.json({

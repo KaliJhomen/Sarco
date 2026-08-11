@@ -1,3 +1,3 @@
 export const jwtConstants = {
-    secret: 'Prueba local de jwt',
+    secret: (process.env.JWT_SECRET),
 }

@@ -11,8 +11,8 @@ export class ProductoColorService {
     private readonly productoColorRepository: Repository<ProductoColor>,
   ) {}
 
-  async create(createProductoDto: CreateProductoColorDto) {
-    return await this.productoColorRepository.save(createProductoDto);
+  async create(createProductoColorDto: CreateProductoColorDto) {
+    return await this.productoColorRepository.save(createProductoColorDto);
   }
 
   async findAllByProducto(id_producto: number) {

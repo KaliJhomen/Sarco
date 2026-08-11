@@ -23,9 +23,9 @@ export class ProductoService {
     private tipoProductoRepository: Repository<TipoProducto>,
   ) { }
 
-  async create(dtoCreate: CreateProductoDto) {
+  async create(createProductoDto: CreateProductoDto) {
     try {
-      const {idTiposProducto, ...productoData}= dtoCreate;
+      const {idTiposProducto, ...productoData}= createProductoDto;
       const producto = this.productoRepository.create(productoData);
       const productoGuardado = await this.productoRepository.save(producto);
       if (idTiposProducto && Array.isArray(idTiposProducto)) {
@@ -335,11 +335,11 @@ export class ProductoService {
     }
   }
 
-  async update(idProducto: number, dtoUpdate: UpdateProductoDto) {
+  async update(idProducto: number, updateProductoDto: UpdateProductoDto) {
     try {
       const producto = await this.productoRepository.preload({
         idProducto,
-        ...dtoUpdate,
+        ...updateProductoDto,
       });
       if (!producto) {
         throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);

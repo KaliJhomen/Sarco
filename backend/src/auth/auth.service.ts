@@ -24,7 +24,7 @@ export class AuthService {
     const isValid = await bcryptjs.compare(clave, usuario.clave || '');
     if (!isValid) throw new UnauthorizedException('Correo |o Contraseña| Incorrectas');
 
-      const payload = { id: usuario.idUsuario, email: usuario.email };
+    const payload = { id: usuario.idUsuario, email: usuario.email };
     const token = await this.jwtService.signAsync(payload);
     return {
       token,

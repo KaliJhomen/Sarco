@@ -13,15 +13,15 @@ export class DetalleSeparadoService {
     private detalleSeparadoRepository: Repository<DetalleSeparado>,
   ) { }
 
-  async create(dtoCreate: CreateDetalleSeparadoDto) {
+  async create(createDetalleSeparadoDto: CreateDetalleSeparadoDto) {
     try {
-      if ((dtoCreate as any)?.idArticulo !== undefined) {
+      if ((createDetalleSeparadoDto as any)?.idArticulo !== undefined) {
         throw new BadRequestException('Campo idArticulo no permitido. Use idProducto.');
       }
-      if (dtoCreate?.idProducto === undefined || dtoCreate?.idProducto === null) {
+      if (createDetalleSeparadoDto?.idProducto === undefined || createDetalleSeparadoDto?.idProducto === null) {
         throw new BadRequestException('idProducto es requerido.');
       }
-      const newDetalleSeparado = this.detalleSeparadoRepository.create(dtoCreate);
+      const newDetalleSeparado = this.detalleSeparadoRepository.create(createDetalleSeparadoDto);
       return this.detalleSeparadoRepository.save(newDetalleSeparado);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al guardar el detalle de separado');
@@ -60,19 +60,19 @@ export class DetalleSeparadoService {
   }
 
 
-  async update(id: number, dtoUpdate: UpdateDetalleSeparadoDto) {
+  async update(id: number, updateDetalleSeparadoDto: UpdateDetalleSeparadoDto) {
     try {
       const found = await this.detalleSeparadoRepository.findOneBy({ idDetalleSeparado: id });
       if (!found) {
         throw new NotFoundException('Detalle de separado no encontrado');
       }
-      if ((dtoUpdate as any)?.idArticulo !== undefined) {
+      if ((updateDetalleSeparadoDto as any)?.idArticulo !== undefined) {
         throw new BadRequestException('Campo idArticulo no permitido. Use idProducto.');
       }
-      if ('idProducto' in (dtoUpdate as any) && (dtoUpdate as any).idProducto == null) {
+      if ('idProducto' in (updateDetalleSeparadoDto as any) && (updateDetalleSeparadoDto as any).idProducto == null) {
         throw new BadRequestException('Si envía idProducto debe ser un valor válido.');
       }
-      const updated = Object.assign(found, dtoUpdate);
+      const updated = Object.assign(found, updateDetalleSeparadoDto);
       return await this.detalleSeparadoRepository.save(updated);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al actualizar el detalle de separado');

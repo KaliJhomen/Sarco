@@ -14,18 +14,15 @@ export class UsuarioService {
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
-      const newUser: Usuario = Object.assign(new Usuario(), createUsuarioDto as any);
-    if (createUsuarioDto.clave) {
-      newUser.clave= await bcryptjs.hash(createUsuarioDto.clave, 10);
-    }
-    return await this.usuarioRepository.save(newUser);
+      const nuevoUsuario: Usuario = Object.assign(new Usuario(), createUsuarioDto as any);
+    return await this.usuarioRepository.save(nuevoUsuario);
   }
-  async findOne(id: number) {
+  async findOne(idUsuario: number) {
     const usuario = await this.usuarioRepository.findOne({
-      where: { idUsuario: id },
-      relations: ['cargo', 'tienda'],
+      where: { idUsuario},
+      relations: ['carrito', 'favoritos'],
     });
-    if (!usuario) throw new NotFoundException(`Usuario ${usuario} no encontrado`);
+    if (!usuario) throw new NotFoundException(`Usuario ${idUsuario} no encontrado`);
     return usuario;
   }
   
@@ -36,7 +33,7 @@ export class UsuarioService {
     });
   }
 
-  findOneByLogin(login: string) {
+  findOneByLogin(login: string) {   
     return this.usuarioRepository.findOne({
       where: { login },
     });
@@ -45,19 +42,16 @@ export class UsuarioService {
   async findOneByEmail(email: string): Promise<Usuario | null> {
     return this.usuarioRepository.findOneBy({ email });
   }
-
+/*
   findByImagen(imagen: string) {
     return this.usuarioRepository.findOne({
       where: { imagen },
     });
   }
-
-
-
-
-  async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    const usuario = await this.usuarioRepository.findOne({ where: { idUsuario: id } });
-    if (!usuario) throw new NotFoundException(`Usuario ${id} no encontrado`);
+*/
+  async update(idUsuario: number, updateUsuarioDto: UpdateUsuarioDto) {
+    const usuario = await this.usuarioRepository.findOne({ where: { idUsuario} });
+    if (!usuario) throw new NotFoundException(`Usuario ${idUsuario} no encontrado`);
 
     const toSave = { ...usuario, ...updateUsuarioDto } as any;
 
@@ -66,12 +60,12 @@ export class UsuarioService {
     }
 
     await this.usuarioRepository.save(toSave);
-    return this.findOne(id);
+    return await this.findOne(idUsuario);
   }
 
-  async remove(id: number) {
-    const res = await this.usuarioRepository.delete({ idUsuario: id });
-    if (res.affected === 0) throw new NotFoundException(`Usuario ${id} no encontrado`);
+  async remove(idUsuario: number) {
+    const res = await this.usuarioRepository.delete({ idUsuario });
+    if (res.affected === 0) throw new NotFoundException(`Usuario ${idUsuario} no encontrado`);
     return { success: true };
   }
 }

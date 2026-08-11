@@ -12,9 +12,9 @@ export class EgresoService {
     @InjectRepository(Egreso)
     private readonly egresoRepository: Repository<Egreso>,
   ) { }
-  async create(dtoCreate: CreateEgresoDto) {
+  async create(createEgresoDto: CreateEgresoDto) {
     try {
-      const newEgreso = this.egresoRepository.create(dtoCreate);
+      const newEgreso = this.egresoRepository.create(createEgresoDto);
       return this.egresoRepository.save(newEgreso);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al guardar el Egreso');

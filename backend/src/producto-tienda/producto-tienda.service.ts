@@ -12,12 +12,12 @@ export class ProductoTiendaService {
     private productoTiendaRepository: Repository<ProductoTienda>,
   ) {}
 
-  async create(dtoCreate: CreateProductoTiendaDto) {
+  async create(createProductoTiendaDto: CreateProductoTiendaDto) {
     try {
       const entity = this.productoTiendaRepository.create({
-        idProducto: dtoCreate.idProducto,
-        idTienda:  dtoCreate.idTienda ,
-        cantidad: dtoCreate.cantidad ?? null,
+        idProducto: createProductoTiendaDto.idProducto,
+        idTienda:  createProductoTiendaDto.idTienda ,
+        cantidad: createProductoTiendaDto.cantidad ?? null,
       });
       return await this.productoTiendaRepository.save(entity);
     } catch (error) {
@@ -76,15 +76,15 @@ export class ProductoTiendaService {
     }
   }
 
-  async update(idProductoTienda: number, dtoUpdate: UpdateProductoTiendaDto) {
+  async update(idProductoTienda: number, updateProductoTiendaDto: UpdateProductoTiendaDto) {
     try {
       const entity = await this.productoTiendaRepository.preload({
         idProductoTienda,
-        producto: dtoUpdate.idProducto
-          ? { idProducto: dtoUpdate.idProducto }
+        producto: updateProductoTiendaDto.idProducto
+          ? { idProducto: updateProductoTiendaDto.idProducto }
           : undefined,
-        tienda: dtoUpdate.idTienda
-          ? { idTienda: dtoUpdate.idTienda }
+        tienda: updateProductoTiendaDto.idTienda
+          ? { idTienda: updateProductoTiendaDto.idTienda }
           : undefined,
       });
       if (!entity) {

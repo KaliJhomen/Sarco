@@ -13,15 +13,15 @@ export class DetalleCreditoService {
     private detalleCreditoRepository: Repository<DetalleCredito>,
   ) { }
 
-  async create(dtoCreate: CreateDetalleCreditoDto) {
+  async create(createDetalleCreditoDto: CreateDetalleCreditoDto) {
     try {
-      if ((dtoCreate as any)?.idArticulo !== undefined) {
+      if ((createDetalleCreditoDto as any)?.idArticulo !== undefined) {
         throw new BadRequestException('Campo idArticulo no permitido. Use idProducto.');
       }
-      if (dtoCreate?.idProducto === undefined || dtoCreate?.idProducto === null) {
+      if (createDetalleCreditoDto?.idProducto === undefined || createDetalleCreditoDto?.idProducto === null) {
         throw new BadRequestException('idProducto es requerido.');
       }
-      const newDetalleCredito = this.detalleCreditoRepository.create(dtoCreate);
+      const newDetalleCredito = this.detalleCreditoRepository.create(createDetalleCreditoDto);
       return this.detalleCreditoRepository.save(newDetalleCredito);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al guardar el detalle de crédito');

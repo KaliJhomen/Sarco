@@ -118,7 +118,7 @@ export class TipoProductoService {
     }
   }
 
-  async update(idTipoProducto: number, dtoUpdate: UpdateTipoProductoDto) {
+  async update(idTipoProducto: number, updateTipoProductoDto: UpdateTipoProductoDto) {
     try {
       const tipoProductoFound = await this.tipoProductoRepository.findOne({
         where: { idTipoProducto}
@@ -128,7 +128,7 @@ export class TipoProductoService {
         throw new NotFoundException('Tipo Producto no encontrado');
       }
 
-      const { idSubCategorias, ...tipoProductoData } = dtoUpdate;
+      const { idSubCategorias, ...tipoProductoData } = updateTipoProductoDto;
 
       // Actualizar datos básicos
       const updatedTipoProducto = Object.assign(tipoProductoFound, tipoProductoData);

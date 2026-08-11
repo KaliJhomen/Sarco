@@ -11,11 +11,11 @@ export class ProductoTipoProductoService {
     @InjectRepository(ProductoTipoProducto)
     private productoTipoProductoRepository: Repository<ProductoTipoProducto>,
   ) { }
-  async create(dtoCreate: CreateProductoTipoProductoDto) {
+  async create(createProductoTipoProductoDto: CreateProductoTipoProductoDto) {
     try {
       const entity = this.productoTipoProductoRepository.create({
-        producto: { idProducto: dtoCreate.idProducto },
-        tipoProducto: { idTipoProducto: dtoCreate.idTipoProducto },
+        producto: { idProducto: createProductoTipoProductoDto.idProducto },
+        tipoProducto: { idTipoProducto: createProductoTipoProductoDto.idTipoProducto },
       });
       return await this.productoTipoProductoRepository.save(entity);
     } catch (error : any) {
@@ -89,15 +89,15 @@ export class ProductoTipoProductoService {
     }
   }
 
-  async update(idProductoTipoProducto: number, dtoUpdate: UpdateProductoTipoProductoDto) {
+  async update(idProductoTipoProducto: number, updateProductoTipoProductoDto: UpdateProductoTipoProductoDto) {
     try {
       const entity = await this.productoTipoProductoRepository.preload({
-        tipoProducto: dtoUpdate.idTipoProducto
-          ? { idTipoProducto: dtoUpdate.idTipoProducto,
+        tipoProducto: updateProductoTipoProductoDto.idTipoProducto
+          ? { idTipoProducto: updateProductoTipoProductoDto.idTipoProducto,
            }
           : undefined,
-        producto: dtoUpdate.idProducto
-          ? { idProducto: dtoUpdate.idProducto
+        producto: updateProductoTipoProductoDto.idProducto
+          ? { idProducto: updateProductoTipoProductoDto.idProducto
           }
           : undefined,
       });

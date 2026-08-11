@@ -13,15 +13,15 @@ export class DetalleVentaService {
     private detalleVentaRepository: Repository<DetalleVenta>,
   ) { }
 
-  async create(dtoCreate: CreateDetalleVentaDto) {
+  async create(createDetalleVentaDto: CreateDetalleVentaDto) {
     try {
-      if ((dtoCreate as any)?.idArticulo !== undefined) {
+      if ((createDetalleVentaDto as any)?.idArticulo !== undefined) {
         throw new BadRequestException('Campo idArticulo no permitido. Use idProducto.');
       }
-      if (dtoCreate?.idProducto === undefined || dtoCreate?.idProducto === null) {
+      if (createDetalleVentaDto?.idProducto === undefined || createDetalleVentaDto?.idProducto === null) {
         throw new BadRequestException('idProducto es requerido.');
       }
-      const newDetalleVenta = this.detalleVentaRepository.create(dtoCreate);
+      const newDetalleVenta = this.detalleVentaRepository.create(createDetalleVentaDto);
       return this.detalleVentaRepository.save(newDetalleVenta);
     } catch (error) {
       handleDBError(error, 'Ocurrió un error al guardar el detalle de venta');
