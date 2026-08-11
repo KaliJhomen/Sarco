@@ -37,55 +37,73 @@ export class ClienteService {
     }
   }
 
+  private selectFields(qb: any) {
+    return qb
+      .leftJoinAndSelect('c.documento', 'd')
+      .leftJoinAndSelect('c.estadoCliente', 'ec')
+      .select([
+        'c.idCliente', 'c.nombre', 'c.numeroDocumento',
+        'c.direccion', 'c.telefono', 'c.email',
+        'd.idDocumento', 'd.nombre',
+        'ec.nombre',
+      ]);
+  }
+
   async findAll() {
     try {
-      return await this.clienteRepository
-          .createQueryBuilder('c')
-          .leftJoinAndSelect('c.documento', 'd')
-          .leftJoinAndSelect('c.estadoCliente', 'ec')
-          .select([
-            'c.idCliente', 'c.nombre', 'c.numeroDocumento',
-            'c.direccion', 'c.telefono', 'c.email',
-            'd.idDocumento', 'd.nombre',
-            'ec.nombre',
-          ])
-          .getMany();
+      const qb = this.clienteRepository.createQueryBuilder('c');
+      return await this.selectFields(qb).getMany();
     } catch (error) {
-      handleDBError(error,'Ocurrió un error al obtener clientes');
+      handleDBError(error, 'Ocurrió un error al obtener clientes');
     }
   }
-  async findOne(idCliente: number): Promise<Cliente> {
-    const cliente = await this.clienteRepository.findOneBy({ idCliente });
+
+  async findWithFilters(qs: any) {
+    if (qs.id) return this.findOne(+qs.id);
+
+    const page = Number(qs.page) || 1;
+    const limit = Math.min(Number(qs.limit) || 20, 200);
+    const qb = this.clienteRepository.createQueryBuilder('c');
+
+    if (qs.idDocumento) qb.andWhere('c.idDocumento = :idDocumento', { idDocumento: qs.idDocumento });
+
+    if (qs.numeroDocumento) qb.andWhere('LOWER(c.numeroDocumento) LIKE :num', { num: `%${String(qs.numeroDocumento).toLowerCase()}%` });
+    if (qs.nombre) qb.andWhere('LOWER(c.nombre) LIKE :nombre', { nombre: `%${String(qs.nombre).toLowerCase()}%` });
+    if (qs.direccion) qb.andWhere('LOWER(c.direccion) LIKE :direccion', { direccion: `%${String(qs.direccion).toLowerCase()}%` });
+    if (qs.referencia) qb.andWhere('LOWER(c.referencia) LIKE :ref', { ref: `%${String(qs.referencia).toLowerCase()}%` });
+    if (qs.telefono) qb.andWhere('LOWER(c.telefono) LIKE :tel', { tel: `%${String(qs.telefono).toLowerCase()}%` });
+    if (qs.email) qb.andWhere('LOWER(c.email) LIKE :email', { email: `%${String(qs.email).toLowerCase()}%` });
+
+    if (qs.estado) qb.andWhere('c.idEstadoCliente = :estado', { estado: qs.estado });
+
+    if (qs.q) {
+      const term = `%${String(qs.q).toLowerCase()}%`;
+      qb.andWhere(
+        '(LOWER(c.nombre) LIKE :term OR LOWER(c.numeroDocumento) LIKE :term OR LOWER(c.email) LIKE :term OR LOWER(c.telefono) LIKE :term)',
+        { term },
+      );
+    }
+
+    const allowedSort = ['nombre', 'numeroDocumento', 'email', 'telefono', 'idCliente', 'createdAt'];
+    if (qs.sortBy && allowedSort.includes(qs.sortBy)) {
+      qb.orderBy(`c.${qs.sortBy}`, (qs.sortOrder || 'ASC').toUpperCase() as 'ASC' | 'DESC');
+    } else {
+      qb.orderBy('c.idCliente', 'DESC');
+    }
+
+    const [data, total] = await this.selectFields(qb).skip((page - 1) * limit).take(limit).getManyAndCount();
+
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+  }
+
+  async findOne(id: number) {
+    const qb = this.clienteRepository.createQueryBuilder('c')
+      .where('c.idCliente = :id', { id });
+    const cliente = await this.selectFields(qb).getOne();
     if (!cliente) {
-      throw new NotFoundException(`Cliente con ID ${idCliente} no encontrado`);
+      throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
     }
     return cliente;
-  }
-  async findOneByEmail(email: string): Promise<Cliente | null> {
-    return this.clienteRepository.findOneBy({ email: email });
-  }
-
-  async findOneWithRelations(id: number) {
-    try {
-      const clienteFound = await this.clienteRepository.findOne({
-        where: { idCliente: id },
-        relations: ["idDocumento2"],
-        select: {
-          documento: {
-            idDocumento: true,
-            nombre: true
-          },
-        },
-      });
-      if (!clienteFound) {
-        throw new NotFoundException('cliente no encontrado');
-      }
-
-      return clienteFound;
-    }
-    catch (error) {
-      handleDBError(error,'Ocurrió un error al obtener el cliente');
-    }
   }
 
   async update(idCliente: number, updateClienteDto: UpdateClienteDto) {
@@ -120,48 +138,6 @@ export class ClienteService {
       throw handleDBError(error, 'Ocurrió un error al eliminar el cliente');
     }
   }
-
-  async findWithFilters(qs: any) {
-    const page = Number(qs.page) || 1;
-    const limit = Math.min(Number(qs.limit) || 20, 200);
-    const qb = this.clienteRepository.createQueryBuilder('c');
-
-    if (qs.id) qb.andWhere('c.idCliente = :id', { id: qs.id });
-    if (qs.idDocumento) qb.andWhere('c.idDocumento = :idDocumento', { idDocumento: qs.idDocumento });
-
-    // case-insensitive searches compatible con MySQL/Postgres
-    if (qs.numeroDocumento) qb.andWhere('LOWER(c.numeroDocumento) LIKE :num', { num: `%${String(qs.numeroDocumento).toLowerCase()}%` });
-    if (qs.nombre) qb.andWhere('LOWER(c.nombre) LIKE :nombre', { nombre: `%${String(qs.nombre).toLowerCase()}%` });
-    if (qs.direccion) qb.andWhere('LOWER(c.direccion) LIKE :direccion', { direccion: `%${String(qs.direccion).toLowerCase()}%` });
-    if (qs.referencia) qb.andWhere('LOWER(c.referencia) LIKE :ref', { ref: `%${String(qs.referencia).toLowerCase()}%` });
-    if (qs.telefono) qb.andWhere('LOWER(c.telefono) LIKE :tel', { tel: `%${String(qs.telefono).toLowerCase()}%` });
-    if (qs.email) qb.andWhere('LOWER(c.email) LIKE :email', { email: `%${String(qs.email).toLowerCase()}%` });
-
-    // estado viene como id de estado cliente
-    if (qs.estado) qb.andWhere('c.idEstadoCliente = :estado', { estado: qs.estado });
-
-    // quick full-text q across several columns (lowercased)
-    if (qs.q) {
-      const term = `%${String(qs.q).toLowerCase()}%`;
-      qb.andWhere(
-        '(LOWER(c.nombre) LIKE :term OR LOWER(c.numeroDocumento) LIKE :term OR LOWER(c.email) LIKE :term OR LOWER(c.telefono) LIKE :term)',
-        { term },
-      );
-    }
-
-    // safe sorting: whitelist columns
-    const allowedSort = ['nombre', 'numeroDocumento', 'email', 'telefono', 'idCliente', 'createdAt'];
-    if (qs.sortBy && allowedSort.includes(qs.sortBy)) {
-      qb.orderBy(`c.${qs.sortBy}`, (qs.sortOrder || 'ASC').toUpperCase() as 'ASC' | 'DESC');
-    } else {
-      qb.orderBy('c.idCliente', 'DESC');
-    }
-
-    const [data, total] = await qb.skip((page - 1) * limit).take(limit).getManyAndCount();
-
-    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
-  }
-
   async filterWithBody(body: any) {
     // Por ahora delegamos a findWithFilters; aquí puedes implementar AND/OR complejos más adelante.
     return this.findWithFilters(body || {});

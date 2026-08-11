@@ -37,13 +37,13 @@ export class ClienteController {
   @ApiParam({
     name: 'id',
     type: Number,
-    description: 'ID único del cliente',
+    description: 'ID del cliente',
     example: 1,
   })
   @ApiResponse({ status: 200, description: 'Cliente encontrado' })
   @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
   getCliente(@Param('id') id: string) {
-    return this.clienteService.findOneWithRelations(+id);
+    return this.clienteService.findOne(+id);
   }
 
   @Patch(':id')
