@@ -11,11 +11,11 @@ import {
 import { Cargo } from "../../cargo/entities/cargo.entity";
 import { Documento } from "../../documento/entities/documento.entity";
 import { Tienda } from "../../tienda/entities/tienda.entity";
-import { Favoritos } from "src/favoritos/entities/favoritos.entity";
-import { Carrito } from "src/carrito/entities/carrito.entity";
+import { Favoritos } from "../../favoritos/entities/favoritos.entity";
+import { Carrito } from "../../carrito/entities/carrito.entity";
 
-import { PagoCredito } from "src/pago-credito/entities/pago-credito.entity";
-import { PagoSeparado } from "src/pago-separado/entities/pago-separado.entity";
+import { PagoCredito } from "../../pago-credito/entities/pago-credito.entity";
+import { PagoSeparado } from "../../pago-separado/entities/pago-separado.entity";
 @Index("fk_usuario_documento_2", ["idDocumento"], {})
 @Entity("usuario", { schema: "sarcos_db" })
 export class Usuario {

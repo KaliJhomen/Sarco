@@ -38,7 +38,6 @@ export class TipoProductoSubCategoriaService {
         relations:['idTipoProducto', 'idSubCategoria']
       });
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException(
         'Ocurrió un error al obtener las categorías',
       );

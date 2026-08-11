@@ -4,7 +4,7 @@ import { UpdateClienteDto } from './dto/update-cliente.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cliente } from './entities/cliente.entity';
-import { handleDBError } from '../common/execeptions/errors';
+import { handleDBError } from '../common/exceptions/errors';
 
 @Injectable()
 export class ClienteService {
@@ -116,7 +116,7 @@ export class ClienteService {
       }
       return { message: `Cliente con ID ${idCliente} eliminado correctamente` };
     } catch (error) {
-      handleDBError(error,'Ocurrió un error al elimiar el cliente');
+      throw handleDBError(error, 'Ocurrió un error al eliminar el cliente');
     }
   }
 

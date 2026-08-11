@@ -4,7 +4,7 @@ import { UpdateDetalleSeparadoDto } from './dto/update-detalle-separado.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DetalleSeparado } from './entities/detalle-separado.entity';
-import { handleDBError } from 'src/common/execeptions/errors';
+import { handleDBError } from '../common/exceptions/errors';
 
 @Injectable()
 export class DetalleSeparadoService {

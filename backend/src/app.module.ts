@@ -4,6 +4,9 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+
 import { MarcaModule } from './marca/marca.module';
 import { AnuncioModule } from './anuncio/anuncio.module';
 import { AgendaModule } from './agenda/agenda.module';
@@ -74,6 +77,10 @@ import { ConfigModule} from './config/config.module'
       rootPath: join(__dirname, '..', 'public'), // Serve the "public" folder
       serveRoot: '/public', // Files will be accessible under "/public"
     }),
+    ThrottlerModule.forRoot([{
+        ttl: 1000 * 60, 
+        limit: 100,       
+    }]),
     MarcaModule,
     AgendaModule,
     AnuncioModule,
@@ -128,7 +135,13 @@ import { ConfigModule} from './config/config.module'
     ConfigModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
 

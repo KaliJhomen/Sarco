@@ -35,7 +35,6 @@ export class ProductoTiendaService {
         relations: ['producto', 'tienda'],
       });
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException('Ocurrió un error al obtener las asociaciones producto-tienda');
     }
   }

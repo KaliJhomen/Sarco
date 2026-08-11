@@ -33,7 +33,6 @@ export class SubCategoriaService {
       return await this.subCategoriaRepository.find({
         relations: ['idCategoria2'] });
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException('Error al obtener subcategorías');
     }
   }

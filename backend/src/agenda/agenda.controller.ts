@@ -3,7 +3,7 @@ import { AgendaService } from './agenda.service';
 import { CreateAgendaDto } from './dto/create-agenda.dto';
 import { UpdateAgendaDto } from './dto/update-agenda.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 import { UpdateEstadoAgendaDto } from './dto/state-agenda.dto';
 
 @ApiTags('Agenda')
@@ -25,7 +25,7 @@ export class AgendaController {
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Obtener todas las agendas' })
   @ApiResponse({ status: 200, description: 'Lista de agendas devuelta' })
-  getAgendas() {
+  findAll() {
     return this.agendaService.findAll();
   }
 
@@ -40,7 +40,7 @@ export class AgendaController {
   })
   @ApiResponse({ status: 200, description: 'Agenda encontrada' })
   @ApiResponse({ status: 404, description: 'Agenda no encontrada' })
-  getAgenda(@Param('id') id: string) {
+  findOne(@Param('id') id: string) {
     return this.agendaService.findOne(+id);
   }
 
@@ -68,7 +68,7 @@ export class AgendaController {
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Eliminar una agenda' })
   @ApiResponse({ status: 200, description: 'Agenda eliminada correctamente' })
-  deleteAgenda(@Param('id') id: string) {
+  remove(@Param('id') id: string) {
     return this.agendaService.remove(+id);
   }
 }

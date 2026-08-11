@@ -4,7 +4,7 @@ import { UpdateDetalleVentaDto } from './dto/update-detalle-venta.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DetalleVenta } from './entities/detalle-venta.entity';
-import { handleDBError } from 'src/common/execeptions/errors';
+import { handleDBError } from '../common/exceptions/errors';
 
 @Injectable()
 export class DetalleVentaService {

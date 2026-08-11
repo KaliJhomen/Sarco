@@ -4,8 +4,8 @@ import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/s
 import { ProductoService } from './producto.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Producto')
 @Controller('producto')
@@ -20,7 +20,6 @@ export class ProductoController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiBody({ type: CreateProductoDto })
   async create(@Body() createProductoDto: CreateProductoDto) {
-    console.log('DTO recibido:', createProductoDto);
     return await this.productoService.create(createProductoDto);
   }
 
@@ -195,7 +194,7 @@ export class ProductoController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar un articulo' })
-  @ApiResponse({ status: 201, description: 'Articulo actualizado correctamente' })
+  @ApiResponse({ status: 200, description: 'Articulo actualizado correctamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiBody({ type: UpdateProductoDto })
   update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto) {
@@ -204,7 +203,7 @@ export class ProductoController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar un articulo' })
-  @ApiResponse({ status: 201, description: 'Articulo eliminado correctamente' })
+  @ApiResponse({ status: 200, description: 'Articulo eliminado correctamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   remove(@Param('id') id: string) {
     return this.productoService.remove(+id);

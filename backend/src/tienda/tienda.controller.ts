@@ -3,7 +3,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { TiendaService } from './tienda.service';
 import { CreateTiendaDto } from './dto/create-tienda.dto';
 import { UpdateTiendaDto } from './dto/update-tienda.dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 @ApiTags('Tienda')
 @Controller('tienda')
@@ -15,13 +15,13 @@ export class TiendaController {
   @ApiOperation({ summary: 'Crear una tienda' })
   @ApiResponse({ status: 201, description: 'Tienda creada correctamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
-  async createTienda(@Body() createTiendaDto: CreateTiendaDto) {
-    return await this.tiendaService.createTienda(createTiendaDto);
+  async create(@Body() createTiendaDto: CreateTiendaDto) {
+    return await this.tiendaService.create(createTiendaDto);
   }
   @Get()
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Obtener Todas las tiendas' })
-  @ApiResponse({ status: 201, description: 'Fetch correctamente' })
+  @ApiResponse({ status: 200, description: 'Tiendas obtenidas correctamente' })
   async findAll() {
     return await this.tiendaService.findAll();
   }
@@ -29,8 +29,8 @@ export class TiendaController {
   @Get(':id')
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Obtener tienda por id' })
-  @ApiResponse({ status: 201, description: 'Tienda obtenida correctamente' })
-  @ApiResponse({ status: 400, description: 'No existe esa tienda' })
+  @ApiResponse({ status: 200, description: 'Tienda obtenida correctamente' })
+  @ApiResponse({ status: 404, description: 'No existe esa tienda' })
   async findOne(@Param('id') id: string) {
     return await this.tiendaService.findOne(+id);
   }
@@ -38,7 +38,7 @@ export class TiendaController {
   @Patch(':id')
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Actualizar una Tienda' })
-  @ApiResponse({ status: 201, description: 'Tienda actualizada correctamente' })
+  @ApiResponse({ status: 200, description: 'Tienda actualizada correctamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiBody({ type: UpdateTiendaDto })
   async update(@Param('id') id: string, @Body() updateTiendaDto: UpdateTiendaDto) {
@@ -47,8 +47,8 @@ export class TiendaController {
   @Delete(':id')
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Eliminar una tienda' })
-  @ApiResponse({ status: 201, description: 'Tienda eliminada correctamente' })
-  @ApiResponse({ status: 400, description: 'No existe una tienda con ${id}' })
+  @ApiResponse({ status: 200, description: 'Tienda eliminada correctamente' })
+  @ApiResponse({ status: 404, description: 'No existe una tienda con ese ID' })
   async remove(@Param('id') id: string) {
     return await this.tiendaService.remove(+id);
   }

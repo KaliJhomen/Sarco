@@ -12,7 +12,7 @@ export class CreateUsuarioDto {
 
   @ApiPropertyOptional()
   @IsString()
-  documento?: string | null;
+  numeroDocumento?: string | null;
 /*
   @ApiProperty()
   @IsInt()

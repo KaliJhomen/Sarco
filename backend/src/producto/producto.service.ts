@@ -36,7 +36,6 @@ export class ProductoService {
       return await this.productoTipoProductoRepository.save(relaciones);
       }
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException(
         'Ocurrió un error al crear el producto',
       );
@@ -264,7 +263,6 @@ export class ProductoService {
 
     // Filtro de descuento
     if (filtros.hasDiscount === true) {
-      console.log('🔍 DEBUG SERVICE - Aplicando filtro hasDiscount');
       query.andWhere('producto.descuento > :minDiscount', { minDiscount: 0 });
     }
 

@@ -4,7 +4,7 @@ import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/s
 import { ColorService } from './color.service';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 @ApiTags('Color')
 @Controller('color')
@@ -30,8 +30,8 @@ export class ColorController {
   @Get()
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Obtener todos los colores' })
-  @ApiResponse({ status: 201, description: 'Color Existe' })
-  @ApiResponse({ status: 400, description: 'Err' })
+  @ApiResponse({ status: 200, description: 'Colores obtenidos correctamente' })
+  @ApiResponse({ status: 400, description: 'Error al obtener colores' })
   findAll() {
     return this.colorService.findAll();
   }
@@ -39,10 +39,10 @@ export class ColorController {
   @Patch(':id')
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Actualizar Color' })
-  @ApiResponse({ status: 201, description: 'Color actualizado correctamente' })
-  @ApiResponse({ status: 400, description: 'Actualizacion fallida' })
+  @ApiResponse({ status: 200, description: 'Color actualizado correctamente' })
+  @ApiResponse({ status: 400, description: 'Actualización fallida' })
   @ApiBody({ type: UpdateColorDto })
-  update(@Param('id') id: number, @Body() updateColorDto: UpdateColorDto) {
+  update(@Param('id') id: string, @Body() updateColorDto: UpdateColorDto) {
     return this.colorService.update(+id, updateColorDto);
   }
 
@@ -51,7 +51,7 @@ export class ColorController {
   @ApiOperation({ summary: 'Eliminar un Color' })
   @ApiResponse({ status: 200, description: 'Color eliminado correctamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
-  remove(@Param('id') id: number) {
-    return this.colorService.remove(Number(id));
+  remove(@Param('id') id: string) {
+    return this.colorService.remove(+id);
   }
 }

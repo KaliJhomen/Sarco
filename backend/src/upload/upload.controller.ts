@@ -33,7 +33,7 @@ export class UploadController {
     }),
     limits: { fileSize: 5 * 1024 * 1024 },
   }))
-  uploadFile(@UploadedFile() file: any) {
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
     const url = `/productos/${file.filename}`;
     return { url };
   }

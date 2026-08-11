@@ -20,7 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let message = 'Error interno del servidor.';
 
     if (exception instanceof QueryFailedError) {
-      const error: any = exception;
+      const error = exception as QueryFailedError & { code?: string };
 
       if (error.code === 'ER_DUP_ENTRY') {
         status = HttpStatus.BAD_REQUEST;

@@ -1,8 +1,10 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcryptjs from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import {UsuarioService} from "../usuario/usuario.service";
+import { UsuarioService } from '../usuario/usuario.service';
 import { RegisterDto } from './dto/register.dto';
+import { Usuario } from '../usuario/entities/usuario.entity';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -10,19 +12,20 @@ export class AuthService {
     private readonly usuarioService: UsuarioService
   ) {}
 
-  private mapUsuario(usuario: any) {
+  private mapUsuario(usuario: Usuario) {
     return {
       idUsuario: usuario.idUsuario,
       nombre: usuario.nombre,
       email: usuario.email,
     };
-  } 
+  }
+
   async login({ email, clave }: { email: string; clave: string }) {
     const usuario = await this.usuarioService.findOneByEmail(email);
-    if (!usuario) throw new UnauthorizedException('Correo o Contraseña Incorrectass');
+    if (!usuario) throw new UnauthorizedException('Correo o contraseña incorrectos');
 
     const isValid = await bcryptjs.compare(clave, usuario.clave || '');
-    if (!isValid) throw new UnauthorizedException('Correo |o Contraseña| Incorrectas');
+    if (!isValid) throw new UnauthorizedException('Correo o contraseña incorrectos');
 
     const payload = { id: usuario.idUsuario, email: usuario.email };
     const token = await this.jwtService.signAsync(payload);
@@ -32,7 +35,7 @@ export class AuthService {
     };
   }
 
-  async register({nombre, email, telefono, documento, clave }: RegisterDto) {
+  async register({nombre, email, telefono, idDocumento, documento, clave }: RegisterDto) {
     const existing = await this.usuarioService.findOneByEmail(email);
     if (existing) {
       throw new BadRequestException('El email ya está registrado');
@@ -45,7 +48,8 @@ export class AuthService {
       nombre,
       email,
       telefono,
-      documento,
+      idDocumento: idDocumento || null,
+      numeroDocumento: documento || null,
       clave: hashed,
     });
     return {

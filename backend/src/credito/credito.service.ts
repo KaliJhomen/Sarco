@@ -4,7 +4,7 @@ import { UpdateCreditoDto } from './dto/update-credito.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Credito } from './entities/credito.entity';
-import { handleDBError } from 'src/common/execeptions/errors';
+import { handleDBError } from '../common/exceptions/errors';
 
 @Injectable()
 export class CreditoService {

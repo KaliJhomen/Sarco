@@ -10,8 +10,8 @@ export class ConfigController {
   constructor(private readonly configService: ConfigService) {}
 
   @Post()
-  create(@Body() dto: CreateConfigDto) {
-    return this.configService.create(dto);
+  create(@Body() createConfigDto: CreateConfigDto) {
+    return this.configService.create(createConfigDto);
   }
 
   @Get()
@@ -27,9 +27,9 @@ export class ConfigController {
   @Patch(':key')
   update(
     @Param('key') key: string,
-    @Body() dto: UpdateConfigDto,
+    @Body() updateConfigDto: UpdateConfigDto,
   ) {
-    return this.configService.update(key, dto);
+    return this.configService.update(key, updateConfigDto);
   }
 
   @Delete(':key')

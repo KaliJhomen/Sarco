@@ -4,6 +4,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth.guard';
+import {Throttle} from '@nestjs/throttler'
 import type { Response } from 'express';
 
 import { UsuarioService } from '../usuario/usuario.service';
@@ -22,28 +23,30 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiBody({ type: LoginDto })
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) 
   async login(@Body() body: LoginDto, @Res({passthrough: true}) res: Response) {
     const { token, usuario } = await this.authService.login(body);
     //const userDB = await this.usuarioService.findOne(usuario.idUsuario);
     if (body.sessionToken) {
       await this.carritoService.mergeGuestCart(usuario.idUsuario, body.sessionToken);
     }
+    const isProduction = process.env.NODE_ENV === 'production';
+
     res.cookie('token', token, {
       httpOnly: true,
       sameSite: 'lax',
       secure: false,
       path: '/',
-      maxAge: 30 * 1000 * 60,
+      maxAge: 30 * 60 * 1000,
     });
-
-    return res.json({
+    return {
       token,
       user: {
-        id: userDB.idUsuario,
-        name: userDB.nombre,
-        email: userDB.email,
+        id: usuario.idUsuario,
+        name: usuario.nombre,
+        email: usuario.email,
       },
-    });
+    };
   }
 
   @Post('logout')
@@ -66,9 +69,11 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('profile')
   @ApiOperation({ summary: 'Perfil del usuario' })
-  async profile(@Request() req: any) {
+  async profile(@Request() req: { usuario?: { id: number } }) {
     const idUsuario = req.usuario?.id;
-    if (!idUsuario) return {};
+    if (!idUsuario) {
+      return { user: null };
+    }
 
     const usuario = await this.usuarioService.findOne(idUsuario);
     return {

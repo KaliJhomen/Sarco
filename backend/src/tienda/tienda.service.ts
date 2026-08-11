@@ -12,7 +12,7 @@ export class TiendaService {
     private readonly tiendaRepository: Repository<Tienda>,
   ) {}
 
-  async createTienda(createTiendaDto: CreateTiendaDto) {
+  async create(createTiendaDto: CreateTiendaDto) {
     try {
       const tienda = this.tiendaRepository.create(createTiendaDto);
       return await this.tiendaRepository.save(tienda);

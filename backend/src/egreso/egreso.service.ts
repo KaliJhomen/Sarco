@@ -4,7 +4,7 @@ import { UpdateEgresoDto } from './dto/update-egreso.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Egreso } from './entities/egreso.entity';
-import { handleDBError } from 'src/common/execeptions/errors';
+import { handleDBError } from '../common/exceptions/errors';
 
 @Injectable()
 export class EgresoService {

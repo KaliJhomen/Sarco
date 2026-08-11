@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
-import { HttpExceptionFilter } from './common/execeptions/http-exception.filter';
+import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
 import { join } from 'path';
@@ -12,7 +12,6 @@ dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
   app.use('/productos', express.static(join(__dirname, '..', 'public', 'productos')));
 
@@ -54,6 +53,6 @@ async function bootstrap() {
   const port = Number(process.env.PORT ?? 4000);
   const host = process.env.HOST || '0.0.0.0';
   await app.listen(process.env.PORT || 4000);
-  console.log(`Nest app listening on http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`);
+  Logger.log(`Nest app listening on http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`, 'Bootstrap');
 }
 bootstrap();

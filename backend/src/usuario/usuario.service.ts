@@ -14,7 +14,7 @@ export class UsuarioService {
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
-      const nuevoUsuario: Usuario = Object.assign(new Usuario(), createUsuarioDto as any);
+      const nuevoUsuario: Usuario = Object.assign(new Usuario(), createUsuarioDto);
     return await this.usuarioRepository.save(nuevoUsuario);
   }
   async findOne(idUsuario: number) {
@@ -22,7 +22,7 @@ export class UsuarioService {
       where: { idUsuario},
       relations: ['carrito', 'favoritos'],
     });
-    if (!usuario) throw new NotFoundException(`Usuario ${idUsuario} no encontrado`);
+    if (!usuario) throw new NotFoundException(`Usuario con ID ${idUsuario} no encontrado`);
     return usuario;
   }
   
@@ -51,21 +51,35 @@ export class UsuarioService {
 */
   async update(idUsuario: number, updateUsuarioDto: UpdateUsuarioDto) {
     const usuario = await this.usuarioRepository.findOne({ where: { idUsuario} });
-    if (!usuario) throw new NotFoundException(`Usuario ${idUsuario} no encontrado`);
+    if (!usuario) throw new NotFoundException(`Usuario con ID ${idUsuario} no encontrado`);
 
-    const toSave = { ...usuario, ...updateUsuarioDto } as any;
+    const toSave: Record<string, unknown> = {
+      idUsuario: usuario.idUsuario,
+      login: usuario.login,
+      email: usuario.email,
+      nombre: usuario.nombre,
+      clave: usuario.clave,
+      idDocumento: usuario.idDocumento,
+      numeroDocumento: usuario.numeroDocumento,
+      telefono: usuario.telefono,
+      ciudad: usuario.ciudad,
+      direccion: usuario.direccion,
+      imagen: usuario.imagen,
+      fondo: usuario.fondo,
+      ...updateUsuarioDto,
+    };
 
     if (updateUsuarioDto.clave) {
-      toSave.clave = await bcryptjs.hash(updateUsuarioDto.clave, 10);
+      toSave.clave = await bcryptjs.hash(updateUsuarioDto.clave as string, 10);
     }
 
-    await this.usuarioRepository.save(toSave);
+    await this.usuarioRepository.save(toSave as unknown as Usuario);
     return await this.findOne(idUsuario);
   }
 
   async remove(idUsuario: number) {
     const res = await this.usuarioRepository.delete({ idUsuario });
-    if (res.affected === 0) throw new NotFoundException(`Usuario ${idUsuario} no encontrado`);
-    return { success: true };
+    if (res.affected === 0) throw new NotFoundException(`Usuario con ID ${idUsuario} no encontrado`);
+    return { message: `Usuario con ID ${idUsuario} eliminado correctamente` };
   }
 }

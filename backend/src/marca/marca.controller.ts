@@ -4,7 +4,7 @@ import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/s
 import { MarcaService } from './marca.service';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 @ApiTags('Marca')
 @Controller('marca')
@@ -48,7 +48,7 @@ export class MarcaController {
   @Delete(':id')
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Eliminar una marca' })
-  @ApiResponse({ status: 201, description: 'Marca eliminada correctamente' })
+  @ApiResponse({ status: 200, description: 'Marca eliminada correctamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   async remove(@Param('id') id: string) {
     return await this.marcaService.remove(+id);

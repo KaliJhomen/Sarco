@@ -54,12 +54,13 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async remove(idUser: number): Promise<void> {
+  async remove(idUser: number) {
     const user = await this.userRepository.findOneBy({ idUser });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${idUser} no encontrado`);
     }
 
     await this.userRepository.remove(user);
+    return { message: `Usuario con ID ${idUser} eliminado correctamente` };
   }
 }

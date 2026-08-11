@@ -3,7 +3,7 @@ import { ClienteService } from './cliente.service';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 @ApiTags('Cliente')
 @Controller('cliente')
@@ -50,7 +50,7 @@ export class ClienteController {
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Actualizar un cliente' })
   @ApiResponse({ status: 200, description: 'Cliente actualizado correctamente' })
-  @ApiResponse({ status: 400, description: 'Cliente no encontrado' })
+  @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
   @ApiBody({ type: UpdateClienteDto })
   update(@Param('id') id: string, @Body() updateClienteDto: UpdateClienteDto) {
     return this.clienteService.update(+id, updateClienteDto);
@@ -60,7 +60,7 @@ export class ClienteController {
   //@UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Eliminar un cliente' })
   @ApiResponse({ status: 200, description: 'Cliente eliminado correctamente' })
-  @ApiResponse({ status: 400, description: 'Cliente no encontrado' })
+  @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
   remove(@Param('id') id: string) {
     return this.clienteService.remove(+id);
   }

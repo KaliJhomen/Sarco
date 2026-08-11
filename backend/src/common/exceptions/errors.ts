@@ -8,7 +8,7 @@ import {
  * 🧩 Función reutilizable para manejar errores comunes de base de datos.
  * Se puede importar en cualquier servicio.
  */
-export function handleDBError(error: any, customMessage: string): never {
+export function handleDBError(error: Error & { code?: string }, customMessage: string): never {
   // Si ya es una excepción HTTP (por ejemplo NotFoundException o BadRequest), la relanzamos
   if (error instanceof HttpException) throw error;
 

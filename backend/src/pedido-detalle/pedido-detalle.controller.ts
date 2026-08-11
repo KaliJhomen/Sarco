@@ -74,7 +74,7 @@ export class PedidoDetalleController {
     if (!idUsuario && !sessionToken) {
       throw new BadRequestException('Usuario no autenticado o sessionToken requerido');
     }
-    if (!body?.cantidad) throw new BadRequestException('quantity es requerido');
+    if (!body?.cantidad) throw new BadRequestException('La cantidad es requerida');
 
     return this.pedidoDetalleService.updateOrderItem(
       idProducto,
