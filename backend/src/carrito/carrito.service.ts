@@ -9,7 +9,7 @@ import { Carrito } from './entities/carrito.entity';
 import { CarritoItem } from './entities/carrito-item.entity';
 import { Producto } from '../producto/entities/producto.entity';
 import { randomUUID } from 'crypto';
-import { Usuario } from 'src/usuario/entities/usuario.entity';
+import { Usuario } from '../usuario/entities/usuario.entity';
 type CartIdent = { idUsuario?: number; sessionToken?: string };
 @Injectable()
 export class CarritoService {

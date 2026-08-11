@@ -181,7 +181,7 @@ export class ProductoController {
       hasDiscount: hasDiscountFilter,
     } as any;
 
-    return this.productoService.findProductosFiltro(filtros);
+return this.productoService.findProductosFiltros(filtros);
   }
 
   @Get(':id')

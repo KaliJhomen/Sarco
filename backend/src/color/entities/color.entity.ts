@@ -1,4 +1,4 @@
-import { ProductoColor } from 'src/producto-color/entities/producto-color.entity';
+import { ProductoColor } from '../../producto-color/entities/producto-color.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity('color', {schema: 'sarcos_db'})

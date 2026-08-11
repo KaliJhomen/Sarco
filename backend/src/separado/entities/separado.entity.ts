@@ -62,8 +62,11 @@ export class Separado {
   })
   deudaRestante!: string | null;
 
-  @Column("tinyint", { name: "estado", nullable: true })
-  estado!: number | null;
+  @Column("tinyint", { name: "estado", nullable: true, transformer: {
+    to: (value: boolean | null): number | null => value === null ? null : value ? 1 : 0,
+    from: (value: number | null): boolean | null => value === null ? null : Boolean(value),
+  }})
+  estado!: boolean | null;
 
   @Column("varchar", { name: "descripcion", nullable: true, length: 250 })
   descripcion!: string | null;

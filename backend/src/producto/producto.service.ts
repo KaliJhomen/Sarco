@@ -1,44 +1,82 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { Producto } from './entities/producto.entity';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 
-import { ProductoTipoProducto } from 'src/producto-tipo-producto/entities/producto-tipo-producto.entity';
-import { TipoProducto } from 'src/tipo-producto/entities/tipo-producto.entity';
+import { ProductoTipoProducto } from '../producto-tipo-producto/entities/producto-tipo-producto.entity';
+import { TipoProducto } from '../tipo-producto/entities/tipo-producto.entity';
 
-import { DeepPartial, Repository, SelectQueryBuilder } from 'typeorm';
+export interface ProductoFiltros {
+  idCategoria?: number;
+  idSubCategoria?: number;
+  idTipoProducto?: number;
+  idMarca?: number;
+  idMarcaList?: number[];
+  idTiendaList?: number[];
+  categoriaNombre?: string;
+  subCategoriaNombre?: string;
+  tipoProductoNombre?: string;
+  categoriasNombres?: string[];
+  subcategoriasNombres?: string[];
+  tiposNombres?: string[];
+  priceMin?: number;
+  priceMax?: number;
+  page?: number;
+  limit?: number;
+  busqueda?: string;
+  hasDiscount?: boolean;
+}
+
 @Injectable()
 export class ProductoService {
+
+  private readonly logger = new Logger(ProductoService.name);
 
   constructor(
     @InjectRepository(Producto)
     private productoRepository: Repository<Producto>,
 
     @InjectRepository(ProductoTipoProducto)
-    private productoTipoProductoRepository: Repository<ProductoTipoProducto>, 
+    private productoTipoProductoRepository: Repository<ProductoTipoProducto>,
 
     @InjectRepository(TipoProducto)
     private tipoProductoRepository: Repository<TipoProducto>,
+
+    private dataSource: DataSource,
   ) { }
 
   async create(createProductoDto: CreateProductoDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
-      const {idTiposProducto, ...productoData}= createProductoDto;
-      const producto = this.productoRepository.create(productoData);
-      const productoGuardado = await this.productoRepository.save(producto);
-      if (idTiposProducto && Array.isArray(idTiposProducto)) {
+      const { idTiposProducto, estado, ...productoData } = createProductoDto;
+      const producto = this.productoRepository.create({
+        ...productoData,
+        ...(estado !== undefined && { estado: Number(estado) as any }),
+      });
+      const productoGuardado = await queryRunner.manager.save(producto);
+
+      if (idTiposProducto && Array.isArray(idTiposProducto) && idTiposProducto.length > 0) {
         const relaciones = idTiposProducto.map(id => ({
           producto: productoGuardado,
-          tipoProducto: { idTipoProducto: id }
-        })) as DeepPartial<ProductoTipoProducto>[];
-      return await this.productoTipoProductoRepository.save(relaciones);
+          tipoProducto: { idTipoProducto: id },
+        }));
+        await queryRunner.manager.save(relaciones);
       }
+
+      await queryRunner.commitTransaction();
+      return productoGuardado;
     } catch (error) {
-      throw new InternalServerErrorException(
-        'Ocurrió un error al crear el producto',
-      );
+      await queryRunner.rollbackTransaction();
+      this.logger.error('Error al crear producto:', error);
+      throw new InternalServerErrorException('Ocurrió un error al crear el producto');
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -49,154 +87,55 @@ export class ProductoService {
         .leftJoinAndSelect('producto.marca', 'm')
         .leftJoinAndSelect('producto.productoTipoProductos', 'ptp')
         .leftJoinAndSelect('ptp.tipoProducto', 'tp')
-        .leftJoinAndSelect('tp.tipoProductoSubCategoria', 'tpsc')
+        .leftJoinAndSelect('tp.tipoProductoSubCategorias', 'tpsc')
         .leftJoinAndSelect('tpsc.subCategoria', 'sc')
         .leftJoinAndSelect('sc.categoria', 'c')
         .leftJoinAndSelect('producto.productoTiendas', 'pt')
         .leftJoinAndSelect('pt.tienda', 't')
+        .where('producto.estado = :estado', { estado: true })
         .getMany();
-      /*
-      const getCategoriaNombre = (producto: Producto) => {
-        if (!producto.productoTipoProductos) return null;
-        for (const ptp of producto.productoTipoProductos) {
-          const tipo = ptp.idTipoProducto as any;
-          if (!tipo || !tipo.tipoProductoSubCategoria) continue;
-          for (const tpsc of tipo.tipoProductoSubCategoria) {
-            const sub = (tpsc as any).idSubCategoria;
-            const cat = sub?.idCategoria2;
-            if (cat?.nombre) return cat.nombre;
-          }
-        }
-        return null;
-      };
-      */
 
-      return productos.map(p  => ({
-        ...p,
+      return productos.map(p => ({
+        idProducto: p.idProducto,
+        nombre: p.nombre,
+        modelo: p.modelo,
+        descripcion: p.descripcion,
+        stock: p.stock,
+        imagen: p.imagen,
+        precioTope: p.precioTope,
+        precioVenta: p.precioVenta,
+        estado: p.estado,
+        fechaIngreso: p.fechaIngreso,
+        garantiaFabrica: p.garantiaFabrica,
+        descuento: p.descuento,
         marca: p.marca?.nombre ?? null,
         categoria: p.productoTipoProductos?.[0]?.tipoProducto?.tipoProductoSubCategorias?.[0]?.subCategoria?.categoria?.nombre ?? null,
       }));
     } catch (error) {
-      console.error('Error en findAll:', error);
-      throw new InternalServerErrorException(
-        'Ocurrió un error al obtener los productos',
-      );
+      this.logger.error('Error en findAll:', error);
+      throw new InternalServerErrorException('Ocurrió un error al obtener los productos');
     }
   }
 
-  // async findProductosFiltro(filtros: {
-  //   idCategoria?: number;
-  //   idSubCategoria?: number;
-  //   idTipoProducto?: number;
-  //   idMarca?: number;
-  // }) {
-  //   try {
-  //     const query = this.productoRepository
-  //       .createQueryBuilder('producto')
-  //       .leftJoinAndSelect('producto.producto_tipo_productos', 'productoTipoProducto')
-  //       .leftJoinAndSelect('productoTipoProducto.idTipoProducto2', 'tipoProducto')
-  //       .leftJoinAndSelect('tipoProducto.sub_categoria_tipo_productos', 'subCategoriaTipoProducto')
-  //       .leftJoinAndSelect('subCategoriaTipoProducto.idSubCategoria2', 'subCategoria')
-  //       .leftJoinAndSelect('subCategoria.idCategoria2', 'categoria')
-  //       .leftJoinAndSelect('producto.idMarca2', 'marca');
-
-  //     const params: any = {};
-
-  //     if (filtros.idCategoria) {
-  //       query.andWhere('categoria.idCategoria = :idCategoria');
-  //       params.idCategoria = filtros.idCategoria;
-  //     }
-
-  //     if (filtros.idSubCategoria) {
-  //       query.andWhere('subCategoria.idSubCategoria = :idSubCategoria');
-  //       params.idSubCategoria = filtros.idSubCategoria;
-  //     }
-
-  //     if (filtros.idTipoProducto) {
-  //       query.andWhere('tipoProducto.idTipoProducto = :idTipoProducto');
-  //       params.idTipoProducto = filtros.idTipoProducto;
-  //     }
-
-  //     if (filtros.idMarca) {
-  //       query.andWhere('marca.idMarca = :idMarca');
-  //       params.idMarca = filtros.idMarca;
-  //     }
-
-  //     if (Object.keys(params).length > 0) {
-  //       query.setParameters(params);
-  //     }
-
-  //     const productos = await query.getMany();
-
-  //     if (!productos.length) {
-  //       return { message: 'No se encontraron productos con los filtros aplicados.', data: [] };
-  //     }
-
-  //     //NO BORRAR Xd
-  //     //SI LO BORRAS VAS A LAMENTARLO LUEGO 😞😢
-  //     // return { total: productos.length, data: productos };
-  //     return productos;
-  //   } catch (error) {
-  //     console.error('Error en findProductosFiltro:', error);
-  //     throw new InternalServerErrorException('Error interno del servidor.');
-  //   }
-  // }
-
-  async findProductosFiltro(filtros: {
-    // IDs únicos (backwards compatibility)
-    idCategoria?: number;
-    idSubCategoria?: number;
-    idTipoProducto?: number;
-    idMarca?: number;
-    
-    // Arrays de IDs
-    idMarcaList?: number[];
-    idTiendaList?: number[];
-    
-    // Nombres únicos (backwards compatibility)
-    categoriaNombre?: string;
-    subCategoriaNombre?: string;
-    tipoProductoNombre?: string;
-    
-    // Arrays de nombres (nuevo - para selección múltiple)
-    categoriasNombres?: string[];
-    subcategoriasNombres?: string[];
-    tiposNombres?: string[];
-    
-    // Precio
-    priceMin?: number;
-    priceMax?: number;
-    
-    // Paginación
-    page?: number;
-    limit?: number;
-    
-    // Búsqueda
-    busqueda?: string;
-
-    // Filtro de descuento ← AGREGAR ESTO
-    hasDiscount?: boolean;
-  }) {
+  async findProductosFiltros(filtros: ProductoFiltros) {
     try {
       const query = this.buildProductoQuery(filtros);
-
       this.applyPagination(query, filtros);
-
-      const [productos/*, total*/] = await query.getManyAndCount();
+      const [productos] = await query.getManyAndCount();
       return productos;
     } catch (error) {
-      console.error('Error en findProductosFiltro:', error);
+      this.logger.error('Error en findProductosFiltros:', error);
       throw new InternalServerErrorException('Error interno del servidor.');
     }
   }
 
-  private buildProductoQuery(filtros: any): SelectQueryBuilder<Producto> {
+  private buildProductoQuery(filtros: ProductoFiltros): SelectQueryBuilder<Producto> {
     const query = this.productoRepository
       .createQueryBuilder('producto')
       .leftJoinAndSelect('producto.marca', 'marca')
       .leftJoinAndSelect('producto.productoTipoProductos', 'ptp')
       .leftJoinAndSelect('ptp.tipoProducto', 'tp')
-      .leftJoinAndSelect('tp.tipoProductoSubCategoria', 'tpsc')
+      .leftJoinAndSelect('tp.tipoProductoSubCategorias', 'tpsc')
       .leftJoinAndSelect('tpsc.subCategoria', 'sc')
       .leftJoinAndSelect('sc.categoria', 'categoria')
       .leftJoinAndSelect('producto.productoTiendas', 'pt')
@@ -209,92 +148,91 @@ export class ProductoService {
     return query;
   }
 
-  private applyFilters(query: SelectQueryBuilder<Producto>, filtros: any) {
-    // Filtro de marca única (backwards compatibility)
+  private applyFilters(query: SelectQueryBuilder<Producto>, filtros: ProductoFiltros) {
     if (filtros.idMarca)
       query.andWhere('marca.idMarca = :idMarca', { idMarca: filtros.idMarca });
 
-    // Filtro de múltiples marcas (nuevo)
     if (filtros.idMarcaList && filtros.idMarcaList.length)
       query.andWhere('marca.idMarca IN (:...idMarcaList)', { idMarcaList: filtros.idMarcaList });
 
-    // Filtro de tipo de producto único (backwards compatibility)
     if (filtros.idTipoProducto)
-      query.andWhere('tipoProducto.idTipoProducto = :idTipoProducto', { idTipoProducto: filtros.idTipoProducto });
+      query.andWhere('tp.idTipoProducto = :idTipoProducto', { idTipoProducto: filtros.idTipoProducto });
 
-    // Filtro de subcategoría única (backwards compatibility)
     if (filtros.idSubCategoria)
-      query.andWhere('subCategoria.idSubCategoria = :idSubCategoria', { idSubCategoria: filtros.idSubCategoria });
+      query.andWhere('sc.idSubCategoria = :idSubCategoria', { idSubCategoria: filtros.idSubCategoria });
 
-    // Filtro de categoría única (backwards compatibility)
     if (filtros.idCategoria)
       query.andWhere('categoria.idCategoria = :idCategoria', { idCategoria: filtros.idCategoria });
 
-    // Filtro de tiendas
     if (filtros.idTiendaList && filtros.idTiendaList.length)
       query.andWhere('tienda.idTienda IN (:...idTiendaList)', { idTiendaList: filtros.idTiendaList });
 
-    // Filtros por nombre único (backwards compatibility)
     if (filtros.categoriaNombre)
-      query.andWhere('LOWER(categoria.nombre) = :categoriaNombre', { categoriaNombre: filtros.categoriaNombre });
+      query.andWhere('LOWER(categoria.nombre) = :categoriaNombre', { categoriaNombre: filtros.categoriaNombre.toLowerCase() });
     if (filtros.subCategoriaNombre)
-      query.andWhere('LOWER(subCategoria.nombre) = :subCategoriaNombre', { subCategoriaNombre: filtros.subCategoriaNombre });
+      query.andWhere('LOWER(sc.nombre) = :subCategoriaNombre', { subCategoriaNombre: filtros.subCategoriaNombre.toLowerCase() });
     if (filtros.tipoProductoNombre)
-      query.andWhere('LOWER(tipoProducto.nombre) = :tipoProductoNombre', { tipoProductoNombre: filtros.tipoProductoNombre });
+      query.andWhere('LOWER(tp.nombre) = :tipoProductoNombre', { tipoProductoNombre: filtros.tipoProductoNombre.toLowerCase() });
 
-    // Filtros por arrays de nombres (nuevo - OR logic)
     if (filtros.categoriasNombres && filtros.categoriasNombres.length > 0) {
-      query.andWhere('LOWER(categoria.nombre) IN (:...categoriasNombres)', { 
-        categoriasNombres: filtros.categoriasNombres 
+      query.andWhere('LOWER(categoria.nombre) IN (:...categoriasNombres)', {
+        categoriasNombres: filtros.categoriasNombres.map(n => n.toLowerCase()),
       });
     }
 
     if (filtros.subcategoriasNombres && filtros.subcategoriasNombres.length > 0) {
-      query.andWhere('LOWER(subCategoria.nombre) IN (:...subcategoriasNombres)', { 
-        subcategoriasNombres: filtros.subcategoriasNombres 
+      query.andWhere('LOWER(sc.nombre) IN (:...subcategoriasNombres)', {
+        subcategoriasNombres: filtros.subcategoriasNombres.map(n => n.toLowerCase()),
       });
     }
 
     if (filtros.tiposNombres && filtros.tiposNombres.length > 0) {
-      query.andWhere('LOWER(tipoProducto.nombre) IN (:...tiposNombres)', { 
-        tiposNombres: filtros.tiposNombres 
+      query.andWhere('LOWER(tp.nombre) IN (:...tiposNombres)', {
+        tiposNombres: filtros.tiposNombres.map(n => n.toLowerCase()),
       });
     }
 
-    // Filtro de descuento
     if (filtros.hasDiscount === true) {
       query.andWhere('producto.descuento > :minDiscount', { minDiscount: 0 });
     }
-
   }
 
-  private applyPriceFilters(query: SelectQueryBuilder<Producto>, filtros: any) {
+  private applyPriceFilters(query: SelectQueryBuilder<Producto>, filtros: ProductoFiltros) {
     if (typeof filtros.priceMin === 'number')
       query.andWhere('producto.precioVenta >= :priceMin', { priceMin: filtros.priceMin });
     if (typeof filtros.priceMax === 'number')
       query.andWhere('producto.precioVenta <= :priceMax', { priceMax: filtros.priceMax });
   }
 
-  private applySearchFilter(query: SelectQueryBuilder<Producto>, filtros: any) {
+  private applySearchFilter(query: SelectQueryBuilder<Producto>, filtros: ProductoFiltros) {
     if (!filtros.busqueda) return;
+
+    const escaped = filtros.busqueda
+      .replace(/%/g, '\\%')
+      .replace(/_/g, '\\_');
+
     query.andWhere(
       `(
-        producto.nombre LIKE :busqueda
-        OR producto.modelo LIKE :busqueda
-        OR producto.descripcion LIKE :busqueda
-        OR marca.nombre LIKE :busqueda
-        OR categoria.nombre LIKE :busqueda
-        OR subCategoria.nombre LIKE :busqueda
-        OR tipoProducto.nombre LIKE :busqueda
+        producto.nombre LIKE :busqueda ESCAPE '\\'
+        OR producto.modelo LIKE :busqueda ESCAPE '\\'
+        OR producto.descripcion LIKE :busqueda ESCAPE '\\'
+        OR marca.nombre LIKE :busqueda ESCAPE '\\'
+        OR categoria.nombre LIKE :busqueda ESCAPE '\\'
+        OR sc.nombre LIKE :busqueda ESCAPE '\\'
+        OR tp.nombre LIKE :busqueda ESCAPE '\\'
       )`,
-      { busqueda: `%${filtros.busqueda}%` }
+      { busqueda: `%${escaped}%` }
     );
   }
 
-  private applyPagination(query: SelectQueryBuilder<Producto>, filtros: any) {
-    if (filtros.limit && filtros.limit > 0) query.take(filtros.limit);
-    if (filtros.page && filtros.page > 1 && filtros.limit && filtros.limit > 0)
-      query.skip((filtros.page - 1) * filtros.limit);
+  private applyPagination(query: SelectQueryBuilder<Producto>, filtros: ProductoFiltros) {
+    const limit = Math.min(Math.max(filtros.limit || 20, 1), 100);
+    const page = Math.max(filtros.page || 1, 1);
+
+    query.take(limit);
+    if (page > 1) {
+      query.skip((page - 1) * limit);
+    }
   }
 
   async findOne(id: number) {
@@ -306,10 +244,10 @@ export class ProductoService {
           'productoColores',
           'productoColores.color',
           'productoTipoProductos',
-          'productoTipoProducto.tipoProducto',
-          'productoTipoProducto.tipoProducto.tipoProductoSubCategoria',
-          'productoTipoProducto.tipoProducto.tipoProductoSubCategoria.subCategoria',
-          'productoTipoProducto.tipoProducto.tipoProductoSubCategoria.subCategoria.categoria',
+          'productoTipoProductos.tipoProducto',
+          'productoTipoProductos.tipoProducto.tipoProductoSubCategorias',
+          'productoTipoProductos.tipoProducto.tipoProductoSubCategorias.subCategoria',
+          'productoTipoProductos.tipoProducto.tipoProductoSubCategorias.subCategoria.categoria',
           'productoTiendas',
           'productoTiendas.tienda',
         ],
@@ -321,48 +259,74 @@ export class ProductoService {
 
       return producto;
     } catch (error) {
-      console.error('Error en findOne:', error);
-      
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      
-      throw new InternalServerErrorException(
-        `Error al obtener el producto con ID ${id}`,
-      );
+      if (error instanceof NotFoundException) throw error;
+
+      this.logger.error(`Error en findOne (id: ${id}):`, error);
+      throw new InternalServerErrorException(`Error al obtener el producto con ID ${id}`);
     }
   }
 
   async update(idProducto: number, updateProductoDto: UpdateProductoDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
-      const producto = await this.productoRepository.preload({
+      const { idTiposProducto, estado, ...camposProducto } = updateProductoDto;
+
+      const producto = await queryRunner.manager.preload(Producto, {
         idProducto,
-        ...updateProductoDto,
+        ...camposProducto,
+        ...(estado !== undefined && { estado: Number(estado) as any }),
       });
+
       if (!producto) {
         throw new NotFoundException(`Producto con ID ${idProducto} no encontrado`);
       }
-      return await this.productoRepository.save(producto);
+
+      const productoGuardado = await queryRunner.manager.save(producto);
+
+      if (Array.isArray(idTiposProducto)) {
+        await queryRunner.manager.delete(ProductoTipoProducto, { producto: { idProducto } });
+
+        if (idTiposProducto.length > 0) {
+          const nuevasRelaciones = idTiposProducto.map(idTipo => ({
+            producto: { idProducto } as any,
+            tipoProducto: { idTipoProducto: idTipo } as any,
+          }));
+          await queryRunner.manager.save(nuevasRelaciones);
+        }
+      }
+
+      await queryRunner.commitTransaction();
+      return productoGuardado;
     } catch (error) {
-      throw new InternalServerErrorException(
-        `Error al actualizar el producto con ID ${idProducto}`,
-      );
+      await queryRunner.rollbackTransaction();
+
+      if (error instanceof NotFoundException) throw error;
+
+      this.logger.error(`Error en update (id: ${idProducto}):`, error);
+      throw new InternalServerErrorException(`Error al actualizar el producto con ID ${idProducto}`);
+    } finally {
+      await queryRunner.release();
     }
   }
 
   async remove(id: number) {
     try {
       const producto = await this.productoRepository.findOne({ where: { idProducto: id } });
+
       if (!producto) {
         throw new NotFoundException(`Producto con ID ${id} no encontrado`);
       }
+
       await this.productoRepository.remove(producto);
       return { message: `Producto con ID ${id} eliminado correctamente` };
     } catch (error) {
-      console.error('Error en remove:', error);
-      throw new InternalServerErrorException(
-        `Error al eliminar el producto con ID ${id}`,
-      );
+      if (error instanceof NotFoundException) throw error;
+
+      this.logger.error(`Error en remove (id: ${id}):`, error);
+      throw new InternalServerErrorException(`Error al eliminar el producto con ID ${id}`);
     }
   }
 }

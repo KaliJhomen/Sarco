@@ -12,7 +12,7 @@ import { productTypeProductService } from '@/services/productTypeProduct.service
 export function useProducts() {
   return useQuery({
     queryKey: ['products'],
-    queryFn: productService.getAll,
+    queryFn: () => productService.getAll(),
     staleTime: 5 * 60 * 1000, 
   });
 }

@@ -3,7 +3,7 @@ import { EgresoService } from './egreso.service';
 import { CreateEgresoDto } from './dto/create-egreso.dto';
 import { UpdateEgresoDto } from './dto/update-egreso.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 @ApiTags('Egreso')
 @Controller('egreso')

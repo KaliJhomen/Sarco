@@ -3,7 +3,7 @@ import { DetalleCreditoService } from './detalle-credito.service';
 import { CreateDetalleCreditoDto } from './dto/create-detalle-credito.dto';
 import { UpdateDetalleCreditoDto } from './dto/update-detalle-credito.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 @ApiTags('Detalle Crédito')
 @Controller('detalle-credito')

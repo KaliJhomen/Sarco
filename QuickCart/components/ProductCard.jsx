@@ -26,7 +26,6 @@ const { user } = useAppContext();
     descuento,
     stock,
     imagen,
-    idMarca2,
   } = product;
 
   const { addToCart } = useAppContext();
@@ -87,7 +86,7 @@ const { user } = useAppContext();
   const productPrice = Number(precioVenta) || 0;
   const productDiscount = Number(descuento) || 0;
   const productStock = Number(stock) || 0;
-  const brandName = idMarca2?.nombre || "";
+  const brandName = product.marca || "";
 
   const hasDiscount = productDiscount > 0;
   const finalPrice = hasDiscount

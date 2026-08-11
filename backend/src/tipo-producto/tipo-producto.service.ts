@@ -5,8 +5,8 @@ import { TipoProducto } from './entities/tipo-producto.entity';
 import { CreateTipoProductoDto } from './dto/create-tipo-producto.dto';
 import { UpdateTipoProductoDto } from './dto/update-tipo-producto.dto';
 
-import { TipoProductoSubCategoria } from 'src/tipo-producto-sub-categoria/entities/tipo-producto-sub-categoria.entity';
-import { SubCategoria } from 'src/sub-categoria/entities/sub-categoria.entity';
+import { TipoProductoSubCategoria } from '../tipo-producto-sub-categoria/entities/tipo-producto-sub-categoria.entity';
+import { SubCategoria } from '../sub-categoria/entities/sub-categoria.entity';
 
 import { DeepPartial, Repository } from 'typeorm';
 

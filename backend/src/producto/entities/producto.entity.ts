@@ -66,8 +66,10 @@ export class Producto {
   })
   precioVenta!: string | null;
 
-  @Column("tinyint", { name: "estado", nullable: true, default: () => "'1'" })
-  estado!: boolean | null;
+  @Column("tinyint", { name: "estado", nullable: true, default: 1, transformer: {
+    to: (value: boolean | null): number | null => value === null ? null : value ? 1 : 0,
+    from: (value: number | null): boolean | null => value === null ? null : Boolean(value),},})
+  estado!: boolean;
 
   @Column("date", { name: "fecha_ingreso", nullable: true })
   fechaIngreso!: string | null;
@@ -77,6 +79,7 @@ export class Producto {
 
   @Column("int", { name: "descuento", nullable: true })
   descuento!: number | null;
+
 
 
   @OneToOne(() => Garantia, (garantia) => garantia.producto)
