@@ -85,7 +85,7 @@ export class TipoProductoService {
 
       return qb.getMany();
     } catch (error) {
-      console.error('❌ ERROR en findAllFiltered:', {
+      console.error('ERROR en findAllFiltered:', {
         message: error.message,
         stack: error.stack,
         params: { idProducto, idSubCategoria }

@@ -13,6 +13,7 @@ export class RegisterDto {
     email!: string;
 
     @ApiProperty()
+    @IsOptional()
     @IsString()
     @MinLength(9)
     telefono?: string | null;
@@ -23,6 +24,7 @@ export class RegisterDto {
     idDocumento?: number | null;
     
     @ApiProperty()
+    @IsOptional()
     @IsString()
     @MinLength(1)
     documento?: string | null;

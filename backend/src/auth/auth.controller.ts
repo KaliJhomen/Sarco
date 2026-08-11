@@ -35,7 +35,7 @@ export class AuthController {
     res.cookie('token', token, {
       httpOnly: true,
       sameSite: 'lax',
-      secure: false,
+      secure: isProduction,
       path: '/',
       maxAge: 30 * 60 * 1000,
     });
@@ -51,10 +51,11 @@ export class AuthController {
 
   @Post('logout')
   async logout(@Res() res: Response) {
+    const isProduction = process.env.NODE_ENV === 'production';
     res.clearCookie('token', {
       httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: 'lax',
     });
     return res.json({ message: 'Sesión cerrada' });
   }
