@@ -10,7 +10,7 @@ import { jwtConstants } from '../constants/jwt.constants';
 
 declare module 'express' {
   interface Request {
-    user?: any;
+    usuario?: any;
   }
 }
 
@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
-      request.user = payload;
+      request.usuario = payload;
     } catch (err) {
       throw new UnauthorizedException("Token inválido o expirado");
     }

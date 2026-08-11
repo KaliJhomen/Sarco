@@ -10,25 +10,25 @@ export class AuthService {
     private readonly usuarioService: UsuarioService
   ) {}
 
-  private mapUser(usuario: any) {
+  private mapUsuario(usuario: any) {
     return {
       idUsuario: usuario.idUsuario,
       nombre: usuario.nombre,
       email: usuario.email,
     };
-  }
+  } 
   async login({ email, clave }: { email: string; clave: string }) {
-    const user = await this.usuarioService.findOneByEmail(email);
-    if (!user) throw new UnauthorizedException('Correo o Contraseña Incorrectass');
+    const usuario = await this.usuarioService.findOneByEmail(email);
+    if (!usuario) throw new UnauthorizedException('Correo o Contraseña Incorrectass');
 
-    const isValid = await bcryptjs.compare(clave, user.clave || '');
-    if (!isValid) throw new UnauthorizedException('Correo o Contraseña Incorrectas');
+    const isValid = await bcryptjs.compare(clave, usuario.clave || '');
+    if (!isValid) throw new UnauthorizedException('Correo |o Contraseña| Incorrectas');
 
-    const payload = { id: user.idUsuario, email: user.email };
+      const payload = { id: usuario.idUsuario, email: usuario.email };
     const token = await this.jwtService.signAsync(payload);
     return {
       token,
-      user: this.mapUser(user),
+      usuario: this.mapUsuario(usuario),
     };
   }
 
@@ -40,7 +40,7 @@ export class AuthService {
 
     const hashed = await bcryptjs.hash(clave, 10);
 
-    const newUser = await this.usuarioService.create({
+    const nuevoUsuario = await this.usuarioService.create({
       login: email,
       nombre,
       email,
@@ -49,7 +49,7 @@ export class AuthService {
       clave: hashed,
     });
     return {
-      user: this.mapUser(newUser),
+      usuario: this.mapUsuario(nuevoUsuario),
     };
   }
 }

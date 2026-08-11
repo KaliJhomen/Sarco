@@ -8,7 +8,8 @@ export class FavoritosItem {
   @PrimaryGeneratedColumn({ name: 'id_favoritos_item' })
   idFavoritosItem!: number;
 
-  @ManyToOne(() => Favoritos, (favoritos) => favoritos.items, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToOne(() => Favoritos, (favoritos) => favoritos.items, { 
+    onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'id_favoritos' })
   favoritos!: Favoritos;
 

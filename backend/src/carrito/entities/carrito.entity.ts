@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Usuario } from '../../usuario/entities/usuario.entity';
 import { CarritoItem } from './carrito-item.entity';
 
@@ -32,13 +32,13 @@ export class Carrito {
   @UpdateDateColumn({name: 'updated_at'})
   updatedAt!: Date;
 
+  @OneToOne(() => Usuario, (usuario) => usuario.carrito, { 
+    nullable: true, 
+    onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_usuario' })
+  usuario?: Usuario | null;
 
     //ITEMS
   @OneToMany(() => CarritoItem, (item) => item.carrito, {cascade: true})
   items!: CarritoItem[];
-
-
-  @ManyToOne(() => Usuario, { nullable: true, onDelete:'CASCADE' })
-  @JoinColumn({ name: 'id_usuario' })
-  usuario!: Usuario | null;
 }

@@ -26,7 +26,7 @@ export class GuestGuard implements CanActivate {
         secret: jwtConstants.secret,
       });
 
-      request.user = payload;
+      request.usuario = payload;
 
     } catch {
     }

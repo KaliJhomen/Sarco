@@ -31,13 +31,14 @@ export class UsuarioService {
   
   findAll() {
     return this.usuarioRepository.find({
-      relations: ['cargo', 'tienda'],
+      select: ['idUsuario', 'login', 'email', 'nombre', 'numeroDocumento', 'telefono', 'ciudad', 'direccion', 'imagen', 'fondo'],
+      relations: ['carrito', 'favoritos']
     });
   }
+
   findOneByLogin(login: string) {
     return this.usuarioRepository.findOne({
       where: { login },
-      relations: ['cargo'],
     });
   }
 

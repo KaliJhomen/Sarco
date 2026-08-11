@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn, OneToMany, OneToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Usuario } from 'src/usuario/entities/usuario.entity';
 import { FavoritosItem } from './favoritos-item.entity';
 import { Producto } from 'src/producto/entities/producto.entity';
@@ -8,10 +8,6 @@ export class Favoritos {
   @PrimaryGeneratedColumn({ name: 'id_favoritos' })
   idFavoritos!: number;
 
-  //ITEMS
-  @OneToMany(() => FavoritosItem, (item) => item.favoritos, { cascade: true })
-  items!: FavoritosItem[];
-  //
   @Column("varchar",{ 
     name: 'session_token', 
     length: 36, 
@@ -36,18 +32,18 @@ export class Favoritos {
 
   @UpdateDateColumn({name: 'updated_at'})
   updatedAt!: Date;
-
   
-  @ManyToOne(() => Usuario, (usuario) => usuario.favoritos, { nullable: true, 
+  //ITEMS
+  @OneToMany(() => FavoritosItem, (item) => item.favoritos, { cascade: true })
+  items!: FavoritosItem[];
+  //
+  
+  @OneToOne(() => Usuario, (usuario) => usuario.favoritos, { 
+    nullable: true, 
     onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_usuario' })
   usuario?: Usuario;
 
-  @ManyToOne(() => Favoritos, (favoritos) => favoritos.items, { 
-    onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'id_favoritos' })
-  favoritos!: Favoritos;
-  
   @ManyToOne(() => Producto
 , (producto) => producto.favoritosItems, { 
     onDelete: 'CASCADE' })

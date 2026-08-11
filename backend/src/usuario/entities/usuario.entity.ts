@@ -4,6 +4,7 @@ import {
   Index,
   JoinColumn,
   OneToMany,
+  OneToOne,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -11,6 +12,8 @@ import { Cargo } from "../../cargo/entities/cargo.entity";
 import { Documento } from "../../documento/entities/documento.entity";
 import { Tienda } from "../../tienda/entities/tienda.entity";
 import { Favoritos } from "src/favoritos/entities/favoritos.entity";
+import { Carrito } from "src/carrito/entities/carrito.entity";
+
 import { PagoCredito } from "src/pago-credito/entities/pago-credito.entity";
 import { PagoSeparado } from "src/pago-separado/entities/pago-separado.entity";
 @Index("fk_usuario_documento_2", ["idDocumento"], {})
@@ -51,16 +54,18 @@ export class Usuario {
 
   @Column("varchar", { name: "fondo", nullable: true, length: 255 })
   fondo!: string | null;
-
+/*
   @Column("int", { name: "id_favoritos", nullable: true })
   idFavoritos!: number | null;
 
   @Column("int", { name: "id_carrito", nullable: true })
   idCarrito!: number | null;
+*/
 
-
-  @OneToMany(() => Favoritos, (favoritos) => favoritos.usuario)
-  favoritos!: Favoritos[];
+  @OneToOne(() => Favoritos, (favoritos) => favoritos.usuario)
+  favoritos!: Favoritos;
+  @OneToOne(() => Carrito, (carrito) => carrito.usuario)
+  carrito!: Carrito;
 
 
   /*

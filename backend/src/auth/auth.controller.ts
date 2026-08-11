@@ -15,7 +15,7 @@ import { CarritoService } from '../carrito/carrito.service';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UsuarioService,
+    private readonly usuarioService: UsuarioService,
     private readonly carritoService: CarritoService,
   ) {}
 
@@ -23,11 +23,11 @@ export class AuthController {
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiBody({ type: LoginDto })
   async login(@Body() body: LoginDto, @Res() res: Response) {
-    const { token, user } = await this.authService.login(body);
-    const userDB = await this.userService.findOne(user.idUsuario);
+    const { token, usuario } = await this.authService.login(body);
+    const userDB = await this.usuarioService.findOne(usuario.idUsuario);
     
     if (body.sessionToken) {
-      await this.carritoService.mergeGuestCart(user.idUsuario, body.sessionToken);
+      await this.carritoService.mergeGuestCart(usuario.idUsuario, body.sessionToken);
     }
 
     res.cookie('token', token, {
@@ -69,15 +69,15 @@ export class AuthController {
   @Get('profile')
   @ApiOperation({ summary: 'Perfil del usuario' })
   async profile(@Request() req: any) {
-    const userId = req.user?.id;
-    if (!userId) return {};
+    const idUsuario = req.usuario?.id;
+    if (!idUsuario) return {};
 
-    const user = await this.userService.findOne(userId);
+    const usuario = await this.usuarioService.findOne(idUsuario);
     return {
       user: {
-        id: user.idUsuario,
-        name: user.nombre,
-        email: user.email,
+        id: usuario.idUsuario,
+        name: usuario.nombre,
+        email: usuario.email,
       },
     };
   }
