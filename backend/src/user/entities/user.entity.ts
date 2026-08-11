@@ -1,19 +1,19 @@
-import { Agenda } from 'src/agenda/entities/agenda.entity';
-import { Credito } from 'src/credito/entities/credito.entity';
-import { Egreso } from 'src/egreso/entities/egreso.entity';
-import { Garantia } from 'src/garantia/entities/garantia.entity';
-import { Ingreso } from 'src/ingreso/entities/ingreso.entity';
-import { PagoCredito } from 'src/pago-credito/entities/pago-credito.entity';
-import { PagoSeparado } from 'src/pago-separado/entities/pago-separado.entity';
-import { Separado } from 'src/separado/entities/separado.entity';
-import { Servicio } from 'src/servicio/entities/servicio.entity';
-import { TicketCredito } from 'src/ticket-credito/entities/ticket-credito.entity';
-import { UsuarioRol } from 'src/usuario-rol/entities/usuario-rol.entity';
-import { Venta } from 'src/venta/entities/venta.entity';
-import { UsuarioPermiso } from 'src/usuario-permiso/entities/usuario-permiso.entity';
-import { Cargo } from 'src/cargo/entities/cargo.entity';
-import { Documento } from 'src/documento/entities/documento.entity';
-import { Tienda } from 'src/tienda/entities/tienda.entity';
+import { Agenda } from '../../agenda/entities/agenda.entity';
+import { Credito } from '../../credito/entities/credito.entity';
+import { Egreso } from '../../egreso/entities/egreso.entity';
+import { Garantia } from '../../garantia/entities/garantia.entity';
+import { Ingreso } from '../../ingreso/entities/ingreso.entity';
+import { PagoCredito } from '../../pago-credito/entities/pago-credito.entity';
+import { PagoSeparado } from '../../pago-separado/entities/pago-separado.entity';
+import { Separado } from '../../separado/entities/separado.entity';
+import { Servicio } from '../../servicio/entities/servicio.entity';
+import { TicketCredito } from '../../ticket-credito/entities/ticket-credito.entity';
+import { UsuarioRol } from '../../usuario-rol/entities/usuario-rol.entity';
+import { Venta } from '../../venta/entities/venta.entity';
+import { UsuarioPermiso } from '../../usuario-permiso/entities/usuario-permiso.entity';
+import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Documento } from '../../documento/entities/documento.entity';
+import { Tienda } from '../../tienda/entities/tienda.entity';
 import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn} from 'typeorm';
 
 @Entity('user')
@@ -106,9 +106,6 @@ export class User {
 
   @OneToMany(() => UsuarioRol, (usuarioRol) => usuarioRol.user)
   usuarioRoles!: UsuarioRol[];
-
-  @OneToMany(() => PagoCredito, (pagoCredito) => pagoCredito.user)
-  pagoCredito!: PagoCredito[];
 
   @ManyToOne(() => Cargo, (cargo) => cargo.users, {
     onDelete: "NO ACTION",

@@ -9,17 +9,17 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Marca } from "../../marca/entities/marca.entity";
-import { ProductoTienda } from "src/producto-tienda/entities/producto-tienda.entity";
+import { ProductoTienda } from "../../producto-tienda/entities/producto-tienda.entity";
 import { DetalleCredito } from "../../detalle-credito/entities/detalle-credito.entity";
 import { DetalleSeparado } from "../../detalle-separado/entities/detalle-separado.entity";
 import { DetalleVenta } from "../../detalle-venta/entities/detalle-venta.entity";
 import { PedidoDetalle } from "../../pedido-detalle/entities/pedido-detalle.entity";
 
 import { Garantia } from "../../garantia/entities/garantia.entity";
-import { ProductoTipoProducto } from "src/producto-tipo-producto/entities/producto-tipo-producto.entity";
-import { ProductoColor } from "src/producto-color/entities/producto-color.entity";
+import { ProductoTipoProducto } from "../../producto-tipo-producto/entities/producto-tipo-producto.entity";
+import { ProductoColor } from "../../producto-color/entities/producto-color.entity";
 import { CarritoItem } from "../../carrito/entities/carrito-item.entity"; 
-import { FavoritosItem } from "src/favoritos/entities/favoritos-item.entity";
+import { FavoritosItem } from "../../favoritos/entities/favoritos-item.entity";
 
 @Index("fk_producto_marca_2", ["idMarca"], {})
 @Entity("producto", { schema: "sarcos_db" })

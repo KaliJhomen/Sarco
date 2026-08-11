@@ -9,11 +9,14 @@ export class FavoritosItem {
   idFavoritosItem!: number;
 
   @ManyToOne(() => Favoritos, (favoritos) => favoritos.items, { 
-    onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'id_favoritos' })
+    onDelete: 'CASCADE', 
+    onUpdate: 'CASCADE' })
+  @JoinColumn({ name: 'id_favoritos_item_favoritos' })
   favoritos!: Favoritos;
 
-  @ManyToOne(() => Producto, (producto) => producto.favoritosItems, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'id_producto' })
+  @ManyToOne(() => Producto, (producto) => producto.favoritosItems, { 
+    onDelete: 'CASCADE', 
+    onUpdate: 'CASCADE' })
+  @JoinColumn({ name: 'id_favoritos_item_producto' })
   producto!: Producto;
 }

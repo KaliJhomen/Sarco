@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn, OneToMany, OneToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Usuario } from 'src/usuario/entities/usuario.entity';
 import { FavoritosItem } from './favoritos-item.entity';
-import { Producto } from 'src/producto/entities/producto.entity';
 
 @Entity('favoritos')
 export class Favoritos {
@@ -43,10 +42,4 @@ export class Favoritos {
     onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_usuario' })
   usuario?: Usuario;
-
-  @ManyToOne(() => Producto
-, (producto) => producto.favoritosItems, { 
-    onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'id_producto' })
-  producto!: Producto;
 }

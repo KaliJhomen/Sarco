@@ -8,8 +8,7 @@ import {
 } from "typeorm";
 import { MetodoPago } from "../../metodo-pago/entities/metodo-pago.entity";
 import { Tienda } from "../../tienda/entities/tienda.entity";
-import { Usuario } from "./../../usuario/entities/usuario.entity";
-import { User } from "src/user/entities/user.entity";
+import { User } from "../../user/entities/user.entity";
 
 @Index("fk_ingreso_usuario_1", ["idUsuario"], {})
 @Index("fk_ingreso_metodo_pago_2", ["idMetodoPago"], {})
