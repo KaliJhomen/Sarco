@@ -7,8 +7,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { EnvModule } from './config/env.module';
-import {ConfigModule, ConfigService} from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import type { JwtModuleOptions } from '@nestjs/jwt';
+import type { StringValue } from 'ms';
 import { MarcaModule } from './marca/marca.module';
 import { AnuncioModule } from './anuncio/anuncio.module';
 import { AgendaModule } from './agenda/agenda.module';
@@ -78,6 +81,16 @@ import { PedidoDetalleModule } from './pedido-detalle/pedido-detalle.module';
         synchronize: false,
         logging: config.get<string>('NODE_ENV') !== 'production',
       })
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      global: true,
+      useFactory: (config: ConfigService): JwtModuleOptions => ({
+        secret: config.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: (config.get<string>('JWT_EXPIRES_IN') || '30m') as StringValue
+      },
+      }),
     }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
