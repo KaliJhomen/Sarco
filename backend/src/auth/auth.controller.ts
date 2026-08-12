@@ -3,12 +3,12 @@ import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './guard/auth.guard';
+import { AuthGuard, JwtPayload } from './guard/auth.guard';
 import {Throttle} from '@nestjs/throttler'
 import type { Response } from 'express';
 
 import { UsuarioService } from '../usuario/usuario.service';
-
+import { UserService } from '../user/user.service'
 import { CarritoService } from '../carrito/carrito.service';
 import { FavoritosService } from '../favoritos/favoritos.service';
 import {ConfigService} from '@nestjs/config'
@@ -18,6 +18,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usuarioService: UsuarioService,
+    private readonly userService: UserService,
     private readonly carritoService: CarritoService,
     private readonly favoritosService: FavoritosService,
     private readonly configService: ConfigService, 
@@ -50,7 +51,8 @@ export class AuthController {
 
   @Post('logout')
   async logout(@Res() res: Response) {
-  const isProduction = this.configService.get<string>('NODE_ENV') === 'production';    res.clearCookie('token', {
+  const isProduction = this.configService.get<string>('NODE_ENV') === 'production';    
+  res.clearCookie('token', {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'lax',
@@ -68,19 +70,16 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('profile')
   @ApiOperation({ summary: 'Perfil del usuario' })
-  async profile(@Request() req: { usuario?: { id: number } }) {
-    const idUsuario = req.usuario?.id;
-    if (!idUsuario) {
+  async profile(@Request() req: { usuario?: JwtPayload }) {
+    const { id, table } = req.usuario ?? {};
+    if (!id) {
       return { user: null };
     }
-
-    const usuario = await this.usuarioService.findOne(idUsuario);
-    return {
-      user: {
-        id: usuario.idUsuario,
-        name: usuario.nombre,
-        email: usuario.email,
-      },
-    };
+    if (table === 'user'){
+      const u = await this.userService.findOne(id);
+    return { user: { id: u.idUser, name: u.nombre, email: u.email, role: u.rol, table: 'user' } };
+    }
+      const u = await this.usuarioService.findOne(id);
+      return { user: { id: u.idUsuario, name: u.nombre, email: u.email, role: 'cliente', table: 'usuario' } };
+    }
   }
-}

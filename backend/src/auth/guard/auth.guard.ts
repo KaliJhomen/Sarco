@@ -9,11 +9,11 @@ import { Request } from 'express';
 import { jwtConstants } from '../constants/jwt.constants';
 import { ConfigService } from '@nestjs/config';
 
-interface JwtPayload {
+export interface JwtPayload {
   id: number;
   email: string;
   role: string;
-  table: string;
+  table: 'usuario' | 'user';
 }
 declare module 'express' {
   interface Request {
@@ -43,9 +43,9 @@ export class AuthGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.secret,
+        secret: this.configService.get<string>('JWT_SECRET')!,      
       });
-    if (typeof payload !== 'object' || typeof payload.id !== 'number' || typeof payload.email !== 'string') {
+    if (typeof payload !== 'object' || typeof payload.id !== 'number' || typeof payload.email !== 'string' || typeof payload.table !== 'string') {
       throw new UnauthorizedException('Token con estructura inválida');
     }
 
