@@ -7,12 +7,14 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { jwtConstants } from '../constants/jwt.constants';
+import { ConfigService } from '@nestjs/config';
 
 interface JwtPayload {
   id: number;
   email: string;
+  role: string;
+  table: string;
 }
-
 declare module 'express' {
   interface Request {
     usuario?: JwtPayload;
@@ -21,12 +23,15 @@ declare module 'express' {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    if (process.env.NODE_ENV === 'development'){
-      request.usuario = {id:1, email: 'dev@localhost'};
+    if (this.configService.get<boolean>('DEV_BYPASS_AUTH') === true) {
+      request.usuario = { id: 1, email: 'dev@localhost', role: 'cliente', table: 'usuario' };
       return true;
     }
     const cookieToken = this.extractTokenFromCookie(request);

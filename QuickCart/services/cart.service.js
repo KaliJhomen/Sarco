@@ -28,17 +28,21 @@ export const cartService = {
   /**
    * Actualiza la cantidad de un producto en el carrito.
    */
-  async update(idProducto, quantity) {
+  async update(idProducto, quantity, ident) {
     return client.put(endpoints.cart.update(idProducto), {
       quantity,
+    }, {
+      params: { sessionToken: ident?.sessionToken },
     });
   },
 
   /**
    * Elimina un producto del carrito.
    */
-  async remove(idProducto) {
-    return client.delete(endpoints.cart.remove(idProducto));
+  async remove(idProducto, ident) {
+    return client.delete(endpoints.cart.remove(idProducto), {
+      params: { sessionToken: ident?.sessionToken },
+    });
   },
 
   /**
@@ -50,7 +54,7 @@ export const cartService = {
     const items = Array.isArray(payload?.items) ? payload.items : [];
 
     await Promise.all(
-      items.map((item) => this.remove(item?.producto?.idProducto))
+      items.map((item) => this.remove(item?.producto?.idProducto, ident))
     );
 
     return { ok: true };

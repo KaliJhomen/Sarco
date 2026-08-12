@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { EnvModule } from './config/env.module';
+import {ConfigModule, ConfigService} from '@nestjs/config';
 
 import { MarcaModule } from './marca/marca.module';
 import { AnuncioModule } from './anuncio/anuncio.module';
@@ -58,29 +60,40 @@ import { CarritoModule } from './carrito/carrito.module';
 import { FavoritosModule } from './favoritos/favoritos.module';
 import { PedidoModule} from './pedido/pedido.module';
 import { PedidoDetalleModule } from './pedido-detalle/pedido-detalle.module';
-import { ConfigModule} from './config/config.module'
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql', // ← Hardcodear temporalmente
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '',
-      database: 'sarcos_db',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false, 
-      logging: true, 
+    EnvModule,
+    AuthModule,
+    TypeOrmModule.forRootAsync({
+      imports : [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'mysql', // ← Hardcodear temporalmente
+        host: config.get<string>('DB_HOST'),
+        port: config.get<number>('DB_PORT'),
+        username: config.get<string>('DB_USER'),
+        password: config.get<string>('DB_PASS'),
+        database: config.get<string>('DB_NAME'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: false,
+        logging: config.get<string>('NODE_ENV') !== 'production',
+      })
     }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [{
+        ttl: 60000,
+        limit: config.get<string>('NODE_ENV') === 'production' ? 100 : 1000,
+      }],
+    }),
+
     // ServeStaticModule configuration to serve static files
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'), // Serve the "public" folder
       serveRoot: '/public', // Files will be accessible under "/public"
     }),
-    ThrottlerModule.forRoot([{
-        ttl: 1000 * 60, 
-        limit: 100,       
-    }]),
+
     MarcaModule,
     AgendaModule,
     AnuncioModule,
@@ -112,7 +125,6 @@ import { ConfigModule} from './config/config.module'
     UsuarioModule,
     UsuarioPermisoModule,
     VentaModule,
-    AuthModule,
     RolModule,
     UsuarioRolModule,
     ModuloModule,

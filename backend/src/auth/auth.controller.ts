@@ -10,7 +10,8 @@ import type { Response } from 'express';
 import { UsuarioService } from '../usuario/usuario.service';
 
 import { CarritoService } from '../carrito/carrito.service';
-
+import { FavoritosService } from '../favoritos/favoritos.service';
+import {ConfigService} from '@nestjs/config'
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -18,6 +19,8 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly usuarioService: UsuarioService,
     private readonly carritoService: CarritoService,
+    private readonly favoritosService: FavoritosService,
+    private readonly configService: ConfigService, 
   ) {}
 
   @Post('login')
@@ -25,11 +28,12 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @Throttle({ default: { limit: 5, ttl: 60000 } }) 
   async login(@Body() body: LoginDto, @Res({passthrough: true}) res: Response) {
-    const { token, usuario } = await this.authService.login(body);
+    const { token, user } = await this.authService.login(body);
     if (body.sessionToken) {
-      await this.carritoService.mergeGuestCart(usuario.idUsuario, body.sessionToken);
+      await this.carritoService.mergeGuestCart(user.id, body.sessionToken);
+      await this.favoritosService.mergeGuestFavorites(user.id, body.sessionToken);
     }
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
 
     res.cookie('token', token, {
       httpOnly: true,
@@ -38,20 +42,15 @@ export class AuthController {
       path: '/',
       maxAge: 30 * 60 * 1000,
     });
-    return {
+    return{ 
       token,
-      user: {
-        id: usuario.idUsuario,
-        name: usuario.nombre,
-        email: usuario.email,
-      },
+      user
     };
   }
 
   @Post('logout')
   async logout(@Res() res: Response) {
-    const isProduction = process.env.NODE_ENV === 'production';
-    res.clearCookie('token', {
+  const isProduction = this.configService.get<string>('NODE_ENV') === 'production';    res.clearCookie('token', {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'lax',

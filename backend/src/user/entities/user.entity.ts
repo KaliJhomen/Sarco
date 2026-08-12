@@ -21,7 +21,7 @@ export class User {
   @PrimaryGeneratedColumn({ name: 'id_user' })
   idUser!: number;
 
-  @Column("varchar", {name: 'nombre', nullable: true, length: 255 })
+  @Column("varchar", {name: 'nombre', length: 255 })
   nombre!: string;
   
   @Column("int",{name: 'id_documento', nullable: true} )
@@ -40,7 +40,7 @@ export class User {
   telefono!: string | null;
 
   @Column("varchar", {unique: true, length: 255 })
-  email!: string | null;
+  email!: string;
 
   @Column("varchar", { length: 255 })
   login!: string;
@@ -54,8 +54,8 @@ export class User {
   @Column("varchar", { name: "fondo", nullable: true, length: 255 })
   fondo!: string | null;
 
-  @Column("tinyint", { name: "condicion", nullable: true })
-  condicion!: number | null;
+  @Column("tinyint", { name: "condicion", width:1, nullable: true })
+  condicion!: boolean | null;
 
   @Column("int", { name: "id_tienda", nullable: true })
   idTienda!: number | null;
@@ -63,8 +63,8 @@ export class User {
   @Column("varchar", {name: 'rol', length: 255 })
   rol!: string;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
-  fechaEliminacion!: Date;  
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+  deletedAt!: Date | null;  
 
 
   

@@ -1,5 +1,6 @@
 import client from './api/client';
 import endpoints from './api/endpoints';
+import { getOrCreateSessionToken } from '@/utils/constants/session';
 
 export const authService = {
   async login(identifier, password) {
@@ -7,6 +8,7 @@ export const authService = {
       const res = await client.post(endpoints.auth.login, {
         email: identifier, 
         clave: password,   
+        sessionToken: getOrCreateSessionToken(),
       });
       return { success: true, data: res.data };
     } catch (err) {

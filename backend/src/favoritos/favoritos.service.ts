@@ -91,8 +91,8 @@ export class FavoritosService {
   ///
   async findByUserId(ident: FavoritesIdent) {
     const favoritos = await this.findFavorites(ident);
-    if (!favoritos) return [];
-    return favoritos.items.map(item => item.producto);
+    if (!favoritos) return { items: [] };
+    return { items: favoritos.items.map(item => item.producto) };
   }
 
   async addToFavorites(ident: FavoritesIdent, idProducto: number) {
@@ -186,7 +186,7 @@ export class FavoritosService {
 
     return {
       idFavoritos: favoritos.idFavoritos,
-      items: favoritos.items,
+      items: favoritos.items.map(item => item.producto),
     };
   }
 }

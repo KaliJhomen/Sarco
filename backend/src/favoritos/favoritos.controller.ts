@@ -1,4 +1,4 @@
-  import { Controller, Get, Param, Post, Delete, UseGuards, Req, BadRequestException, Query, Body } from '@nestjs/common';
+  import { Controller, Get, Param, Post, Delete, UseGuards, Req, BadRequestException, Query, Body, ParseIntPipe } from '@nestjs/common';
   import { FavoritosService } from './favoritos.service';
   import { ApiTags, ApiOperation, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
   import { GuestGuard } from '../auth/guard/guest.guard';
@@ -40,6 +40,23 @@
       const idUsuario = req.usuario?.id;
       if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
       return this.favoritosService.clearFavorites({ idUsuario, sessionToken });
+    }
+
+    @Delete(':idProducto')
+    @UseGuards(GuestGuard)
+    @ApiOperation({ summary: 'Eliminar producto de favoritos (usuario o invitado)' })
+    @ApiParam({ name: 'idProducto', type: Number })
+    async removeFromFavorites(
+      @Req() req: any,
+      @Param('idProducto', ParseIntPipe) idProducto: number,
+      @Query('sessionToken') sessionToken?: string,
+    ) {
+      const idUsuario = req.usuario?.id;
+      if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
+      return this.favoritosService.removeFromFavorites(
+        { idUsuario, sessionToken },
+        idProducto,
+      );
     }
 
     @UseGuards(GuestGuard)

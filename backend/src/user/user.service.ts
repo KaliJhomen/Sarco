@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
+import * as bcryptjs from 'bcryptjs'
+
 @Injectable()
 export class UserService {
   constructor(
@@ -14,7 +16,8 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const newUser = this.userRepository.create(createUserDto);
+      const hashedPassword= await bcryptjs.hash(createUserDto.clave, 10);
+      const newUser = this.userRepository.create({...createUserDto, clave: hashedPassword,});
       return await this.userRepository.save(newUser);
     } catch (error) {
       throw new InternalServerErrorException('Ocurrió un error al guardar el usuario');
@@ -50,7 +53,9 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${idUser} no encontrado`);
     }
-
+    if (updateUserDto.clave) {
+        user.clave = await bcryptjs.hash(updateUserDto.clave, 10);
+      }
     return this.userRepository.save(user);
   }
 

@@ -34,7 +34,7 @@ export function useRemoveFromFavorites() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (idProducto) => favoritesService.remove(idProducto),
+    mutationFn: (payload) => favoritesService.remove(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
@@ -48,7 +48,7 @@ export function useClearFavorites() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => favoritesService.clear(),
+    mutationFn: (ident) => favoritesService.clear(ident),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },

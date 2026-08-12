@@ -21,49 +21,30 @@ export const favoritesService = {
   /**
    * Elimina un producto de los favoritos del usuario
    */
-  async remove(idProducto) {
-    return client.delete(endpoints.favorites.remove(idProducto));
-  },
-
-  /**
-   * Actualiza la cantidad de un producto en los favoritos del usuario
-   */
-  async update(idProducto, quantity) {
-    return client.put(endpoints.favorites.update(idProducto), {
-      quantity,
+  async remove(payload) {
+    const { idProducto, sessionToken } = payload || {};
+    return client.delete(endpoints.favorites.remove(idProducto), {
+      params: { sessionToken },
     });
   },
 
   /**
    * Vacía todos los favoritos del usuario
    */
-  async clear() {
-    const response = await this.get();
+  async clear(ident) {
+    const response = await this.get(ident);
     const payload = response?.data ?? response;
     const items = Array.isArray(payload?.items) ? payload.items : [];
 
     await Promise.all(
-      items.map((item) => this.remove(item?.producto?.idProducto))
+      items.map((item) =>
+        this.remove({
+          idProducto: item.idProducto,
+          sessionToken: ident?.sessionToken,
+        })
+      )
     );
 
     return { ok: true };
-  },
-
-  /**
-   * Resumen calculado en frontend.
-   */
-  async getSummary() {
-    const response = await this.get();
-    const payload = response?.data ?? response;
-    const items = Array.isArray(payload?.items) ? payload.items : [];
-
-    const totalItems = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 0), 0);
-    const totalAmount = items.reduce((acc, it) => {
-      const qty = Number(it?.cantidad) || 0;
-      const price = Number(it?.producto?.precioVenta) || 0;
-      return acc + qty * price;
-    }, 0);
-
-    return { totalItems, totalAmount };
   },
 };

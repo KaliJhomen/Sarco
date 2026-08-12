@@ -112,8 +112,8 @@ const endpoints = {
     base: '/carrito',
     get: '/carrito',
     add: '/carrito',
-    update: (idProducto) => `/carrito-item/${idProducto}`,
-    remove: (idProducto) => `/carrito-item/${idProducto}`,
+    update: (idProducto) => `/carrito/${idProducto}`,
+    remove: (idProducto) => `/carrito/${idProducto}`,
     genToken: '/carrito/share',
     getShared: (shareToken) => `/carrito/shared/${shareToken}`,
     // clear: '/carrito/limpiar',
@@ -126,8 +126,7 @@ const endpoints = {
     base: '/favoritos',
     get: '/favoritos', // GET: Obtener todos los favoritos del usuario autenticado
     add: `/favoritos`, // POST: Agregar producto a favoritos (body: { idProducto })
-    update: (idProducto) => `/favoritos-item/${idProducto}`, // PUT: Actualizar cantidad u otra info
-    remove: (idProducto) => `/favoritos-item/${idProducto}`, // DELETE: Quitar producto de favoritos
+    remove: (idProducto) => `/favoritos/${idProducto}`, // DELETE: Quitar producto de favoritos
     genToken: '/favoritos/share',
     getShared: (shareToken) => `/favoritos/shared/${shareToken}`,
   },
