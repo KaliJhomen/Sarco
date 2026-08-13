@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Usuario } from '../../usuario/entities/usuario.entity';
+import { Cliente } from '../../cliente/entities/cliente.entity';
 import { CarritoItem } from './carrito-item.entity';
 
 @Entity('carrito')
@@ -32,11 +32,11 @@ export class Carrito {
   @UpdateDateColumn({name: 'updated_at'})
   updatedAt!: Date;
 
-  @OneToOne(() => Usuario, (usuario) => usuario.carrito, { 
+  @OneToOne(() => Cliente, (cliente) => cliente.carrito, { 
     nullable: true, 
     onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_usuario' })
-  usuario?: Usuario | null;
+  cliente?: Cliente | null;
 
     //ITEMS
   @OneToMany(() => CarritoItem, (item) => item.carrito, {cascade: true})

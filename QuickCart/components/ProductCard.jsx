@@ -13,42 +13,36 @@ import { getOrCreateSessionToken } from "@/utils/constants/session";
 
 const ProductCard = ({ product }) => {
 const { user } = useAppContext();
-  if (!product) {
-    return null;
-  }
-  const {
-    idProducto,
-    nombre,
-    modelo,
-    descripcion,
-    precioVenta,
-    precioTope,
-    descuento,
-    stock,
-    imagen,
-  } = product;
+const { addNotification } = useNotification();
+const [isAdding, setIsAdding] = useState(false);
+const addToCartMutation = useAddToCart();
 
-  const { addToCart } = useAppContext();
-  const { addNotification } = useNotification();
-  const [isAdding, setIsAdding] = useState(false);
-  const addToCartMutation = useAddToCart();
+// Hooks de favoritos
+const favoritesPayload = user ? {} : { sessionToken: getOrCreateSessionToken() };
+const { data: favoritesData } = useFavorites(favoritesPayload);
+const addToFavoritesMutation = useAddToFavorites();
+const removeFromFavoritesMutation = useRemoveFromFavorites();
+const [isProcessingFavorite, setIsProcessingFavorite] = useState(false);
 
-  // Hooks de favoritos
-  const favoritesPayload = user ? {} : { sessionToken: getOrCreateSessionToken() };
-  const { data: favoritesData } = useFavorites(favoritesPayload);
-  const addToFavoritesMutation = useAddToFavorites();
-  const removeFromFavoritesMutation = useRemoveFromFavorites();
+const {
+  idProducto,
+  nombre,
+  modelo,
+  descripcion,
+  precioVenta,
+  precioTope,
+  descuento,
+  stock,
+  imagen,
+} = product;
+
+if (!product) {
+  return null;
+}
 
   // Determinar si el producto está en favoritos
-  const isFavorite = Array.isArray(favoritesData?.items)
-    ? favoritesData.items.some((fav) =>
-        fav.idProducto
-          ? fav.idProducto === idProducto
-          : fav.producto?.idProducto === idProducto
-      )
-    : false;
-
-  const [isProcessingFavorite, setIsProcessingFavorite] = useState(false);
+  const items = favoritesData?.items ?? favoritesData?.data?.items ?? [];
+  const isFavorite = Array.isArray(items) && items.some((fav) => Number(fav.idProducto ?? fav.producto?.idProducto) === Number(idProducto));
 
   const handleFavorite = async (e) => {
     e.preventDefault();
@@ -147,7 +141,6 @@ const { user } = useAppContext();
       }, 1000);
 
     } catch (error) {
-      console.error("Error al agregar:", error);
       addNotification("Error al agregar al carrito", 'error');
       setIsAdding(false);
     }

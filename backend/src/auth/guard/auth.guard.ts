@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { jwtConstants } from '../constants/jwt.constants';
 import { ConfigService } from '@nestjs/config';
 
 export interface JwtPayload {
@@ -30,16 +29,18 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    if (this.configService.get<boolean>('DEV_BYPASS_AUTH') === true) {
-      request.usuario = { id: 1, email: 'dev@localhost', role: 'cliente', table: 'usuario' };
-      return true;
-    }
     const cookieToken = this.extractTokenFromCookie(request);
     const headerToken = this.extractTokenFromHeader(request);
     const token = cookieToken ?? headerToken;
-    if (!token) {
-      throw new UnauthorizedException("Token no proporcionado");
+    const bypass = this.configService.get<boolean>('DEV_BYPASS_AUTH') === true;
+
+    // Opción B: bypass solo si NO hay token (respeta login real)
+    if (bypass && !token) {
+      request.usuario = { id: 1, email: 'dev@localhost', role: 'cliente', table: 'usuario' };
+      return true;
     }
+    // Invitado sin token: pasa, req.usuario queda undefined
+    if (!token) return true;
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {

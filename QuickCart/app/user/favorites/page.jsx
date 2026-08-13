@@ -25,7 +25,11 @@ export default function FavoritesPage() {
 
   const removeFromFavoritesMutation = useRemoveFromFavorites();
 
-  const favorites = favoritesData?.data?.items ?? [];
+  const favorites = Array.isArray(favoritesData?.items) 
+    ? favoritesData.items
+    : Array.isArray(favoritesData?.data?.items)
+    ? favoritesData.data.items
+    : [];
 
   const getId = (p) => p.id || p.idProducto || p._id;
 
@@ -108,20 +112,7 @@ export default function FavoritesPage() {
                   animationDelay: `${index * 0.08}s`,
                 }}
               >
-                <ProductCard product={p} />
-
-                <button
-                  onClick={() => handleRemoveFavorite(p)}
-                  className="absolute top-2 right-2 bg-white rounded-full p-2 shadow hover:bg-red-50 transition-all"
-                  aria-label="Eliminar favorito"
-                  disabled={isRemoving}
-                >
-                  {isRemoving ? (
-                    <Loader2 size={16} className="animate-spin text-red-600" />
-                  ) : (
-                    <Trash2 size={16} className="text-red-600" />
-                  )}
-                </button>
+                <ProductCard product={p} layout="horizontal" />
               </div>
             );
           })}

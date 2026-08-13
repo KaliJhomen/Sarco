@@ -42,7 +42,7 @@ export class GuestGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get<string>('JWT_SECRET')!,   // ya NO usa jwtConstants.secret
+        secret: this.configService.get<string>('JWT_SECRET')!,   
       });
       if (
         typeof payload !== 'object' ||

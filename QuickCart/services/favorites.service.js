@@ -7,7 +7,7 @@ export const favoritesService = {
    */
   async get(payload) {
     const res = await client.get("/favoritos", { params: payload });
-    return res.data;
+    return res;
   },
 
   /**

@@ -54,11 +54,12 @@ export class Usuario {
 
   @Column("varchar", { name: "fondo", nullable: true, length: 255 })
   fondo!: string | null;
+  /*
   @OneToOne(() => Favoritos, (favoritos) => favoritos.usuario)
   favoritos!: Favoritos;
   @OneToOne(() => Carrito, (carrito) => carrito.usuario)
   carrito!: Carrito;
-
+*/
 
   @ManyToOne(() => Documento, (documento) => documento.usuarios, {
     onDelete: "NO ACTION",

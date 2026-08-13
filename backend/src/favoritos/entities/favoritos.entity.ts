@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn, OneToMany, OneToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Usuario } from '../../usuario/entities/usuario.entity';
+import { Cliente } from '../../cliente/entities/cliente.entity';
 import { FavoritosItem } from './favoritos-item.entity';
 
 @Entity('favoritos')
@@ -29,17 +29,17 @@ export class Favoritos {
   @CreateDateColumn({name: 'created_at'})
   createdAt!: Date;
 
-  @UpdateDateColumn({name: 'updated_at'})
-  updatedAt!: Date;
+  @UpdateDateColumn({name: 'updated_at', nullable: true, default: null})
+  updatedAt!: Date | null;
   
   //ITEMS
   @OneToMany(() => FavoritosItem, (item) => item.favoritos, { cascade: true })
   items!: FavoritosItem[];
   //
   
-  @OneToOne(() => Usuario, (usuario) => usuario.favoritos, { 
+  @OneToOne(() => Cliente, (cliente) => cliente.favoritos, { 
     nullable: true, 
     onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'id_usuario' })
-  usuario?: Usuario;
+  @JoinColumn({ name: 'id_cliente' })
+  cliente?: Cliente;
 }
