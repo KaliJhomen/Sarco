@@ -6,7 +6,7 @@ import { FavoritosItem } from './entities/favoritos-item.entity';
 import { randomUUID } from 'crypto';
 import { Producto } from '../producto/entities/producto.entity';
 
-type FavoritesIdent = { idUsuario?: number; sessionToken?: string | null };
+type FavoritesIdent = { idCliente?: number; sessionToken?: string | null };
 
 @Injectable()
 export class FavoritosService {
@@ -23,8 +23,8 @@ export class FavoritosService {
   /// PRIVADOS
   ///
   private async findFavorites(ident: FavoritesIdent): Promise<Favoritos | null> {
-    const { idUsuario, sessionToken } = ident;
-    if (idUsuario) return this.getFavoritesByUser(idUsuario);
+    const { idCliente, sessionToken } = ident;
+    if (idCliente) return this.getFavoritesByClient(idCliente);
     if (sessionToken) return this.getFavoritesBySession(sessionToken);
     return null;
   }
@@ -33,8 +33,8 @@ export class FavoritosService {
     const favoritos = await this.findFavorites(ident);
     if (favoritos) return favoritos;
 
-    const { idUsuario, sessionToken } = ident;
-    if (idUsuario) return this.createFavorites(idUsuario);
+    const { idCliente, sessionToken } = ident;
+    if (idCliente) return this.createFavorites(idCliente);
     if (sessionToken) return this.createGuestFavorites(sessionToken);
 
     throw new NotFoundException('No se pudo crear los favoritos');
@@ -49,9 +49,9 @@ export class FavoritosService {
     });
   }
 
-  private async getFavoritesByUser(idUsuario: number): Promise<Favoritos | null> {
+  private async getFavoritesByClient(idCliente: number): Promise<Favoritos | null> {
     return this.favoritesRepository.findOne({
-      where: { usuario: { idUsuario } },
+      where: { cliente: { idCliente } },
       relations: ['items', 'items.producto'],
     });
   }
@@ -63,13 +63,13 @@ export class FavoritosService {
     });
   }
 
-  private async createFavorites(idUsuario: number): Promise<Favoritos> {
+  private async createFavorites(idCliente: number): Promise<Favoritos> {
     return this.favoritesRepository.save(
       this.favoritesRepository.create({
         sessionToken: null,
         shareToken: null,
         expiresAt: null,
-        usuario: { idUsuario },
+        cliente: { idCliente },
         items: [],
       })
     );
@@ -89,7 +89,7 @@ export class FavoritosService {
   ///
   /// PÚBLICOS
   ///
-  async findByUserId(ident: FavoritesIdent) {
+  async findByClientId(ident: FavoritesIdent) {
     const favoritos = await this.findFavorites(ident);
     if (!favoritos) return { items: [] };
     return { items: favoritos.items.map(item => item.producto) };
@@ -135,14 +135,14 @@ export class FavoritosService {
     return { message: 'Favoritos limpiados' };
   }
 
-  async mergeGuestFavorites(idUsuario: number, sessionToken: string) {
+  async mergeGuestFavorites(idCliente: number, sessionToken: string) {
     const guestFavorites = await this.getFavoritesBySession(sessionToken);
     if (!guestFavorites) return;
 
-    const userFavorites = await this.getFavoritesByUser(idUsuario);
+    const clientFavorites = await this.getFavoritesByClient(idCliente);
 
-    if (!userFavorites) {
-      guestFavorites.usuario = { idUsuario } as any;
+    if (!clientFavorites) {
+      guestFavorites.cliente = { idCliente } as any;
       guestFavorites.sessionToken = null;
       guestFavorites.expiresAt = null;
       await this.favoritesRepository.save(guestFavorites);
@@ -150,12 +150,12 @@ export class FavoritosService {
     }
 
     for (const item of guestFavorites.items) {
-      const existingItem = userFavorites.items.find(
+      const existingItem = clientFavorites.items.find(
         i => i.producto.idProducto === item.producto.idProducto,
       );
 
       if (!existingItem) {
-        item.favoritos = userFavorites;
+        item.favoritos = clientFavorites;
         await this.favoritesItemRepository.save(item);
       }
     }

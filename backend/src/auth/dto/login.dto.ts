@@ -10,7 +10,7 @@ export class LoginDto {
     email!: string;
 
     @ApiProperty()
-    @Transform(({value}) => value.trim())
+    @Transform(({value}) => value == null ? value : String(value).trim())
     @IsString()
     @MinLength(1)
     clave!: string;

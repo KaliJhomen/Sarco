@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cliente } from './entities/cliente.entity';
 import { handleDBError } from '../common/exceptions/errors';
+import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class ClienteService {
@@ -14,27 +15,67 @@ export class ClienteService {
     @InjectRepository(Cliente)
     private clienteRepository: Repository<Cliente>,
   ) { }
-
+  async activateAccount(idCliente:number, login:string, email:string, clave:string){
+    const cliente = await this.clienteRepository.findOne({ where: { idCliente } });
+    if (!cliente) throw new NotFoundException(`Cliente con ID ${idCliente} no encontrado`);
+    cliente.login = login;
+    cliente.email = email;
+    cliente.clave = clave;
+    return this.clienteRepository.save(cliente);
+  }
   async create(createClienteDto: CreateClienteDto) {
+    const clave = createClienteDto.clave ?? '';
+    const login = createClienteDto.login ?? createClienteDto.email ?? '';
     const existing = await this.clienteRepository.findOne({
       where:[
         {email: createClienteDto.email ?? undefined},
-  
-        {nombre: createClienteDto.nombre ?? undefined},
-        
-        {numeroDocumento: createClienteDto.numeroDocumento}
+        {numeroDocumento: createClienteDto.numeroDocumento ?? undefined}
       ]
     });
     if (existing) {
       throw new BadRequestException('Ya hay registros con esta informacion');
     }
     try {
-      const newCliente = this.clienteRepository.create(createClienteDto);
-      return await this.clienteRepository.save(newCliente);
+      const nuevoCliente = this.clienteRepository.create({...createClienteDto, login, clave});
+      return await this.clienteRepository.save(nuevoCliente);
     } catch (error) {
       this.logger.error(error);
      throw handleDBError(error,'Ocurrió un error al guardar el cliente');
     }
+  }
+
+  async findAll() {
+    try {
+      const qb = this.clienteRepository.createQueryBuilder('c');
+      return await this.selectFields(qb).getMany();
+    } catch (error) {
+      handleDBError(error, 'Ocurrió un error al obtener clientes');
+    }
+  }
+
+  async findOne(id: number) {
+    const qb = this.clienteRepository.createQueryBuilder('c')
+      .where('c.idCliente = :id', { id });
+    const cliente = await this.selectFields(qb).getOne();
+    if (!cliente) {
+      throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
+    }
+    return cliente;
+  }
+  
+  findOneByNumeroDocumento(numeroDocumento: string) {   
+    return this.clienteRepository.findOne({
+      where: { numeroDocumento },
+    });
+  }
+  findOneByLogin(login: string) {   
+    return this.clienteRepository.findOne({
+      where: { login },
+    });
+  }
+
+  async findOneByEmail(email: string): Promise<Cliente | null> {
+    return this.clienteRepository.findOneBy({ email });
   }
 
   private selectFields(qb: any) {
@@ -49,15 +90,6 @@ export class ClienteService {
       ]);
   }
 
-  async findAll() {
-    try {
-      const qb = this.clienteRepository.createQueryBuilder('c');
-      return await this.selectFields(qb).getMany();
-    } catch (error) {
-      handleDBError(error, 'Ocurrió un error al obtener clientes');
-    }
-  }
-
   async findWithFilters(qs: any) {
     if (qs.id) return this.findOne(+qs.id);
 
@@ -66,16 +98,13 @@ export class ClienteService {
     const qb = this.clienteRepository.createQueryBuilder('c');
 
     if (qs.idDocumento) qb.andWhere('c.idDocumento = :idDocumento', { idDocumento: qs.idDocumento });
-
     if (qs.numeroDocumento) qb.andWhere('LOWER(c.numeroDocumento) LIKE :num', { num: `%${String(qs.numeroDocumento).toLowerCase()}%` });
     if (qs.nombre) qb.andWhere('LOWER(c.nombre) LIKE :nombre', { nombre: `%${String(qs.nombre).toLowerCase()}%` });
     if (qs.direccion) qb.andWhere('LOWER(c.direccion) LIKE :direccion', { direccion: `%${String(qs.direccion).toLowerCase()}%` });
     if (qs.referencia) qb.andWhere('LOWER(c.referencia) LIKE :ref', { ref: `%${String(qs.referencia).toLowerCase()}%` });
     if (qs.telefono) qb.andWhere('LOWER(c.telefono) LIKE :tel', { tel: `%${String(qs.telefono).toLowerCase()}%` });
     if (qs.email) qb.andWhere('LOWER(c.email) LIKE :email', { email: `%${String(qs.email).toLowerCase()}%` });
-
     if (qs.estado) qb.andWhere('c.idEstadoCliente = :estado', { estado: qs.estado });
-
     if (qs.q) {
       const term = `%${String(qs.q).toLowerCase()}%`;
       qb.andWhere(
@@ -96,35 +125,34 @@ export class ClienteService {
     return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async findOne(id: number) {
-    const qb = this.clienteRepository.createQueryBuilder('c')
-      .where('c.idCliente = :id', { id });
-    const cliente = await this.selectFields(qb).getOne();
-    if (!cliente) {
-      throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
-    }
-    return cliente;
-  }
-
   async update(idCliente: number, updateClienteDto: UpdateClienteDto) {
-    try {
-      if (updateClienteDto.email || updateClienteDto.nombre || updateClienteDto.numeroDocumento) {
-      const existing = await this.clienteRepository.findOne({ 
-        where: [
-          { email: updateClienteDto.email ?? undefined}, 
-          { nombre: updateClienteDto.nombre ?? undefined},
-          { numeroDocumento: updateClienteDto.numeroDocumento ?? undefined},
-        ] 
-      });
-      if (existing && existing.idCliente !== idCliente) {
-        throw new BadRequestException('Ya hay registros con esta informacion');
+    const cliente = await this.clienteRepository.findOne({ where: { idCliente} });
+    if (!cliente) throw new NotFoundException(`cliente con ID ${idCliente} no encontrado`);
+    const patch: Partial<UpdateClienteDto> = {};
+    for (const [key, value] of Object.entries(updateClienteDto)){
+      if (value !== undefined && value !== null){
+        (patch as Record<string, unknown>)[key] =value;
       }
-      }
-      const updatedCliente = Object.assign(updateClienteDto);
-      return await this.clienteRepository.save({ idCliente, updatedCliente});
-    } catch (error) {
-      handleDBError(error,'Ocurrió un error al actualizar el cliente');
     }
+    const nuevoEmail = patch.email as string | undefined;
+    const nuevoDocumento = patch.numeroDocumento as string | undefined;
+    if (nuevoEmail || nuevoDocumento) {
+      const dupe = await this.clienteRepository.findOne({
+        where: [
+          ...(nuevoEmail ? [{ email: nuevoEmail }] : []),
+          ...(nuevoDocumento ? [{ numeroDocumento: nuevoDocumento }] : []),
+        ],
+      });
+      if (dupe && dupe.idCliente !== idCliente) {
+        throw new BadRequestException('Ya hay registros con esta información');
+      }
+    }
+    if (patch.clave) {
+    patch.clave = await bcryptjs.hash(patch.clave as string, 10);
+    }
+    Object.assign(cliente, patch);
+    await this.clienteRepository.save(cliente);
+    return await this.findOne(idCliente);
   }
 
   async remove(idCliente: number) {

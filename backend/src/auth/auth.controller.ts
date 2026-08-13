@@ -3,12 +3,12 @@ import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
-import { AuthGuard, JwtPayload } from './guard/auth.guard';
+import { JwtPayload } from './guard/jwt-payload';
+import { AuthGuard } from './guard/auth.guard'
 import {Throttle} from '@nestjs/throttler'
 import type { Response } from 'express';
 
-import { UsuarioService } from '../usuario/usuario.service';
-import { UserService } from '../user/user.service'
+import { ClienteService } from '../cliente/cliente.service';
 import { CarritoService } from '../carrito/carrito.service';
 import { FavoritosService } from '../favoritos/favoritos.service';
 import {ConfigService} from '@nestjs/config'
@@ -17,8 +17,7 @@ import {ConfigService} from '@nestjs/config'
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usuarioService: UsuarioService,
-    private readonly userService: UserService,
+    private readonly clienteService: ClienteService,
     private readonly carritoService: CarritoService,
     private readonly favoritosService: FavoritosService,
     private readonly configService: ConfigService, 
@@ -29,10 +28,10 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @Throttle({ default: { limit: 5, ttl: 60000 } }) 
   async login(@Body() body: LoginDto, @Res({passthrough: true}) res: Response) {
-    const { token, user } = await this.authService.login(body);
+    const { token, cliente } = await this.authService.login(body);
     if (body.sessionToken) {
-      await this.carritoService.mergeGuestCart(user.id, body.sessionToken);
-      await this.favoritosService.mergeGuestFavorites(user.id, body.sessionToken);
+      await this.carritoService.mergeGuestCart(cliente.id, body.sessionToken);
+      await this.favoritosService.mergeGuestFavorites(cliente.id, body.sessionToken);
     }
     const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
 
@@ -45,7 +44,7 @@ export class AuthController {
     });
     return{ 
       token,
-      user
+      cliente
     };
   }
 
@@ -61,7 +60,7 @@ export class AuthController {
   }
 
   @Post('register')
-  @ApiOperation({ summary: 'Registrar nuevo usuario' })
+  @ApiOperation({ summary: 'Registrar nuevo cliente' })
   @ApiBody({ type: RegisterDto })
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
@@ -69,17 +68,13 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  @ApiOperation({ summary: 'Perfil del usuario' })
-  async profile(@Request() req: { usuario?: JwtPayload }) {
-    const { id, table } = req.usuario ?? {};
+  @ApiOperation({ summary: 'Perfil del cliente' })
+  async profile(@Request() req: { cliente?: JwtPayload }) {
+    const { id, table } = req.cliente ?? {};
     if (!id) {
-      return { user: null };
+      return { cliente: null };
     }
-    if (table === 'user'){
-      const u = await this.userService.findOne(id);
-    return { user: { id: u.idUser, name: u.nombre, email: u.email, role: u.rol, table: 'user' } };
-    }
-      const u = await this.usuarioService.findOne(id);
-      return { user: { id: u.idUsuario, name: u.nombre, email: u.email, role: 'cliente', table: 'usuario' } };
-    }
+    const u = await this.clienteService.findOne(id);
+    return { cliente: { id: u.idCliente, name: u.nombre, email: u.email, table: 'cliente' } };
   }
+}

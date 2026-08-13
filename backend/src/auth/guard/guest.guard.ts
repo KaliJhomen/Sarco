@@ -2,19 +2,12 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
-
-export interface JwtPayload {
-  id: number;
-  email: string;
-  role: string;
-  table: 'usuario' | 'user';
-}
+import { JwtPayload } from './jwt-payload'
 declare module 'express' {
   interface Request {
-    usuario?: JwtPayload;
+    cliente?: JwtPayload;
   }
 }
-
 @Injectable()
 export class GuestGuard implements CanActivate {
   constructor(
@@ -33,11 +26,11 @@ export class GuestGuard implements CanActivate {
 
     // Opción B: bypass solo si NO hay token (respeta login real)
     if (bypass && !token) {
-      request.usuario = { id: 1, email: 'dev@localhost', role: 'cliente', table: 'usuario' };
+      request.cliente = { id: 1, email: "dev@development.com", table: "cliente"};      
       return true;
     }
 
-    // Invitado sin token: pasa, req.usuario queda undefined
+    // Invitado sin token: pasa, req.cliente queda undefined
     if (!token) return true;
 
     try {
@@ -52,10 +45,10 @@ export class GuestGuard implements CanActivate {
       ) {
         throw new UnauthorizedException('Token con estructura inválida');
       }
-      request.usuario = payload;
+      request.cliente = payload;
     } catch {
       // Token inválido en ruta guest: tratar como invitado, NO setear usuario
-      request.usuario = undefined;
+      request.cliente = undefined;
     }
 
     return true;

@@ -7,16 +7,10 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
-
-export interface JwtPayload {
-  id: number;
-  email: string;
-  role: string;
-  table: 'usuario' | 'user';
-}
+import { JwtPayload } from './jwt-payload';
 declare module 'express' {
   interface Request {
-    usuario?: JwtPayload;
+    cliente?: JwtPayload;
   }
 }
 
@@ -34,23 +28,22 @@ export class AuthGuard implements CanActivate {
     const token = cookieToken ?? headerToken;
     const bypass = this.configService.get<boolean>('DEV_BYPASS_AUTH') === true;
 
-    // Opción B: bypass solo si NO hay token (respeta login real)
+    // Opción B: bypass solo si NO hay token 
     if (bypass && !token) {
-      request.usuario = { id: 1, email: 'dev@localhost', role: 'cliente', table: 'usuario' };
+      request.cliente = { id: 1, email: "dev@development.com", table: "cliente"};
       return true;
     }
-    // Invitado sin token: pasa, req.usuario queda undefined
-    if (!token) return true;
+    if (!token) throw new UnauthorizedException("Token no proporcionado");
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_SECRET')!,      
       });
-    if (typeof payload !== 'object' || typeof payload.id !== 'number' || typeof payload.email !== 'string' || typeof payload.table !== 'string') {
+    if (typeof payload !== 'object' || typeof payload.id !== 'number' || typeof payload.email !== 'string' || payload.table !== 'cliente') {
       throw new UnauthorizedException('Token con estructura inválida');
     }
 
-    request.usuario = payload;
+    request.cliente = payload;
     } catch (err) {
       throw new UnauthorizedException("Token inválido o expirado");
     }

@@ -26,12 +26,12 @@ export class PedidoDetalleController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async getOrder(@Req() req: any) {
-    const idUsuario = req.usuario?.id;
-    // Para usuarios no registrados, pueden pasar sessionToken en query
-    if (!idUsuario && !req.query?.sessionToken) {
-      throw new BadRequestException('Usuario no autenticado o sessionToken requerido');
+    const idCliente = req.cliente?.id;
+    // Para clientes no registrados, pueden pasar sessionToken en query
+    if (!idCliente && !req.query?.sessionToken) {
+      throw new BadRequestException('cliente no autenticado o sessionToken requerido');
     }
-    return this.pedidoDetalleService.findByUser(idUsuario, req.query?.sessionToken);
+    return this.pedidoDetalleService.findByUser(idCliente, req.query?.sessionToken);
   }
 
   @Post()
@@ -40,11 +40,11 @@ export class PedidoDetalleController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async addToOrder(@Req() req: any, @Body() body: AddPedidoDetalleDto) {
-    const idUsuario = req.usuario?.id;
+    const idCliente = req.cliente?.id;
     const sessionToken = body.sessionToken;
 
-    if (!idUsuario && !sessionToken) {
-      throw new BadRequestException('Usuario no autenticado o sessionToken requerido');
+    if (!idCliente && !sessionToken) {
+      throw new BadRequestException('cliente no autenticado o sessionToken requerido');
     }
     if (!body?.idProducto) throw new BadRequestException('idProducto es requerido');
     if (!body?.cantidad) throw new BadRequestException('Cantidad es requerido');
@@ -52,7 +52,7 @@ export class PedidoDetalleController {
     return this.pedidoDetalleService.addToOrder(
       Number(body.idProducto),
       Number(body.cantidad),
-      idUsuario,
+      idCliente,
       sessionToken ?? undefined,
     );
   }
@@ -68,18 +68,18 @@ export class PedidoDetalleController {
     @Param('idProducto', ParseIntPipe) idProducto: number,
     @Body() body: AddPedidoDetalleDto,
   ) {
-    const idUsuario = req.usuario?.id;
+    const idCliente = req.cliente?.id;
     const sessionToken = body['sessionToken'];
 
-    if (!idUsuario && !sessionToken) {
-      throw new BadRequestException('Usuario no autenticado o sessionToken requerido');
+    if (!idCliente && !sessionToken) {
+      throw new BadRequestException('cliente no autenticado o sessionToken requerido');
     }
     if (!body?.cantidad) throw new BadRequestException('La cantidad es requerida');
 
     return this.pedidoDetalleService.updateOrderItem(
       idProducto,
       Number(body.cantidad),
-      idUsuario,
+      idCliente,
       sessionToken ?? undefined,
     );
   }
@@ -93,13 +93,13 @@ export class PedidoDetalleController {
     @Req() req: any,
     @Param('idProducto', ParseIntPipe) idProducto: number,
   ) {
-    const idUsuario = req.usuario?.id;
+    const idCliente = req.cliente?.id;
     const sessionToken = req.query?.sessionToken;
 
-    if (!idUsuario && !sessionToken) {
-      throw new BadRequestException('Usuario no autenticado o sessionToken requerido');
+    if (!idCliente && !sessionToken) {
+      throw new BadRequestException('cliente no autenticado o sessionToken requerido');
     }
 
-    return this.pedidoDetalleService.removeFromOrder(idProducto, idUsuario, sessionToken);
+    return this.pedidoDetalleService.removeFromOrder(idProducto, idCliente, sessionToken);
   }
 }

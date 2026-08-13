@@ -25,13 +25,13 @@ export class PedidoController {
   @ApiOperation({ summary: 'Crear un nuevo pedido (checkout)' })
   @ApiBody({ type: CreatePedidoDto })
   async createPedido(@Req() req: any, @Body() body: CreatePedidoDto) {
-    const idUser = req.usuario?.id;
-    if (!idUser) throw new BadRequestException('Usuario no autenticado');
+    const idCliente = req.cliente?.id;
+    if (!idCliente) throw new BadRequestException('cliente no autenticado');
     if (!Array.isArray(body.items) || body.items.length === 0) {
       throw new BadRequestException('Debes enviar al menos un producto en items');
     }
     return this.pedidoService.createPedido(
-      idUser,
+      idCliente,
       {
         nombre: body.nombre,
         email: body.email,
@@ -44,11 +44,11 @@ export class PedidoController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Obtener todos los pedidos del usuario autenticado' })
+  @ApiOperation({ summary: 'Obtener todos los pedidos del cliente autenticado' })
   async getPedidosByUser(@Req() req: any) {
-    const idUser = req.usuario?.id;
-    if (!idUser) throw new BadRequestException('Usuario no autenticado');
-    return this.pedidoService.findByUserId(idUser);
+    const idCliente = req.cliente?.id;
+    if (!idCliente) throw new BadRequestException('cliente no autenticado');
+    return this.pedidoService.findByUserId(idCliente);
   }
 
   @Get(':idPedido')

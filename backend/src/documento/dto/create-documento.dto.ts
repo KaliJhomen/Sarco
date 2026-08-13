@@ -1,3 +1,9 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
+
 export class CreateDocumentoDto {
-    nombre: string;
+    @ApiProperty({ description: 'Nombre del documento', example: 'DNI' })
+    @IsString()
+    @IsNotEmpty()
+    nombre!: string;
 }

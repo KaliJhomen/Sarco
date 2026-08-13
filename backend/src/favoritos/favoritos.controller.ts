@@ -11,12 +11,12 @@
 
     @UseGuards(GuestGuard)
     @Get()
-    @ApiOperation({ summary: 'Obtener favoritos de un usuario o invitado' })
+    @ApiOperation({ summary: 'Obtener favoritos de un cliente o invitado' })
     @ApiQuery({ name: 'sessionToken', required: false, type: String })
     async getFavoritos(@Req() req: any, @Query('sessionToken') sessionToken?: string) {
-      const idUsuario = req.usuario?.id;
-      if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
-      return this.favoritosService.findByUserId({ idUsuario, sessionToken });
+      const idCliente= req.cliente?.id;
+      if (!idCliente && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
+      return this.favoritosService.findByClientId({ idCliente, sessionToken });
     }
 
     @UseGuards(GuestGuard)
@@ -24,11 +24,11 @@
     @ApiOperation({ summary: 'Agregar producto a favoritos' })
     @ApiBody({ type: CreateFavoritosDto })
     async addToFavorites(@Req() req: any, @Body() body: CreateFavoritosDto) {
-      const idUsuario = req.usuario?.id;
-      const sessionToken = idUsuario ? undefined : body.sessionToken;
-      if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
+      const idCliente = req.cliente?.id;
+      const sessionToken = idCliente ? undefined : body.sessionToken;
+      if (!idCliente && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
       return this.favoritosService.addToFavorites(
-        { idUsuario, sessionToken },
+        { idCliente, sessionToken },
         body.idProducto,
       );
     }
@@ -37,24 +37,24 @@
     @UseGuards(GuestGuard)
     @ApiOperation({ summary: 'Limpiar favoritos' })
     async clearFavoritos(@Req() req: any, @Query('sessionToken') sessionToken?: string) {
-      const idUsuario = req.usuario?.id;
-      if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
-      return this.favoritosService.clearFavorites({ idUsuario, sessionToken });
+      const idCliente = req.cliente?.id;
+      if (!idCliente && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
+      return this.favoritosService.clearFavorites({ idCliente, sessionToken });
     }
 
     @Delete(':idProducto')
     @UseGuards(GuestGuard)
-    @ApiOperation({ summary: 'Eliminar producto de favoritos (usuario o invitado)' })
+    @ApiOperation({ summary: 'Eliminar producto de favoritos (cliente o invitado)' })
     @ApiParam({ name: 'idProducto', type: Number })
     async removeFromFavorites(
       @Req() req: any,
       @Param('idProducto', ParseIntPipe) idProducto: number,
       @Query('sessionToken') sessionToken?: string,
     ) {
-      const idUsuario = req.usuario?.id;
-      if (!idUsuario && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
+      const idCliente = req.cliente?.id;
+      if (!idCliente && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
       return this.favoritosService.removeFromFavorites(
-        { idUsuario, sessionToken },
+        { idCliente, sessionToken },
         idProducto,
       );
     }
@@ -79,12 +79,12 @@
       schema: {
         type: 'object',
         properties: {
-          idUsuario: { type: 'number' },
+          idCliente: { type: 'number' },
           sessionToken: { type: 'string' },
         },
       },
     })
-    async generateShareLink(@Body() ident: { idUsuario?: number; sessionToken?: string }) {
+    async generateShareLink(@Body() ident: { idCliente?: number; sessionToken?: string }) {
       return this.favoritosService.generateShareFavoritesLink(ident);
     }
   }

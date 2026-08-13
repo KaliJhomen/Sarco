@@ -1,82 +1,70 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcryptjs from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { UsuarioService } from '../usuario/usuario.service';
 import { RegisterDto } from './dto/register.dto';
-import { Usuario } from '../usuario/entities/usuario.entity';
-
-import { UserService } from '../user/user.service';
-import { User } from '../user/entities/user.entity';
+import { Cliente } from '../cliente/entities/cliente.entity';
+import { ClienteService } from '../cliente/cliente.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usuarioService: UsuarioService,
-    private readonly userService: UserService,
+    private readonly clienteService: ClienteService,
   ) {}
 
-  private mapUsuario(usuario: Usuario) {
+  private mapCliente(cliente: Cliente) {
     return {
-      idUsuario: usuario.idUsuario,
-      nombre: usuario.nombre,
-      email: usuario.email,
+      idCliente: cliente.idCliente,
+      nombre: cliente.nombre,
+      email: cliente.email,
     };
   }
-
-  private mapUser(entity: Usuario | User, table: 'usuario' | 'user') {
-    if (table === 'usuario') {
-      const u = entity as Usuario;
-      return { id: u.idUsuario, email: u.email, role: 'cliente', table };
-    }
-    const u = entity as User;
-    return { id: u.idUser, email: u.email, role: u.rol, table };
+  private hasAccount(cliente: Cliente): boolean {
+  return !!cliente.clave && cliente.clave !== '' && !!cliente.login && cliente.login !== '';
   }
-
 
   async login({ email, clave }: { email: string; clave: string }) {
-  let usuario = await this.usuarioService.findOneByEmail(email);
-  if (usuario) {
-    const isValid = await bcryptjs.compare(clave, usuario.clave || '');
-    if (isValid) {
-      const payload = { id: usuario.idUsuario, email: usuario.email, role: 'cliente', table: 'usuario' };
-      const token = await this.jwtService.signAsync(payload); 
-      return { token, user: payload };
-    }
+  const cliente = await this.clienteService.findOneByEmail(email);
+  if (!cliente) throw new UnauthorizedException("Credenciales incorrectas");
+  const isValid = await bcryptjs.compare(clave, cliente.clave || '');
+  if (!isValid) throw new UnauthorizedException("Credenciales incorrectas")
+  const payload = { id: cliente.idCliente, email:cliente.email, table: 'cliente'};
+  const token = await this.jwtService.signAsync(payload); 
+  return { token, cliente: payload };
   }
-  // 2. Intentar tabla user (admins)
-  const user = await this.userService.findOneByEmail(email);
-  if (user) {
-    const isValid = await bcryptjs.compare(clave, user.clave || '');
-    if (isValid){
-      const payload = { id: user.idUser, email: user.email, role:user.rol, table: 'user'};
-      const token = await this.jwtService.signAsync(payload); 
-      return { token, user: payload };
-  }
-}
-  throw new UnauthorizedException('Credenciales incorrectas');
-}
-
   async register( registerDto: RegisterDto) {
-    const existsInUsuario = await this.usuarioService.findOneByEmail(registerDto.email);
-    const existsInUser = await this.userService.findOneByEmail(registerDto.email);
-    if (existsInUsuario || existsInUser) {
+  const email = registerDto.email.trim().toLowerCase();
+  const hashed = await bcryptjs.hash(registerDto.clave, 10);
+
+  const porEmail = await this.clienteService.findOneByEmail(email);
+  if (porEmail) {
+    if (this.hasAccount(porEmail)) {
       throw new BadRequestException('El email ya está registrado');
     }
-
-    const hashed = await bcryptjs.hash(registerDto.clave, 10);
-
-    const nuevoUsuario = await this.usuarioService.create({
-      login: registerDto.email,
-      nombre: registerDto.nombre,
-      email: registerDto.email,
-      telefono: registerDto.telefono,
-      idDocumento: registerDto.idDocumento || null,
-      numeroDocumento: registerDto.documento || null,
-      clave: hashed,
-    });
-    return {
-      usuario: this.mapUsuario(nuevoUsuario),
-    };
+    const adoptado = await this.clienteService.activateAccount(porEmail.idCliente, email, email, hashed);
+    return { usuario: this.mapCliente(adoptado) };
   }
+
+  if (registerDto.numeroDocumento) {
+    const porDoc = await this.clienteService.findOneByNumeroDocumento(registerDto.numeroDocumento);
+    if (porDoc) {
+      if (this.hasAccount(porDoc)) {
+        throw new BadRequestException('Ya existe una cuenta con este documento');
+      }
+      const adoptado = await this.clienteService.activateAccount(porDoc.idCliente, email, email, hashed);
+      return { usuario: this.mapCliente(adoptado) };
+    }
+  }
+
+  const nuevoCliente = await this.clienteService.create({
+    login: email,
+    nombre: registerDto.nombre,
+    email,
+    telefono: registerDto.telefono ?? null,
+    numeroDocumento: registerDto.numeroDocumento ?? null,
+    clave: hashed,
+  });
+
+  return { usuario: this.mapCliente(nuevoCliente) };
+}
 }

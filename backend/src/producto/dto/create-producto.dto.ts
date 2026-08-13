@@ -1,17 +1,22 @@
-import { IsString, IsNumber, IsOptional, IsBoolean, IsDateString, IsArray, ArrayNotEmpty, IsInt, Min} from 'class-validator';
+import { Type } from 'class-transformer';
+import { Matches, IsString, IsOptional, IsBoolean, IsDateString, IsArray, ArrayNotEmpty, IsInt, Min, IsNotEmpty } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateProductoDto {
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   nombre!: string;
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   modelo!: string;
   
   @ApiProperty()
-  @IsNumber()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   idMarca!: number;
 
   @ApiPropertyOptional({ required: false })
@@ -20,7 +25,8 @@ export class CreateProductoDto {
   descripcion!: string | null;
 
   @ApiProperty({default:0})
-  @IsNumber()
+  @Type(() => Number)
+  @IsInt()
   @Min(0)
   stock!: number;
 
@@ -30,14 +36,14 @@ export class CreateProductoDto {
   imagen!: string | null; 
 
   @ApiPropertyOptional({ required:false })
-  @IsNumber()
-  @Min(0)
+  @IsString()
+  @Matches(/^\d+(\.\d{1,2})?$/)
   @IsOptional()
   precioTope!: string | null; 
 
   @ApiPropertyOptional({ required: false })
-  @IsNumber()
-  @Min(0)
+  @Matches(/^\d+(\.\d{1,2})?$/)
+  @IsString()
   @IsOptional()
   precioVenta!: string | null;
 
@@ -52,14 +58,18 @@ export class CreateProductoDto {
   fechaIngreso!: string | null;
 
   @ApiPropertyOptional({ required: false, type: Number })
+  @Type(() => Number)
   @IsOptional()
-  @IsNumber()
+  @IsInt()
+  @Min(0)
   garantiaFabrica!: number | null; 
 
   @ApiPropertyOptional({required:false})
-  @IsNumber()
+  @Type(() => Number)
   @IsOptional()
-  descuento!: number | null;
+  @IsInt()
+  @Min(0)
+  descuento?: number | null;
 
   //Relacion
   @ApiProperty({ type: [Number] })
@@ -68,7 +78,6 @@ export class CreateProductoDto {
   @ArrayNotEmpty()
   @IsInt({each:true})
   @Min(1, { each: true })
-  idTiposProducto!: number[];
+  idTiposProducto?: number[]; 
 
 }
-

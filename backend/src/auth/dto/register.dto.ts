@@ -27,10 +27,10 @@ export class RegisterDto {
     @IsOptional()
     @IsString()
     @MinLength(1)
-    documento?: string | null;
+    numeroDocumento?: string | null;
     
     @ApiProperty()
-    @Transform(({value}) => value.trim())
+    @Transform(({value}) => value == null ? value : String(value).trim())
     @IsString()
     @MinLength(8)
     clave!: string;

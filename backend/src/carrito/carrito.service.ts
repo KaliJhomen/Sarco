@@ -9,8 +9,8 @@ import { Carrito } from './entities/carrito.entity';
 import { CarritoItem } from './entities/carrito-item.entity';
 import { Producto } from '../producto/entities/producto.entity';
 import { randomUUID } from 'crypto';
-import { Usuario } from '../usuario/entities/usuario.entity';
-type CartIdent = { idUsuario?: number; sessionToken?: string };
+import { Cliente } from '../cliente/entities/cliente.entity';
+type CartIdent = { idCliente?: number; sessionToken?: string };
 @Injectable()
 export class CarritoService {
   constructor(
@@ -31,8 +31,8 @@ export class CarritoService {
   }
 
   private async findCart(ident: CartIdent): Promise<Carrito | null> {
-    const { idUsuario, sessionToken } = ident;
-    if (idUsuario) return this.getCart(idUsuario);
+    const { idCliente, sessionToken } = ident;
+    if (idCliente) return this.getCart(idCliente);
     if (sessionToken) return this.getCartBySession(sessionToken);
       return null;
     }
@@ -41,8 +41,8 @@ export class CarritoService {
     const carrito = await this.findCart(ident);
     if (carrito) return carrito;
 
-    const { idUsuario, sessionToken } = ident;
-    if (idUsuario) return this.createCart(idUsuario);
+    const { idCliente, sessionToken } = ident;
+    if (idCliente) return this.createCart(idCliente);
     if (sessionToken) return this.createGuestCart(sessionToken);
 
     throw new NotFoundException('No se pudo crear el carrito');
@@ -59,20 +59,20 @@ export class CarritoService {
 
 
 
-  private async createCart(idUsuario: number): Promise<Carrito> {
+  private async createCart(idCliente: number): Promise<Carrito> {
       const carrito = this.cartRepository.create({
           sessionToken: null,
           shareToken: null,
           expiresAt: null,
-          usuario: { idUsuario },
+          cliente: { idCliente },
           items: [],
         });
         return this.cartRepository.save(carrito);
     }
 
-  private async getCart(idUsuario: number): Promise<Carrito | null> {
+  private async getCart(idCliente: number): Promise<Carrito | null> {
     return this.cartRepository.findOne({ 
-      where: { usuario: { idUsuario } }, 
+      where: { cliente: { idCliente } }, 
       relations: ['items', 'items.producto'] 
     });
   }
@@ -110,9 +110,9 @@ export class CarritoService {
       throw new BadRequestException('La cantidad debe ser mayor a 0');
     }
 
-    const { idUsuario, sessionToken } = ident;
-    if (!idUsuario && !sessionToken) {
-      throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
+    const { idCliente, sessionToken } = ident;
+    if (!idCliente && !sessionToken) {
+      throw new BadRequestException('Se requiere un ID de cliente o un token de sesión');
     }
     const carrito = await this.findCart(ident);
     if (!carrito) {
@@ -134,16 +134,16 @@ export class CarritoService {
     }
     return this.cartItemRepository.remove(item);
   }
-  async findByUser(ident: CartIdent) {
-    const { idUsuario, sessionToken } = ident;
-    if (!idUsuario && !sessionToken) {
-      throw new BadRequestException('Se requiere un ID de usuario o un token de sesión');
+  async findByClient(ident: CartIdent) {
+    const { idCliente, sessionToken } = ident;
+    if (!idCliente && !sessionToken) {
+      throw new BadRequestException('Se requiere un ID de cliente o un token de sesión');
     }
 
     const carrito = await this.findCart(ident);
     if (!carrito) {
       return {
-        idUsuario: ident.idUsuario,
+        idCliente: ident.idCliente,
         sessionToken: ident.sessionToken,
         idCarrito: null,
         items: [],
@@ -151,7 +151,7 @@ export class CarritoService {
       };
     }
     return {
-      idUsuario: ident.idUsuario,
+      idCliente: ident.idCliente,
       sessionToken: carrito.sessionToken,
       idCarrito: carrito.idCarrito,
       items: carrito.items || [],
@@ -188,7 +188,7 @@ export class CarritoService {
     );
   }
 
-  async mergeGuestCart(idUsuario: number, sessionToken: string) {
+  async mergeGuestCart(idCliente: number, sessionToken: string) {
     const guestCart = await this.cartRepository.findOne({
       where: { sessionToken },
       relations: ['items', 'items.producto'],
@@ -196,13 +196,13 @@ export class CarritoService {
 
     if (!guestCart) return;
 
-    const userCart = await this.cartRepository.findOne({
-      where: { usuario: { idUsuario } },
+    const clientCart = await this.cartRepository.findOne({
+      where: { cliente: { idCliente } },
       relations: ['items', 'items.producto'],
     });
 
-    if (!userCart) {
-      guestCart.usuario = { idUsuario } as any;
+    if (!clientCart) {
+      guestCart.cliente = { idCliente } as any;
       guestCart.sessionToken = null;
       guestCart.expiresAt = null;
       await this.cartRepository.save(guestCart);
@@ -210,7 +210,7 @@ export class CarritoService {
     }
 
     for (const item of guestCart.items) {
-      const existingItem = userCart.items.find(
+      const existingItem = clientCart.items.find(
         (i) => i.producto.idProducto === item.producto.idProducto,
       );
 
@@ -218,7 +218,7 @@ export class CarritoService {
         existingItem.cantidad += item.cantidad;
         await this.cartItemRepository.save(existingItem);
       } else {
-        item.carrito = userCart;
+        item.carrito = clientCart;
         await this.cartItemRepository.save(item);
       }
     }
