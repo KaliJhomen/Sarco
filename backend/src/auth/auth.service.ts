@@ -66,6 +66,7 @@ export class AuthService {
     nombre: registerDto.nombre,
     email:email,
     telefono: registerDto.telefono ?? null,
+    idDocumento: registerDto.idDocumento ?? null,
     numeroDocumento: registerDto.numeroDocumento ?? null,
     clave: hashed,
   });

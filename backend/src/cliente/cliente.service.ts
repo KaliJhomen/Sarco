@@ -77,8 +77,8 @@ export class ClienteService {
       .leftJoinAndSelect('c.documento', 'd')
       .leftJoinAndSelect('c.estadoCliente', 'ec')
       .select([
-        'c.idCliente', 'c.nombre', 'c.numeroDocumento',
-        'c.direccion', 'c.telefono', 'c.email',
+        'c.idCliente', 'c.nombre', 'c.numeroDocumento', 'c.departamento',
+        'c.provincia', 'c.distrito', 'c.ciudad', 'c.direccion', 'c.referencia', 'c.telefono', 'c.email',
         'd.idDocumento', 'd.nombre',
         'ec.nombre',
       ]);

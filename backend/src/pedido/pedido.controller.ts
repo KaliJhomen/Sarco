@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Param,
   Body,
   Req,
@@ -13,7 +14,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam } from '@nestjs
 import { PedidoService } from './pedido.service';
 import { AuthGuard } from '../auth/guard/auth.guard';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
-
+import { UpdatePedidoDto} from './dto/update-pedido.dto'
 @ApiTags('Pedido')
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
@@ -27,20 +28,19 @@ export class PedidoController {
   async createPedido(@Req() req: any, @Body() body: CreatePedidoDto) {
     const idCliente = req.cliente?.id;
     if (!idCliente) throw new BadRequestException('cliente no autenticado');
-    if (!Array.isArray(body.items) || body.items.length === 0) {
-      throw new BadRequestException('Debes enviar al menos un producto en items');
-    }
-    return this.pedidoService.createPedido(
-      idCliente,
-      {
-        nombre: body.nombre,
-        email: body.email,
-        telefono: body.telefono,
-        direccion: body.direccion,
-        ciudad: body.ciudad,
-      },
-      body.items
-    );
+    return this.pedidoService.createPedido(idCliente, body);
+  }
+
+  @Patch(':idPedido')
+  @ApiOperation({ summary: 'Actualizar pedido (cancelar o editar dirección)' })
+  async updatePedido(
+    @Param('idPedido', ParseIntPipe) idPedido: number,
+    @Req() req: any,
+    @Body() body: UpdatePedidoDto,
+  ) {
+    const idCliente = req.cliente?.id;
+    if (!idCliente) throw new BadRequestException('cliente no autenticado');
+    return this.pedidoService.update(idPedido, body, idCliente);
   }
 
   @Get()

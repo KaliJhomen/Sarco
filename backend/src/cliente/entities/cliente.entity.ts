@@ -32,9 +32,6 @@ export class Cliente {
   @Column("int", { name: "id_estado_cliente", nullable: true, default:null})
   idEstadoCliente!: number | null;
   
-  @Column("char", { name: "ubigeo_codigo", nullable: true, length: 6, default: null })
-  ubigeoCodigo!: string | null;
-  
   @Column("varchar", { name: "nombre", nullable: true, length: 255, default: null})
   nombre!: string | null;
 

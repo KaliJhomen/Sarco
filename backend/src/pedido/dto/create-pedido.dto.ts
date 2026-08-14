@@ -1,48 +1,97 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsEmail, IsArray, ValidateNested, IsInt, Min, IsOptional } from "class-validator";
-import { Type } from "class-transformer";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type, Transform } from 'class-transformer';
+import {
+  IsArray, ArrayNotEmpty, IsEmail, IsEnum, IsInt, IsOptional,
+  IsString, Matches, Min, ValidateIf, ValidateNested,
+} from 'class-validator';
+
+export enum TipoEntrega {
+  DELIVERY = 'delivery',
+  RECOJO = 'recojo',
+}
+
+const trim = ({ value }: { value: unknown }) =>
+  typeof value === 'string' ? value.trim() : value;
+const optTrim = ({ value }: { value: unknown }) =>
+  value == null || value === '' ? null : String(value).trim();
 
 class PedidoItemDto {
-  @ApiProperty({ description: 'ID del producto a agregar' })
+  @ApiProperty({ description: 'ID del producto' })
+  @Type(() => Number)
   @IsInt()
-  idProducto: number;
+  idProducto!: number;
 
   @ApiProperty({ description: 'Cantidad del producto' })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
-  cantidad: number;
+  cantidad!: number;
 }
 
 export class CreatePedidoDto {
-  @ApiProperty({ description: 'Nombre del cliente' })
-  @IsString()
-  nombre: string;
 
-  @ApiProperty({ description: 'Email del cliente' })
+  @ApiPropertyOptional({ description: 'Codigo ubigeo del cliente' })
+  @IsOptional()
+  @Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
+  @Matches(/^\d{6}$/)
+  @IsString()
+  ubigeoCodigo?: string | null;
+
+  @ApiProperty({ description: 'Tipo de entrega', enum: TipoEntrega })
+  @IsEnum(TipoEntrega)
+  tipoEntrega!: TipoEntrega;
+
+  @ApiProperty({ description: 'Nombre de quien recibe/retira' })
+  @Transform(trim)
+  @IsString()
+  nombre!: string;
+
+  @ApiProperty({ description: 'Teléfono de contacto' })
+  @Transform(trim)
+  @IsString()
+  telefono!: string;
+
+  @ApiPropertyOptional({ description: 'Email del cliente' })
+  @Transform(trim)
   @IsEmail()
+  email!: string;
+
+  // ----- Solo aplican si es delivery -----
+  @ValidateIf((o) => o.tipoEntrega === TipoEntrega.DELIVERY)
+  @Transform(trim)
+  @IsString()
+  departamento!: string;
+
+  @ValidateIf((o) => o.tipoEntrega === TipoEntrega.DELIVERY)
+  @Transform(trim)
+  @IsString()
+  provincia!: string;
+
+  @ValidateIf((o) => o.tipoEntrega === TipoEntrega.DELIVERY)
+  @Transform(trim)
+  @IsString()
+  distrito!: string;
+
+  @ValidateIf((o) => o.tipoEntrega === TipoEntrega.DELIVERY)
+  @Transform(trim)
+  @IsString()
+  ciudad!: string;
+
+  @ValidateIf((o) => o.tipoEntrega === TipoEntrega.DELIVERY)
+  @Transform(trim)
+  @IsString()
+  direccion!: string;
+
+  @ApiPropertyOptional({ description: 'Referencia del domicilio' })
   @IsOptional()
-  email?: string;
-
-  @ApiProperty({ description: 'Teléfono del cliente' })
+  @Transform(optTrim)
   @IsString()
-  telefono: string;
-
-  @ApiProperty({ description: 'Dirección de envío' })
-  @IsString()
-  direccion: string;
-
-  @ApiProperty({ description: 'Ciudad de envío' })
-  @IsString()
-  ciudad: string;
-
-  @ApiProperty({ description: 'Token de sesión para usuarios invitados', required: false })
-  @IsOptional()
-  @IsString()
-  sessionToken?: string;
-
-  @ApiProperty({ type: [PedidoItemDto], description: 'Lista de productos a comprar' })
+  referencia?: string | null;
+  
+  @ApiProperty({ type: [PedidoItemDto], description: 'Items del pedido' })
   @IsArray()
+  @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => PedidoItemDto)
-  items: PedidoItemDto[];
+  items!: PedidoItemDto[];
 }

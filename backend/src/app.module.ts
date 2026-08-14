@@ -62,7 +62,7 @@ import { ColorModule } from './color/color.module';
 import { CarritoModule } from './carrito/carrito.module';
 import { FavoritosModule } from './favoritos/favoritos.module';
 import { PedidoModule} from './pedido/pedido.module';
-import { PedidoDetalleModule } from './pedido-detalle/pedido-detalle.module';
+import { UbigeoModule } from './ubigeo/ubigeo.module';
 @Module({
   imports: [
     EnvModule,
@@ -156,8 +156,8 @@ import { PedidoDetalleModule } from './pedido-detalle/pedido-detalle.module';
     CarritoModule,
     FavoritosModule,
     PedidoModule,
-    PedidoDetalleModule,
     ConfigModule,
+    UbigeoModule,
   ],
   controllers: [AppController],
   providers: [

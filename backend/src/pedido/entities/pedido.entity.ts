@@ -22,32 +22,35 @@ export class Pedido {
   @Column( "int",{ name: 'id_cliente' })
   idCliente!: number;
 
-  @Column("enum", { name: 'tipoEntrega',enum: TipoEntrega})
+  @Column("char", { name: "ubigeo_codigo", nullable: true, length: 6, default: null })
+  ubigeoCodigo!: string | null;
+
+  @Column("enum", { name: 'tipo_entrega',enum: TipoEntrega})
   tipoEntrega!: TipoEntrega;
   
   @Column("varchar",{ name:'nombre_cliente', length: 100 })
   nombreCliente!: string;
 
-  @Column("varchar", { name:'email_cliente', length: 100, nullable: true })
+  @Column("varchar", { name:'email_cliente', length: 100})
   emailCliente!: string;
 
   @Column("varchar", { name: 'telefono_cliente', length: 20 })
   telefonoCliente!: string;
 
   @Column("varchar", { name: 'departamento_cliente', nullable: true,  length: 60 })
-  departamentoCliente!: string;
+  departamentoCliente!: string | null;
   
   @Column("varchar", { name: 'provincia_cliente', nullable: true,  length: 60 })
-  provinciaCliente!: string;
+  provinciaCliente!: string | null;
   
   @Column("varchar", { name: 'distrito_cliente', nullable: true,  length: 60 })
-  distritoCliente!: string;
+  distritoCliente!: string | null;
 
   @Column("varchar", { name: 'ciudad_cliente', nullable: true, length: 100 })
-  ciudadCliente!: string;
+  ciudadCliente!: string | null;
 
   @Column("varchar",{ name: 'direccion_cliente',  nullable: true, length: 255 })
-  direccionCliente!: string;
+  direccionCliente!: string | null;
 
   @Column("varchar", { name: 'referencia_cliente', nullable: true, length: 255 })
   referenciaCliente!: string | null;
@@ -55,11 +58,8 @@ export class Pedido {
   @Column("decimal", { name: 'total', precision: 10, scale: 2, default: 0 })
   total!: string;
 
-  @Column("enum", { name: 'estadoPedido',enum: EstadoPedido, default: EstadoPedido.PENDIENTE })
+  @Column("enum", { name: 'estado_pedido',enum: EstadoPedido, default: EstadoPedido.PENDIENTE })
   estadoPedido!: EstadoPedido;
-
-  @Column('varchar', { name: 'session_token', nullable: true, length: 32 })
-  sessionToken!: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'datetime' })
   createdAt!: Date;
@@ -73,7 +73,7 @@ export class Pedido {
   pedidoDetalles!: PedidoDetalle[];
 
   @ManyToOne(() => Cliente, { 
-    onDelete: 'SET NULL', 
+    onDelete: 'RESTRICT', 
     onUpdate: 'CASCADE'})
   @JoinColumn({ name: 'id_cliente' })
   cliente!: Cliente;

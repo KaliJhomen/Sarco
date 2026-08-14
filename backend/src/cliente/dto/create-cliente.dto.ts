@@ -10,13 +10,6 @@ export class CreateClienteDto {
 @IsNumber()
 idEstadoCliente?: number | null;
 
-@ApiPropertyOptional({ description: 'Codigo ubigeo del cliente' })
-@IsOptional()
-@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
-@Matches(/^\d{6}$/)
-@IsString()
-ubigeoCodigo?: string | null;
-
 @ApiPropertyOptional({ description: 'Nombres del cliente' })
 @IsOptional()
 @IsString()
@@ -54,21 +47,25 @@ numeroDocumento?: string | null
 telefono?: string | null;
 
 @ApiPropertyOptional({ description: 'Departamento del cliente' })
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
 @IsOptional()
 @IsString()
 departamento?: string | null;
 
 @ApiPropertyOptional({ description: 'Provincia del cliente' })
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
 @IsOptional()
 @IsString()
 provincia?: string | null;
 
 @ApiPropertyOptional({ description: 'Distrito del cliente' })
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
 @IsOptional()
 @IsString()
 distrito?: string | null;
 
 @ApiPropertyOptional({ description: 'Ciudad del cliente' })
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
 @IsOptional()
 @IsString()
 ciudad?: string | null;
