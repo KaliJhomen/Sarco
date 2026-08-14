@@ -1,37 +1,40 @@
-import { Transform } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsInt, IsEmail, IsString, MinLength, IsOptional} from "class-validator";
-
 export class RegisterDto {
-    @ApiProperty()
-    @IsString()
-    @MinLength(1)
-    nombre!: string;
+@ApiProperty()
+@IsString()
+@MinLength(1)
+nombre!: string;
 
-    @ApiProperty()
-    @IsEmail()
-    email!: string;
+@ApiProperty()
+@Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
+@IsEmail()
+email!: string;
 
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    @MinLength(9)
-    telefono?: string | null;
+@ApiPropertyOptional()
+@IsOptional()
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
+@IsString()
+@MinLength(9)
+telefono?: string | null;
 
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsInt()
-    idDocumento?: number | null;
+@ApiPropertyOptional()
+@Type(() => Number) 
+@IsOptional()
+@IsInt()
+idDocumento?: number | null;
     
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    @MinLength(1)
-    numeroDocumento?: string | null;
+@ApiPropertyOptional()
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
+@IsOptional()
+@IsString()
+@MinLength(1)
+numeroDocumento?: string | null;
     
-    @ApiProperty()
-    @Transform(({value}) => value == null ? value : String(value).trim())
-    @IsString()
-    @MinLength(8)
-    clave!: string;
+@ApiProperty()
+@Transform(({value}) => value == null ? value : String(value).trim())
+@IsString()
+@MinLength(8)
+clave!: string;
 }

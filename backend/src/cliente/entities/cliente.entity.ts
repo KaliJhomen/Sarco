@@ -31,12 +31,12 @@ export class Cliente {
 
   @Column("int", { name: "id_estado_cliente", nullable: true, default:null})
   idEstadoCliente!: number | null;
-
+  
+  @Column("char", { name: "ubigeo_codigo", nullable: true, length: 6, default: null })
+  ubigeoCodigo!: string | null;
+  
   @Column("varchar", { name: "nombre", nullable: true, length: 255, default: null})
   nombre!: string | null;
-
-  @Column("varchar", { name: "login", length: 255 })
-  login!: string | null;
 
   @Column("varchar", { name: "email", nullable: true, length: 255, default: null })
   email!: string | null;
@@ -50,12 +50,18 @@ export class Cliente {
   @Column("varchar", { name: "numero_documento", length: 255, unique: true })
   numeroDocumento!: string | null;
 
-  @Column("varchar", { name: "direccion_dni", nullable: true, length: 255, default: null })
-  direccionDni!: string | null;
-
   @Column("varchar", { name: "telefono", nullable: true, length: 255 })
   telefono!: string | null;
-
+  
+  @Column("varchar", { name: "departamento", nullable: true, length: 60, default: null })
+  departamento!: string | null;
+  
+  @Column("varchar", { name: "provincia", nullable: true, length: 60, default: null })
+  provincia!: string | null;
+  
+  @Column("varchar", { name: "distrito", nullable: true, length: 60, default: null })
+  distrito!: string | null;
+  
   @Column("varchar", { name: "ciudad", nullable: true, length: 255, default: null })
   ciudad!: string | null;
 
@@ -64,12 +70,6 @@ export class Cliente {
 
   @Column("varchar", { name: "referencia", nullable: true, length: 255, default: null })
   referencia!: string | null;
-
-  @Column("varchar", { name: "imagen", nullable: true, length: 255, default: null })
-  imagen!: string | null;
-
-  @Column("varchar", { name: "fondo", nullable: true, length: 255, default: null })
-  fondo!: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
@@ -83,7 +83,7 @@ export class Cliente {
   @OneToOne(() => Carrito, (carrito) => carrito.cliente)
   carrito!: Carrito;
 
-  
+
   @OneToMany(() => Credito, (credito) => credito.cliente)
   creditos!: Credito[];
 

@@ -15,17 +15,16 @@ export class ClienteService {
     @InjectRepository(Cliente)
     private clienteRepository: Repository<Cliente>,
   ) { }
-  async activateAccount(idCliente:number, login:string, email:string, clave:string){
+  async activateAccount(idCliente:number, email:string, clave:string){
     const cliente = await this.clienteRepository.findOne({ where: { idCliente } });
     if (!cliente) throw new NotFoundException(`Cliente con ID ${idCliente} no encontrado`);
-    cliente.login = login;
     cliente.email = email;
     cliente.clave = clave;
     return this.clienteRepository.save(cliente);
   }
   async create(createClienteDto: CreateClienteDto) {
     const clave = createClienteDto.clave ?? '';
-    const login = createClienteDto.login ?? createClienteDto.email ?? '';
+    const email = createClienteDto.email ?? '';
     const existing = await this.clienteRepository.findOne({
       where:[
         {email: createClienteDto.email ?? undefined},
@@ -36,7 +35,7 @@ export class ClienteService {
       throw new BadRequestException('Ya hay registros con esta informacion');
     }
     try {
-      const nuevoCliente = this.clienteRepository.create({...createClienteDto, login, clave});
+      const nuevoCliente = this.clienteRepository.create({...createClienteDto, clave});
       return await this.clienteRepository.save(nuevoCliente);
     } catch (error) {
       this.logger.error(error);
@@ -66,11 +65,6 @@ export class ClienteService {
   findOneByNumeroDocumento(numeroDocumento: string) {   
     return this.clienteRepository.findOne({
       where: { numeroDocumento },
-    });
-  }
-  findOneByLogin(login: string) {   
-    return this.clienteRepository.findOne({
-      where: { login },
     });
   }
 

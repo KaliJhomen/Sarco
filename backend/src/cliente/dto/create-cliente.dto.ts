@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString, IsEmail } from "class-validator";
+import { IsNumber, IsOptional, IsString, IsEmail, Matches } from "class-validator";
 import { Transform, Type } from "class-transformer";
 
 export class CreateClienteDto {
@@ -10,29 +10,29 @@ export class CreateClienteDto {
 @IsNumber()
 idEstadoCliente?: number | null;
 
+@ApiPropertyOptional({ description: 'Codigo ubigeo del cliente' })
+@IsOptional()
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
+@Matches(/^\d{6}$/)
+@IsString()
+ubigeoCodigo?: string | null;
+
 @ApiPropertyOptional({ description: 'Nombres del cliente' })
 @IsOptional()
 @IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
 nombre?: string | null;
 
-@ApiPropertyOptional({ description: 'Login del cliente' })
-@IsString()
-@IsOptional()
-@Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-login?: string | null;
-
 @ApiPropertyOptional({ description: 'Email del cliente' })
+@Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
 @IsOptional()
 @IsEmail()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
 email?: string | null;
 
 @ApiPropertyOptional({ description: 'Contraseña del cliente' })
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
 @IsString()
 @IsOptional()
-@Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
 clave?: string | null;
 
 @ApiPropertyOptional({ description: 'Id del tipo de documento' })
@@ -47,45 +47,41 @@ idDocumento?: number | null;
 @Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
 numeroDocumento?: string | null
 
-@ApiPropertyOptional({ description: 'Dirección del DNI' })
-@IsOptional()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
-direccionDni?: string | null;
-
 @ApiPropertyOptional({ description: 'Teléfono del cliente' })
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
 @IsOptional()
 @IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
 telefono?: string | null;
+
+@ApiPropertyOptional({ description: 'Departamento del cliente' })
+@IsOptional()
+@IsString()
+departamento?: string | null;
+
+@ApiPropertyOptional({ description: 'Provincia del cliente' })
+@IsOptional()
+@IsString()
+provincia?: string | null;
+
+@ApiPropertyOptional({ description: 'Distrito del cliente' })
+@IsOptional()
+@IsString()
+distrito?: string | null;
 
 @ApiPropertyOptional({ description: 'Ciudad del cliente' })
 @IsOptional()
 @IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
 ciudad?: string | null;
 
 @ApiPropertyOptional({ description: 'Dirección del cliente' })
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
 @IsOptional()
 @IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
 direccion?: string | null;
 
 @ApiPropertyOptional({ description: 'Referencia de la dirección' })
+@Transform(({ value }) => (value == null || value === '' ? null : String(value).trim()))
 @IsOptional()
 @IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
 referencia?: string | null;
-
-@ApiPropertyOptional({ description: 'Imagen de perfil del cliente' })
-@IsOptional()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
-imagen?: string | null;
-
-@ApiPropertyOptional({ description: 'Imagen de fondo del cliente' })
-@IsOptional()
-@IsString()
-@Transform(({ value }) => (value === undefined || value === '' ? null : String(value).trim()))
-fondo?: string | null;
 }

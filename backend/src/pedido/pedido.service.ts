@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { Pedido } from './entities/pedido.entity';
 import { PedidoDetalle } from '../pedido-detalle/entities/pedido-detalle.entity';
 import { Producto } from '../producto/entities/producto.entity';
-import { Usuario } from '../usuario/entities/usuario.entity';
+import { Cliente } from '../cliente/entities/cliente.entity';
 import { EstadoPedido } from './entities/pedido.entity';
 
 @Injectable()
@@ -20,21 +20,21 @@ export class PedidoService {
     private readonly pedidoDetalleRepository: Repository<PedidoDetalle>,
     @InjectRepository(Producto)
     private readonly productoRepository: Repository<Producto>,
-    @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(Cliente)
+    private readonly clienteRepository: Repository<Cliente>,
   ) {}
   async createPedido(
-    idUsuario: number,
+    idCliente: number,
     shippingData: {
-      nombre: string;
-      email: string | undefined;
-      telefono: string;
-      direccion: string;
-      ciudad: string;
+      nombreCliente: string;
+      emailCliente: string;
+      telefonoCliente: string;
+      direccionCliente: string;
+      ciudadCliente: string;
     },
     items: Array<{ idProducto: number; cantidad: number }>,
   ) {
-    const usuario = await this.usuarioRepository.findOne({ where: { idUsuario } });
+    const usuario = await this.clienteRepository.findOne({ where: { idCliente } });
     if (!usuario) throw new NotFoundException('Usuario no encontrado');
 
     let total = 0;
@@ -57,7 +57,7 @@ export class PedidoService {
     }
 
     const pedido = this.pedidoRepository.create({
-      usuario,
+      idCliente,
       ...shippingData,
       total: String(total),
       estado: EstadoPedido.PENDIENTE,
@@ -67,9 +67,9 @@ export class PedidoService {
     return this.pedidoRepository.save(pedido);
   }
 
-  async findByUserId(idUsuario: number) {
+  async findByUserId(idCliente: number) {
     return this.pedidoRepository.find({
-      where: { idUsuario },
+      where: { idCliente },
       relations: ['items', 'items.producto'],
       order: { createdAt: 'DESC' },
     });

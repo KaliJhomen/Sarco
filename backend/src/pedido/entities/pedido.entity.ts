@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { PedidoDetalle } from '../../pedido-detalle/entities/pedido-detalle.entity';
 
-import { Usuario } from '../../usuario/entities/usuario.entity';
+import { Cliente } from '../../cliente/entities/cliente.entity';
 
 export enum EstadoPedido {
   PENDIENTE = 'pendiente',
@@ -10,35 +10,53 @@ export enum EstadoPedido {
   ENTREGADO = 'entregado',
   CANCELADO = 'cancelado',
 }
-
+export enum TipoEntrega{
+  DELIVERY = 'delivery',
+  RECOJO = 'recojo',
+}
 @Entity('pedido')
 export class Pedido {
   @PrimaryGeneratedColumn({ name: 'id_pedido' })
   idPedido!: number;
 
-  @Column( "int",{ name: 'id_usuario' })
-  idUsuario!: number;
+  @Column( "int",{ name: 'id_cliente' })
+  idCliente!: number;
 
-  @Column("varchar",{ name:'nombre_usuario', length: 100 })
-  nombreUsuario!: string;
+  @Column("enum", { name: 'tipoEntrega',enum: TipoEntrega})
+  tipoEntrega!: TipoEntrega;
+  
+  @Column("varchar",{ name:'nombre_cliente', length: 100 })
+  nombreCliente!: string;
 
-  @Column("varchar", { name:'email_usuario', length: 100, nullable: true })
-  emailUsuario!: string | null;
+  @Column("varchar", { name:'email_cliente', length: 100, nullable: true })
+  emailCliente!: string;
 
-  @Column("varchar", { name: 'telefono_usuario', length: 20 })
-  telefonoUsuario!: string;
+  @Column("varchar", { name: 'telefono_cliente', length: 20 })
+  telefonoCliente!: string;
 
-  @Column("varchar",{ name: 'direccion_usuario', length: 255 })
-  direccionUsuario!: string;
+  @Column("varchar", { name: 'departamento_cliente', nullable: true,  length: 60 })
+  departamentoCliente!: string;
+  
+  @Column("varchar", { name: 'provincia_cliente', nullable: true,  length: 60 })
+  provinciaCliente!: string;
+  
+  @Column("varchar", { name: 'distrito_cliente', nullable: true,  length: 60 })
+  distritoCliente!: string;
 
-  @Column("varchar", { name: 'ciudad_usuario', length: 100 })
-  ciudadUsuario!: string;
+  @Column("varchar", { name: 'ciudad_cliente', nullable: true, length: 100 })
+  ciudadCliente!: string;
+
+  @Column("varchar",{ name: 'direccion_cliente',  nullable: true, length: 255 })
+  direccionCliente!: string;
+
+  @Column("varchar", { name: 'referencia_cliente', nullable: true, length: 255 })
+  referenciaCliente!: string | null;
 
   @Column("decimal", { name: 'total', precision: 10, scale: 2, default: 0 })
   total!: string;
 
-  @Column("enum", { name: 'estado',enum: EstadoPedido, default: EstadoPedido.PENDIENTE })
-  estado!: EstadoPedido;
+  @Column("enum", { name: 'estadoPedido',enum: EstadoPedido, default: EstadoPedido.PENDIENTE })
+  estadoPedido!: EstadoPedido;
 
   @Column('varchar', { name: 'session_token', nullable: true, length: 32 })
   sessionToken!: string | null;
@@ -54,9 +72,9 @@ export class Pedido {
   { cascade: true })
   pedidoDetalles!: PedidoDetalle[];
 
-  @ManyToOne(() => Usuario, { 
+  @ManyToOne(() => Cliente, { 
     onDelete: 'SET NULL', 
     onUpdate: 'CASCADE'})
-  @JoinColumn({ name: 'id_usuario' })
-  usuario!: Usuario;
+  @JoinColumn({ name: 'id_cliente' })
+  cliente!: Cliente;
 }

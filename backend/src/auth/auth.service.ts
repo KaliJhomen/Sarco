@@ -19,8 +19,14 @@ export class AuthService {
       email: cliente.email,
     };
   }
-  private hasAccount(cliente: Cliente): boolean {
-  return !!cliente.clave && cliente.clave !== '' && !!cliente.login && cliente.login !== '';
+  private hasAccount(cliente: Cliente){
+    if (!cliente) return false;
+    const email= cliente.email?.trim()
+    const clave= cliente.clave?.trim()
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || '');  
+    const claveValida = Boolean(clave && clave.length >= 6);
+    
+    return claveValida && emailValido;
   }
 
   async login({ email, clave }: { email: string; clave: string }) {
@@ -32,34 +38,33 @@ export class AuthService {
   const token = await this.jwtService.signAsync(payload); 
   return { token, cliente: payload };
   }
+
   async register( registerDto: RegisterDto) {
   const email = registerDto.email.trim().toLowerCase();
   const hashed = await bcryptjs.hash(registerDto.clave, 10);
-
-  const porEmail = await this.clienteService.findOneByEmail(email);
-  if (porEmail) {
-    if (this.hasAccount(porEmail)) {
+  const byEmail = await this.clienteService.findOneByEmail(email);
+  if (byEmail) {
+    if (this.hasAccount(byEmail)) {
       throw new BadRequestException('El email ya está registrado');
     }
-    const adoptado = await this.clienteService.activateAccount(porEmail.idCliente, email, email, hashed);
+    const adoptado = await this.clienteService.activateAccount(byEmail.idCliente, email, hashed);
     return { usuario: this.mapCliente(adoptado) };
   }
 
   if (registerDto.numeroDocumento) {
-    const porDoc = await this.clienteService.findOneByNumeroDocumento(registerDto.numeroDocumento);
-    if (porDoc) {
-      if (this.hasAccount(porDoc)) {
+    const byDocument = await this.clienteService.findOneByNumeroDocumento(registerDto.numeroDocumento);
+    if (byDocument) {
+      if (this.hasAccount(byDocument)) {
         throw new BadRequestException('Ya existe una cuenta con este documento');
       }
-      const adoptado = await this.clienteService.activateAccount(porDoc.idCliente, email, email, hashed);
+      const adoptado = await this.clienteService.activateAccount(byDocument.idCliente, email, hashed);
       return { usuario: this.mapCliente(adoptado) };
     }
   }
 
   const nuevoCliente = await this.clienteService.create({
-    login: email,
     nombre: registerDto.nombre,
-    email,
+    email:email,
     telefono: registerDto.telefono ?? null,
     numeroDocumento: registerDto.numeroDocumento ?? null,
     clave: hashed,
