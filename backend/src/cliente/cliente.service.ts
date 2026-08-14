@@ -22,24 +22,26 @@ export class ClienteService {
     cliente.clave = clave;
     return this.clienteRepository.save(cliente);
   }
-  async create(createClienteDto: CreateClienteDto) {
-    const clave = createClienteDto.clave ?? '';
-    const email = createClienteDto.email ?? '';
-    const existing = await this.clienteRepository.findOne({
-      where:[
-        {email: createClienteDto.email ?? undefined},
-        {numeroDocumento: createClienteDto.numeroDocumento ?? undefined}
-      ]
-    });
-    if (existing) {
-      throw new BadRequestException('Ya hay registros con esta informacion');
+  async create(createClienteDto: CreateClienteDto, options: { hashClave?: boolean } = {}) {
+    const clave = createClienteDto.clave ? options.hashClave
+      ? await bcryptjs.hash(createClienteDto.clave, 10):createClienteDto.clave: '';
+    const where: any[] =[];
+    if (createClienteDto.email) where.push({ email: createClienteDto.email });
+    if (createClienteDto.numeroDocumento) where.push({ numeroDocumento: createClienteDto.numeroDocumento });
+
+    if (where.length) {
+      const existing = await this.clienteRepository.findOne({ where });
+      if (existing) {
+        throw new BadRequestException('Ya hay registros con esta informacion');
+      }
     }
+
     try {
-      const nuevoCliente = this.clienteRepository.create({...createClienteDto, clave});
+      const nuevoCliente = this.clienteRepository.create({ ...createClienteDto, clave });
       return await this.clienteRepository.save(nuevoCliente);
     } catch (error) {
       this.logger.error(error);
-     throw handleDBError(error,'Ocurrió un error al guardar el cliente');
+      throw handleDBError(error, 'Ocurrió un error al guardar el cliente');
     }
   }
 

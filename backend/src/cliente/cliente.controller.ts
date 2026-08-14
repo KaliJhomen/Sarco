@@ -17,7 +17,7 @@ export class ClienteController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiBody({ type: CreateClienteDto })
   create(@Body() createClienteDto: CreateClienteDto) {
-    return this.clienteService.create(createClienteDto);
+    return this.clienteService.create(createClienteDto, {hashClave: true});
   }
 
   @Get()

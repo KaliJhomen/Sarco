@@ -35,7 +35,7 @@ export class Carrito {
   @OneToOne(() => Cliente, (cliente) => cliente.carrito, { 
     nullable: true, 
     onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'id_usuario' })
+  @JoinColumn({ name: 'id_cliente' })
   cliente?: Cliente | null;
 
     //ITEMS

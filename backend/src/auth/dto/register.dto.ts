@@ -20,7 +20,7 @@ email!: string;
 telefono?: string | null;
 
 @ApiPropertyOptional()
-@Type(() => Number) 
+@Transform(({ value }) => (value == null || value === '' || Number(value) <= 0 ? null : Number(value))) 
 @IsOptional()
 @IsInt()
 idDocumento?: number | null;
