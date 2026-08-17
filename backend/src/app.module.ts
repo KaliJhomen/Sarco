@@ -24,11 +24,9 @@ import { DocumentoModule } from './documento/documento.module';
 import { EstadoClienteModule } from './estado-cliente/estado-cliente.module';
 import { GarantiaModule } from './garantia/garantia.module';
 import { MetodoPagoModule } from './metodo-pago/metodo-pago.module';
-import { PagoSeparadoModule } from './pago-separado/pago-separado.module';
 import { PenalidadesModule } from './penalidades/penalidades.module';
 import { PermisoModule } from './permiso/permiso.module';
 import { PlanPagoModule } from './plan-pago/plan-pago.module';
-import { SeparadoModule } from './separado/separado.module';
 import { TiendaModule } from './tienda/tienda.module';
 import { AuthModule } from './auth/auth.module';
 import { RolModule } from './rol/rol.module';
@@ -105,11 +103,9 @@ import { UbigeoModule } from './ubigeo/ubigeo.module';
     EstadoClienteModule,
     GarantiaModule,
     MetodoPagoModule,
-    PagoSeparadoModule,
     PenalidadesModule,
     PermisoModule,
     PlanPagoModule,
-    SeparadoModule,
     TiendaModule,
     RolModule,
     ModuloModule,

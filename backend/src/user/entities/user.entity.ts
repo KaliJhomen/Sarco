@@ -1,7 +1,5 @@
 import { Agenda } from '../../agenda/entities/agenda.entity';
 import { Garantia } from '../../garantia/entities/garantia.entity';
-import { PagoSeparado } from '../../pago-separado/entities/pago-separado.entity';
-import { Separado } from '../../separado/entities/separado.entity';
 import { Cargo } from '../../cargo/entities/cargo.entity';
 import { Documento } from '../../documento/entities/documento.entity';
 import { Tienda } from '../../tienda/entities/tienda.entity';
@@ -62,9 +60,6 @@ export class User {
 
   @OneToMany(() => Garantia, (garantia) => garantia.user)
   garantias!: Garantia[];
-
-  @OneToMany(() => PagoSeparado, (pagoSeparado) => pagoSeparado.user)
-  pagoSeparados!: PagoSeparado[];
 
   @ManyToOne(() => Cargo, (cargo) => cargo.users, {
     onDelete: "NO ACTION",

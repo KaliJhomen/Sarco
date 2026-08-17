@@ -13,7 +13,6 @@ import {
 import { Documento } from "../../documento/entities/documento.entity";
 import { EstadoCliente } from "../../estado-cliente/entities/estado-cliente.entity";
 import { Garantia } from "../../garantia/entities/garantia.entity";
-import { Separado } from "../../separado/entities/separado.entity";
 
 import { Favoritos } from "../../favoritos/entities/favoritos.entity";
 import { Carrito } from "../../carrito/entities/carrito.entity";
@@ -80,9 +79,6 @@ export class Cliente {
   
   @OneToMany(() => Garantia, (garantia) => garantia.cliente)
   garantias!: Garantia[];
-
-  @OneToMany(() => Separado, (separado) => separado.cliente)
-  separados!: Separado[];
 
   @ManyToOne(() => Documento, (documento) => documento.clientes, {
     onDelete: "NO ACTION",

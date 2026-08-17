@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Producto } from "src/producto/entities/producto.entity";
-import { Separado } from "../../separado/entities/separado.entity";
 
 @Index("fk_detalle_separado_producto_2", ["idProducto"], {})
 @Index("id_separado", ["idSeparado"], {})
@@ -53,11 +52,4 @@ export class DetalleSeparado {
   })
   @JoinColumn([{ name: "id_producto", referencedColumnName: "idProducto" }])
   producto!: Producto;
-
-  @ManyToOne(() => Separado, (separado) => separado.detalleSeparados, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_separado", referencedColumnName: "idSeparado" }])
-  separado!: Separado;
 }
