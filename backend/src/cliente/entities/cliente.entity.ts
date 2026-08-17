@@ -12,11 +12,8 @@ import {
 } from "typeorm";
 import { Documento } from "../../documento/entities/documento.entity";
 import { EstadoCliente } from "../../estado-cliente/entities/estado-cliente.entity";
-import { Credito } from "../../credito/entities/credito.entity";
 import { Garantia } from "../../garantia/entities/garantia.entity";
 import { Separado } from "../../separado/entities/separado.entity";
-import { Servicio } from "../../servicio/entities/servicio.entity";
-import { Venta } from "../../venta/entities/venta.entity";
 
 import { Favoritos } from "../../favoritos/entities/favoritos.entity";
 import { Carrito } from "../../carrito/entities/carrito.entity";
@@ -80,25 +77,12 @@ export class Cliente {
   @OneToOne(() => Carrito, (carrito) => carrito.cliente)
   carrito!: Carrito;
 
-
-  @OneToMany(() => Credito, (credito) => credito.cliente)
-  creditos!: Credito[];
-
-  @OneToMany(() => Credito, (credito) => credito.clienteGarante)
-  creditos2!: Credito[];
   
   @OneToMany(() => Garantia, (garantia) => garantia.cliente)
   garantias!: Garantia[];
 
   @OneToMany(() => Separado, (separado) => separado.cliente)
   separados!: Separado[];
-
-  @OneToMany(() => Servicio, (servicio) => servicio.cliente)
-  servicios!: Servicio[];
-
-  @OneToMany(() => Venta, (venta) => venta.cliente)
-  ventas!: Venta[];
-
 
   @ManyToOne(() => Documento, (documento) => documento.clientes, {
     onDelete: "NO ACTION",

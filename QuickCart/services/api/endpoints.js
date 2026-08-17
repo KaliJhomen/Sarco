@@ -1,10 +1,4 @@
-/*Endpoints
- */
-
-// import { productTypeProductService } from "../productTypeProduct.service";
-
 const endpoints = {
-
   // ============================================
   // AUTENTICACIÓN
   // ============================================
@@ -13,11 +7,37 @@ const endpoints = {
     register: '/auth/register',
     logout: '/auth/logout',
     me: '/auth/profile', 
+    refresh: '/auth/refresh', 
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
     verifyEmail: '/auth/verify-email',
   },
+  
+  // ============================================
+  // CLIENTES
+  // ============================================
 
+  clients: {
+    base: '/cliente',
+    all: '/cliente',
+    byId: (id) => `/cliente/${id}`,
+    update: (id) => `/cliente/${id}`, // PATCH
+    delete: (id) => `/cliente/${id}`, // DELETE
+    search: (q) => `/cliente?q=${encodeURIComponent(q)}`,
+    filter: '/cliente/filter',
+  },
+
+  // ============================================
+  // USUARIOS
+  // ============================================
+  users: {
+    base: `/usuario`,
+    getAll: `/usuario`, // GET: Obtener todos los usuarios
+    getById: (id) => `/usuario/${id}`, // GET: Obtener un usuario por ID
+    create: `/usuario`, // POST: Crear un nuevo usuario
+    update: (id) => `/usuario/${id}`, // PATCH: Actualizar un usuario por ID
+    delete: (id) => `/usuario/${id}`, // DELETE: Eliminar un usuario por ID
+  },
   // ============================================
   // PRODUCTOS
   // ============================================
@@ -163,19 +183,6 @@ const endpoints = {
     update: (detalleId) => `/pedido-detalle/${detalleId}`,
     delete: (detalleId) => `/pedido-detalle/${detalleId}`,
   },
-
-  // ============================================
-  // USUARIOS
-  // ============================================
-  users: {
-    base: `/usuario`,
-    getAll: `/usuario`, // GET: Obtener todos los usuarios
-    getById: (id) => `/usuario/${id}`, // GET: Obtener un usuario por ID
-    create: `/usuario`, // POST: Crear un nuevo usuario
-    update: (id) => `/usuario/${id}`, // PATCH: Actualizar un usuario por ID
-    delete: (id) => `/usuario/${id}`, // DELETE: Eliminar un usuario por ID
-  },
-
   // ============================================
   // VENDEDORES 
   // ============================================
@@ -186,17 +193,6 @@ const endpoints = {
     products: (sellerId) => `/vendedor/${sellerId}/productos`,
     orders: (sellerId) => `/vendedor/${sellerId}/ordenes`,
     stats: (sellerId) => `/vendedor/${sellerId}/estadisticas`,
-  },
-  // ============================================
-  // CLIENTES
-  // ============================================
-
-  clients: {
-    base: '/cliente',
-    all: '/cliente',
-    byId: (id) => `/cliente/${id}`,
-    search: (q) => `/cliente?q=${encodeURIComponent(q)}`,
-    filter: '/cliente/filter',
   },
   //============================================ 
   // Tiendas
@@ -247,7 +243,7 @@ const endpoints = {
   // ============================================
   analytics: {
     dashboard: '/analytics/dashboard',
-    sales: '/analytics/vuserfentas',
+    sales: '/analytics/user-ventas',
     products: '/analytics/productos',
     customers: '/analytics/clientes',
   },

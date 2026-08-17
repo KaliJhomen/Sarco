@@ -2,23 +2,25 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { createPortal } from "react-dom";
-import { useAppContext } from "@/context/AppContext";
 import { Heart, ShoppingCart, Package, CheckCircle } from "lucide-react";
 import { formatPrice } from "@/utils/helpers/formatters";
 import { useAddToCart } from "@/hooks/server/useCart";
 import { useNotification } from "@/context/NotificationContext";
 import { useAddToFavorites, useRemoveFromFavorites, useFavorites } from "@/hooks/server/useFavorites";
 import { getOrCreateSessionToken } from "@/utils/constants/session";
+import { useAuth} from '@/context/AuthContext'
+
 
 const ProductCard = ({ product }) => {
-const { user } = useAppContext();
+  
 const { addNotification } = useNotification();
+const { cliente } = useAuth();
+
 const [isAdding, setIsAdding] = useState(false);
 const addToCartMutation = useAddToCart();
 
 // Hooks de favoritos
-const favoritesPayload = user ? {} : { sessionToken: getOrCreateSessionToken() };
+const favoritesPayload = { sessionToken: getOrCreateSessionToken() };
 const { data: favoritesData } = useFavorites(favoritesPayload);
 const addToFavoritesMutation = useAddToFavorites();
 const removeFromFavoritesMutation = useRemoveFromFavorites();
@@ -51,7 +53,7 @@ if (!product) {
     setIsProcessingFavorite(true);
     const sessionToken= getOrCreateSessionToken();
     const payload = { idProducto: Number(product.idProducto) };
-    if (!user) {
+    if (!cliente) {
       payload.sessionToken = sessionToken;
     }
     try {
@@ -128,7 +130,7 @@ if (!product) {
         quantity: 1,
       };
 
-      if (!user) {
+      if (!cliente) {
         payload.sessionToken = getOrCreateSessionToken();
       }
 

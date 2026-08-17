@@ -7,8 +7,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { PagoCredito } from "../../pago-credito/entities/pago-credito.entity";
-import { Credito } from "../../credito/entities/credito.entity";
 
 @Index("id_credito", ["idCredito"], {})
 @Entity("plan_pago", { schema: "sarcos_db" })
@@ -35,14 +33,4 @@ export class PlanPago {
 
   @Column("varchar", { name: "estado", nullable: true, length: 50 })
   estado!: string | null;
-
-  @OneToMany(() => PagoCredito, (pagoCredito) => pagoCredito.planPago)
-  pagoCreditos!: PagoCredito[];
-
-  @ManyToOne(() => Credito, (credito) => credito.planPagos, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_credito", referencedColumnName: "idCredito" }])
-  credito!: Credito;
 }

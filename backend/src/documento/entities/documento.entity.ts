@@ -1,6 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Cliente } from "../../cliente/entities/cliente.entity";
-import { Usuario } from "../../usuario/entities/usuario.entity";
 import { User } from "../../user/entities/user.entity";
 
 @Entity("documento", { schema: "sarcos_db" })
@@ -17,7 +16,4 @@ export class Documento {
 
   @OneToMany(() => User, (user) => user.documento)
   users!: User[];
-
-  @OneToMany(() => Usuario, (usuario) => usuario.documento)
-  usuarios!: Usuario[];
 }

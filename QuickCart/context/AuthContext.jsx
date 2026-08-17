@@ -1,78 +1,62 @@
 'use client';
-
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth.service';
+export const AuthContext = createContext(null);
 
-export const AuthContext = createContext();
-
-export const useAuth = () => useContext(AuthContext);
-
+export function useAuth() {
+  const context =useContext(AuthContext);
+  if (!context){
+      throw new error("useAuth debe usarse dentro de AuthProvider");
+  }
+  return context;
+}
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-  
-    checkAuth();
-  }, []);
+  const isAuthenticated = !!cliente;
 
-  const checkAuth = async () => {
-    try {
-      const token = localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      const result = await authService.getProfile(token);
-      if (result.success) {
-        setCliente(result.data.cliente);
-        setIsAuthenticated(true);
-      } else if (result.error === 'TokenExpiredError') {
-        // Si el token ha expirado, intenta renovarlo 
-
-        const refreshResult = await authService.refreshToken(token);
-    
-        if (refreshResult.success) {
-          const { token: newToken, cliente } = refreshResult.data;
-          localStorage.setItem('auth-token', newToken);
-          setCliente(cliente);
-          setIsAuthenticated(true);
-        } else {
-          clearAuth();
+  useEffect(() =>{ 
+    let cancelled = false;
+    const verifyAuth = async () => { 
+      try {
+        const result = await authService.getProfile();
+         if (!cancelled) {
+          if (result.success) {
+            setCliente(result.data.cliente);
+          } else {
+            // Token invalid/expired - interceptor handles refresh on 401
+            // This is just initial page load check
+            clearAuth();
+          }
         }
-      } else {
-        clearAuth();
+      } catch {
+        if (!cancelled) clearAuth();
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (error) {
-      clearAuth();
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    verifyAuth();
+    return () => { cancelled = true; };
+  }, []);
 
   const login = async (email, clave, rememberMe = false) => {
     const result = await authService.login(email, clave);
-    
     if (result.success) {
-      const { token, cliente } = result.data;
+      const { token, cliente: clienteData } = result.data;
       if (rememberMe) {
         localStorage.setItem('auth-token', token);
       } else {
         sessionStorage.setItem('auth-token', token);
       }
 
-      setCliente(cliente);
-
-      setIsAuthenticated(true);
-
+      setCliente(clienteData);
       router.push('/');
-
       return { success: true };
     }
-
     return result;
   };
 
@@ -82,39 +66,27 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const token = localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token');
-      
-      // Opcional: llamar endpoint de logout en backend
-      if (token) {
-        await authService.logout(token);
-      }
-    } catch (error) {
-      console.error('Error en logout:', error);
+      await authService.logout();
+    } catch {
+
     } finally {
       clearAuth();
       router.push('/auth/login');
     }
   };
 
-  const clearAuth = () => {
+  const clearAuth = useCallback(() => {
     localStorage.removeItem('auth-token');
     sessionStorage.removeItem('auth-token');
     setCliente(null);
-    setIsAuthenticated(false);
-  };
+  }, []);
 
   const updateCliente = async (updatedData) => {
     try {
-      const token = localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token');
-      
-      if (!token) return { success: false, error: 'No autenticado' };
-
-      const result = await authService.updateProfile(token, updatedData);
-
+      const result = await authService.updateProfile(updatedData);
       if (result.success) {
         setCliente(prev => ({ ...prev, ...result.data }));
       }
-
       return result;
     } catch (error) {
       return { success: false, error: error.message };
@@ -129,7 +101,6 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateCliente,
-    checkAuth
   };
 
   return (
@@ -137,5 +108,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-
 };

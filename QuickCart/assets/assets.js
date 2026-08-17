@@ -5,7 +5,7 @@ import prueba_ad_banner2 from "./prueba_ad_banner2.webp";
 import prueba_ad_banner from "./prueba_ad_banner.webp";
 import moto from "./moto.webp";
 import search_icon from "./search_icon.svg";
-import user_icon from "./user_icon.svg";
+import cliente_icon from "./cliente_icon.svg";
 import cart_icon from "./cart_icon.svg";
 import add_icon from "./add_icon.svg";
 import order_icon from "./order_icon.svg";
@@ -56,7 +56,7 @@ export const assets = {
   moto,
   logo,
   search_icon,
-  user_icon,
+  cliente_icon,
   cart_icon,
   add_icon,
   order_icon,

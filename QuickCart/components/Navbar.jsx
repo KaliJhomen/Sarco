@@ -3,7 +3,6 @@ import React, { useContext, useState, useRef, useMemo, useEffect } from "react";
 import { assets } from "@/assets/assets";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAppContext } from "@/context/AppContext";
 import { useCategories } from "@/hooks/server/useCategories";
 import Image from "next/image";
 import { AuthContext } from "@/context/AuthContext";
@@ -11,7 +10,6 @@ import { AuthContext } from "@/context/AuthContext";
 const Navbar = () => {
   const menuRef = useRef(null);
   const router = useRouter();
-  const { isSeller } = useAppContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showCategoriesMenu, setShowCategoriesMenu] = useState(false);
   const hideTimeout = useRef(null);
@@ -21,7 +19,7 @@ const Navbar = () => {
   const handleToggle = () => setOpen((s) => !s);
   const handleProfile = () => {
     setOpen(false);
-    router.push("/cliente/profile");
+    router.push("/user/profile");
   };
   /*
   // Verifica si el usuario es administrador o gerente
@@ -117,12 +115,12 @@ const Navbar = () => {
             <button className="p-2 hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-sm">
               <Image className="w-5 h-5 brightness-0 invert" src={assets.search_icon} alt="search icon" width={20} height={20} />
             </button>
-            <Link href="/cliente/favorites" className="text-white hover:text-red-100 transition-colors duration-300 font-bold relative group">
+            <Link href="/user/favorites" className="text-white hover:text-red-100 transition-colors duration-300 font-bold relative group">
               Favoritos
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link
-              href="/cliente/cart"
+              href="/user/cart"
               aria-label="Carrito"
               title="Carrito"
               className="p-2 hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-sm"

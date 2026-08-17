@@ -50,28 +50,48 @@ export const authService = {
 
   async getProfile(token) {
     try {
-      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
       const res = await client.get(endpoints.auth.me, { headers });
       return { success: true, data: res.data };
     } catch (err) {
       const message = err?.response?.data?.message || err.message || 'Error obteniendo perfil';
+      const errorType = err?.response?.data?.error;
       return { success: false, error: message };
     }
   },
 
   async refreshToken() {
-    return client.post(endpoints.auth.refresh);
+    try {
+      const res = await client.post(endpoints.auth.refresh);
+      return { success: true, data: res.data };
+    } catch (err) {
+      return { success: false, error: err?.response?.data?.message || 'Error refreshing token' };
+    }
   },
-
+  
   async forgotPassword(email) {
-    return client.post(endpoints.auth.forgotclave, { email });
+    try {
+      const res = await client.post(endpoints.auth.forgotPassword, { email });
+      return { success: true, data: res.data };
+    } catch (err) {
+      return { success: false, error: err?.response?.data?.message || 'Error' };
+    }
   },
 
   async resetPassword(token, nuevaClave) {
-    return client.post(endpoints.auth.resetclave, { token, nuevaClave });
+    try {
+      const res = await client.post(endpoints.auth.resetPassword, { token, nuevaClave });
+      return { success: true, data: res.data };
+    } catch (err) {
+      return { success: false, error: err?.response?.data?.message || 'Error' };
+    }
   },
 
   async verifyEmail(token) {
-    return client.post(endpoints.auth.verifyEmail, { token });
+    try {
+      const res = await client.post(endpoints.auth.verifyEmail, { token });
+      return { success: true, data: res.data };
+    } catch (err) {
+      return { success: false, error: err?.response?.data?.message || 'Error' };
+    }
   },
 };

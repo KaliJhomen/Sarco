@@ -6,7 +6,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Credito } from "../../credito/entities/credito.entity";
 
 @Index("id_credito", ["idCredito"], {})
 @Entity("penalidades", { schema: "sarcos_db" })
@@ -25,11 +24,4 @@ export class Penalidades {
 
   @Column("int", { name: "descuento", nullable: true })
   descuento!: number | null;
-
-  @ManyToOne(() => Credito, (credito) => credito.penalidades, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_credito", referencedColumnName: "idCredito" }])
-  credito!: Credito;
 }

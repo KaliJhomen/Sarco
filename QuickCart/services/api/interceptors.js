@@ -1,5 +1,26 @@
 import client from './client';
 
+function getTokenSource() {
+  if (typeof window === 'undefined') return null;
+  const ls = localStorage.getItem('auth-token');
+  if (ls) return { key: 'auth-token', storage: localStorage };
+  const ss = sessionStorage.getItem('auth-token');
+  if (ss) return { key: 'auth-token', storage: sessionStorage };
+  return null;
+}
+
+// Refresh token state
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    error ? reject(error) : resolve(token);
+  });
+  failedQueue = [];
+};
+
+
 // Interceptor de REQUEST
 client.interceptors.request.use(
   (config) => {
@@ -10,92 +31,88 @@ client.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📤 REQUEST:', config.method?.toUpperCase(), config.url);
-    }
-
     return config;
   },
   (error) => {
-    console.error('❌ Error en request:', error);
     return Promise.reject(error);
   }
 );
-
 // Interceptor de RESPONSE
 client.interceptors.response.use(
-  (response) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📥 RESPONSE:', response.status, response.config.url);
-      console.log('📦 Data recibida:', response.data);
-    }
+  (response) => response.data,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+          if (isRefreshing) {
+            return new Promise((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            }).then((token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return client(originalRequest);
+            });
+          }
 
-    return response.data;
-  },
-  (error) => {
-    if (error.response) {
-      const { status, data, config } = error.response;
+          originalRequest._retry = true;
+          isRefreshing = true;
+          try {
+          const res = await client.post('/auth/refresh');
+          const { token: newToken } = res.data || res;
 
-      console.error(`❌ Error ${status}:`, config.url, data);
+          // Store in the same source as before
+          const source = getTokenSource();
+          if (source && newToken) {
+            source.storage.setItem(source.key, newToken);
+          }
 
-      switch (status) {
-        case 401:
+          // Update authorization header
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+          // Process queued requests
+          processQueue(null, newToken);
+
+          // Retry original request
+          return client(originalRequest);
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+
+          // Refresh failed - clear auth and redirect
           if (typeof window !== 'undefined') {
-            console.warn('⚠️ Sesión expirada, redirigiendo a login...');
             localStorage.removeItem('auth-token');
             sessionStorage.removeItem('auth-token');
-            
+
             if (!window.location.pathname.includes('/auth/login')) {
               window.location.href = '/auth/login';
             }
           }
-          break;
 
-        case 403:
-          console.error('🚫 Acceso prohibido');
-          break;
-
-        case 404:
-          console.error('🔍 Recurso no encontrado:', config.url);
-          break;
-
-        case 422:
-          console.error('⚠️ Errores de validación:', data);
-          break;
-
-        case 500:
-          console.error('💥 Error del servidor');
-          break;
-
-        default:
-          console.error('❌ Error:', data?.message || 'Error desconocido');
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
       }
 
-      return Promise.reject({
-        status,
-        message: data?.message || 'Error en la petición',
-        errors: data?.errors || null,
-        data: data,
-      });
-    } else if (error.request) {
-      console.error('🌐 Error de red: No se pudo conectar al servidor');
-      
-      return Promise.reject({
-        status: 0,
-        message: 'Error de red. No se pudo conectar al servidor.',
-        errors: null,
-      });
-    } else {
-      console.error('⚙️ Error de configuración:', error.message);
-      
-      return Promise.reject({
-        status: -1,
-        message: error.message || 'Error desconocido',
-        errors: null,
-      });
+      // Non-401 errors - just reject
+      if (error.response) {
+        const { status, data } = error.response;
+        return Promise.reject({
+          status,
+          message: data?.message || 'Error en la petición',
+          errors: data?.errors || null,
+          data,
+        });
+      } else if (error.request) {
+        return Promise.reject({
+          status: 0,
+          message: 'Error de red. No se pudo conectar al servidor.',
+          errors: null,
+        });
+      } else {
+        return Promise.reject({
+          status: -1,
+          message: error.message || 'Error desconocido',
+          errors: null,
+        });
+      }
     }
-  }
 );
-
 export default client;

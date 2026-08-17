@@ -12,13 +12,12 @@ import { getOrCreateSessionToken } from "@/utils/constants/session";
 
 const Cart = () => {
   console.log("CART COMPONENT RENDER");
-  const {user} = useAuth();
-  const sessionToken= user ? undefined : getOrCreateSessionToken();
+  const {cliente} = useAuth();
+  const sessionToken= cliente ? undefined : getOrCreateSessionToken();
 
   const { data: cartData, isLoading, error } = useCart({
     sessionToken  
 });
-  console.log("CART DATA:", cartData);
   const items = cartData?.items || [];
 
   const addToCartMutation = useAddToCart();
@@ -29,7 +28,7 @@ const Cart = () => {
 
   const handleAddToCart = (idProducto) => {
     addToCartMutation.mutate({ 
-      sessionToken: user ? undefined : sessionToken,
+      sessionToken: cliente ? undefined : sessionToken,
       idProducto, 
       quantity: 1 
     });
@@ -37,14 +36,14 @@ const Cart = () => {
 
   const handleUpdateCartQuantity = (idProducto, quantity) => {
     if (quantity <= 0) {
-      removeFromCartMutation.mutate({ idUser: user?.id, sessionToken, idProducto });
+      removeFromCartMutation.mutate({ idCliente: cliente?.id, sessionToken, idProducto });
     } else {
-      updateCartQuantityMutation.mutate({ idUser: user?.id, sessionToken, idProducto, quantity });
+      updateCartQuantityMutation.mutate({ idCliente: cliente?.id, sessionToken, idProducto, quantity });
     }
   };
 
   const handleRemoveFromCart = (idProducto) => {
-    removeFromCartMutation.mutate({ idUser: user?.id, sessionToken, idProducto });
+    removeFromCartMutation.mutate({ idCliente: cliente?.id, sessionToken, idProducto });
   };
 
   if (isLoading) {

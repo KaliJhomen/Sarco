@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { cliente, loading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [active, setActive] = useState('info');
   useEffect(() => {
@@ -15,7 +15,7 @@ export default function ProfilePage() {
   }, [loading, isAuthenticated]);
 
   if (loading) return <div className="p-6">Cargando perfil...</div>;
-  if (!user) return null;
+  if (!cliente) return null;
 
   const menu = [
     { id: 'info', label: 'Tu Información' },
@@ -33,11 +33,11 @@ export default function ProfilePage() {
         <div className="bg-white rounded-2xl shadow p-4">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 bg-blue-500 text-white flex items-center justify-center rounded-full font-bold">
-              {user.name?.charAt(0).toUpperCase()}
+              {cliente.name?.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="font-semibold">{user.name}</p>
-              <p className="text-sm text-gray-500">{user.email}</p>
+              <p className="font-semibold">{cliente.name}</p>
+              <p className="text-sm text-gray-500">{cliente.email}</p>
             </div>
           </div>
 
@@ -67,10 +67,10 @@ export default function ProfilePage() {
               <h2 className="text-xl font-bold mb-4">Tu Información</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoItem label="Nombre" value={user.name} />
-                <InfoItem label="Email" value={user.email} />
-                <InfoItem label="Teléfono" value={user.phone} />
-                <InfoItem label="Documento" value={user.documentNumber} />
+                <InfoItem label="Nombre" value={cliente.name} />
+                <InfoItem label="Email" value={cliente.email} />
+                <InfoItem label="Teléfono" value={cliente.phone} />
+                <InfoItem label="Documento" value={cliente.documentNumber} />
               </div>
             </div>
           )}
@@ -81,8 +81,8 @@ export default function ProfilePage() {
               <h2 className="text-xl font-bold mb-4">Datos de la Cuenta</h2>
 
               <div className="space-y-3">
-                <InfoItem label="ID Usuario" value={user.id} />
-                <InfoItem label="Correo" value={user.email} />
+                <InfoItem label="ID Usuario" value={cliente.id} />
+                <InfoItem label="Correo" value={cliente.email} />
               </div>
             </div>
           )}
@@ -116,8 +116,8 @@ export default function ProfilePage() {
             <div>
               <h2 className="text-xl font-bold mb-4">Direcciones</h2>
 
-              <InfoItem label="Dirección" value={user.address} />
-              <InfoItem label="Referencia" value={user.reference} />
+              <InfoItem label="Dirección" value={cliente.address} />
+              <InfoItem label="Referencia" value={cliente.reference} />
 
               <button className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-xl">
                 Editar dirección

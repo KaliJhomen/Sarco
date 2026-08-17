@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useAppContext } from "@/context/AppContext";
+import { useAuth } from "@/context/AuthContext";
 import { 
   ShoppingCart, 
   Loader2, 
@@ -26,8 +26,7 @@ import { getOrCreateSessionToken } from "@/utils/constants/session";
 const Product = () => {
   const { id } = useParams();
   const router = useRouter();
-  const { user } = useAppContext();
-
+  const cliente = useAuth();
   // Obtener producto con todas sus relaciones
   const { data: productData, isLoading, error } = useProduct(id);
 
@@ -217,11 +216,8 @@ const Product = () => {
       const payload = {
         idProducto: Number(idProducto),
         quantity: cantidad,
-        sessionToken: !user ? token : undefined,
+        sessionToken: !cliente ? token : undefined,
       };
-
-      console.log("PAYLOAD FINAL:", payload);
-
       await addToCartMutation.mutateAsync(payload);
 /*
       const payload = {
@@ -231,7 +227,7 @@ const Product = () => {
       };
 
       // Si el usuario no está autenticado, agrega el sessionToken
-      if (!user) {
+      if (!cliente) {
         payload.sessionToken = getOrCreateSessionToken();
       }
 

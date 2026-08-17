@@ -1,16 +1,7 @@
 import { Agenda } from '../../agenda/entities/agenda.entity';
-import { Credito } from '../../credito/entities/credito.entity';
-import { Egreso } from '../../egreso/entities/egreso.entity';
 import { Garantia } from '../../garantia/entities/garantia.entity';
-import { Ingreso } from '../../ingreso/entities/ingreso.entity';
-import { PagoCredito } from '../../pago-credito/entities/pago-credito.entity';
 import { PagoSeparado } from '../../pago-separado/entities/pago-separado.entity';
 import { Separado } from '../../separado/entities/separado.entity';
-import { Servicio } from '../../servicio/entities/servicio.entity';
-import { TicketCredito } from '../../ticket-credito/entities/ticket-credito.entity';
-import { UsuarioRol } from '../../usuario-rol/entities/usuario-rol.entity';
-import { Venta } from '../../venta/entities/venta.entity';
-import { UsuarioPermiso } from '../../usuario-permiso/entities/usuario-permiso.entity';
 import { Cargo } from '../../cargo/entities/cargo.entity';
 import { Documento } from '../../documento/entities/documento.entity';
 import { Tienda } from '../../tienda/entities/tienda.entity';
@@ -66,46 +57,14 @@ export class User {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt!: Date | null;  
 
-
-  
   @OneToMany(() => Agenda, (agenda) => agenda.user)
   agendas!: Agenda[];
-
-  @OneToMany(() => Credito, (credito) => credito.user)
-  creditos!: Credito[];
-  
-  @OneToMany(() => Egreso, (egreso) => egreso.user)
-  egresos!: Egreso[];
 
   @OneToMany(() => Garantia, (garantia) => garantia.user)
   garantias!: Garantia[];
 
-  @OneToMany(() => Ingreso, (ingreso) => ingreso.user)
-  ingresos!: Ingreso[];
-
   @OneToMany(() => PagoSeparado, (pagoSeparado) => pagoSeparado.user)
   pagoSeparados!: PagoSeparado[];
-
-  @OneToMany(() => PagoCredito, (pagoCredito) => pagoCredito.user)
-  pagoCreditos!: PagoCredito[];
-    
-  @OneToMany(() => Separado, (separado) => separado.user)
-  separados!: Separado[];
-
-  @OneToMany(() => Servicio, (servicio) => servicio.user)
-  servicios!: Servicio[];
-
-  @OneToMany(() => TicketCredito, (ticketCredito) => ticketCredito.user)
-  ticketCreditos!: TicketCredito[];
-
-  @OneToMany(() => Venta, (venta) => venta.user)
-  ventas!: Venta[];
-
-  @OneToMany(() => UsuarioPermiso, (usuarioPermiso) => usuarioPermiso.user)
-  usuarioPermisos!: UsuarioPermiso[];
-
-  @OneToMany(() => UsuarioRol, (usuarioRol) => usuarioRol.user)
-  usuarioRoles!: UsuarioRol[];
 
   @ManyToOne(() => Cargo, (cargo) => cargo.users, {
     onDelete: "NO ACTION",

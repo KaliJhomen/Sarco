@@ -91,14 +91,6 @@ export class Separado {
   pagoSeparados!: PagoSeparado[];
 
 
-
-  @ManyToOne(() => User, (user) => user.separados, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_usuario", referencedColumnName: "idUser" }])
-  user!: User;
-
   @ManyToOne(() => Cliente, (cliente) => cliente.separados, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",

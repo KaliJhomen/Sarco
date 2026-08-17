@@ -16,11 +16,11 @@ import { useAuth } from '@/context/AuthContext';
 import { getOrCreateSessionToken } from '@/utils/constants/session';
 
 export default function CartPage() {
-  const { user } = useAuth();
+  const { cliente } = useAuth();
   const sessionToken = getOrCreateSessionToken();
 
   const { data: cartData } = useCart({
-    sessionToken: user ? undefined : sessionToken
+    sessionToken: cliente ? undefined : sessionToken
   });
   const items = Array.isArray(cartData?.items) ? cartData.items : [];
   const addToCartMutation = useAddToCart();
@@ -34,7 +34,7 @@ export default function CartPage() {
 
   const handleAddToCart = (idProducto) => {
     addToCartMutation.mutate({ 
-      sessionToken: user ? undefined : sessionToken,
+      sessionToken: cliente ? undefined : sessionToken,
       idProducto,
       quantity: 1
     });
@@ -42,14 +42,14 @@ export default function CartPage() {
 
   const handleUpdateCartQuantity = (idProducto, quantity) => {
     if (quantity <= 0) {
-      removeFromCartMutation.mutate({ idUser: user?.id, sessionToken, idProducto });
+      removeFromCartMutation.mutate({ idCliente: cliente?.id, sessionToken, idProducto });
     } else {
-      updateCartQuantityMutation.mutate({ idUser: user?.id, sessionToken, idProducto, quantity });
+      updateCartQuantityMutation.mutate({ idCliente: cliente?.id, sessionToken, idProducto, quantity });
     }
   };
 
   const handleRemoveFromCart = (idProducto) => {
-    removeFromCartMutation.mutate({ idUser: user?.id, sessionToken, idProducto });
+    removeFromCartMutation.mutate({ idCliente: cliente?.id, sessionToken, idProducto });
   };
 
 
@@ -75,8 +75,8 @@ export default function CartPage() {
 const handleContactSeller = async () => {
 
   const res = await generateShare({
-    idUser: user?.id,
-    sessionToken: user ? undefined : sessionToken
+    idCliente: cliente?.id,
+    sessionToken: cliente ? undefined : sessionToken
   });
 console.log("RESPUESTA SHARE:", res);
   const shareUrl = `${window.location.origin}/cart/share/${res.url}`;

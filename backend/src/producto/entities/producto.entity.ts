@@ -10,9 +10,7 @@ import {
 } from "typeorm";
 import { Marca } from "../../marca/entities/marca.entity";
 import { ProductoTienda } from "../../producto-tienda/entities/producto-tienda.entity";
-import { DetalleCredito } from "../../detalle-credito/entities/detalle-credito.entity";
 import { DetalleSeparado } from "../../detalle-separado/entities/detalle-separado.entity";
-import { DetalleVenta } from "../../detalle-venta/entities/detalle-venta.entity";
 import { PedidoDetalle } from "../../pedido-detalle/entities/pedido-detalle.entity";
 
 import { Garantia } from "../../garantia/entities/garantia.entity";
@@ -106,16 +104,8 @@ export class Producto {
   @OneToMany(() => PedidoDetalle, (pedidoDetalle) => pedidoDetalle.producto)
   pedidoDetalles!: PedidoDetalle[];
 
-  @OneToMany(() => DetalleCredito, (detalleCredito) => detalleCredito.producto)
-  detalleCreditos!: DetalleCredito[];
-
   @OneToMany(() => DetalleSeparado, (detalleSeparado) => detalleSeparado.producto)
   detalleSeparados!: DetalleSeparado[];
-
-  @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.producto)
-  detalleVentas!: DetalleVenta[];
-
-
 
   @ManyToOne(() => Marca, (marca) => marca.productos, {
     onDelete: "RESTRICT",

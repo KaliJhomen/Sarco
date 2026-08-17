@@ -12,7 +12,7 @@ import {
 } from '@/hooks/server/useFavorites';
 
 export default function FavoritesPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { cliente, loading: authLoading } = useAuth();
   const sessionToken = getOrCreateSessionToken();
 
   const {
@@ -20,7 +20,7 @@ export default function FavoritesPage() {
     isLoading,
     isError,
   } = useFavorites({
-    sessionToken: user ? undefined : sessionToken,
+    sessionToken: cliente ? undefined : sessionToken,
   });
 
   const removeFromFavoritesMutation = useRemoveFromFavorites();
@@ -37,8 +37,8 @@ export default function FavoritesPage() {
     const id = getId(product);
     if (!id) return;
     removeFromFavoritesMutation.mutate({
-      idUser: user?.id,
-      sessionToken: user ? undefined : sessionToken,
+      idUser: cliente?.id,
+      sessionToken: cliente ? undefined : sessionToken,
       idProducto: id,
     });
   };

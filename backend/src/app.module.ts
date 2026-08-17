@@ -19,36 +19,22 @@ import { CargoModule } from './cargo/cargo.module';
 import { CategoriaModule } from './categoria/categoria.module';
 import { ClienteModule } from './cliente/cliente.module';
 import { ComprobanteModule } from './comprobante/comprobante.module';
-import { CreditoModule } from './credito/credito.module';
-import { DetalleCreditoModule } from './detalle-credito/detalle-credito.module';
 import { DetalleSeparadoModule } from './detalle-separado/detalle-separado.module';
-import { DetalleVentaModule } from './detalle-venta/detalle-venta.module';
 import { DocumentoModule } from './documento/documento.module';
-import { EgresoModule } from './egreso/egreso.module';
 import { EstadoClienteModule } from './estado-cliente/estado-cliente.module';
-import { EstadoCreditoModule } from './estado-credito/estado-credito.module';
-import { EstadoVentaModule } from './estado-venta/estado-venta.module';
 import { GarantiaModule } from './garantia/garantia.module';
-import { IngresoModule } from './ingreso/ingreso.module';
 import { MetodoPagoModule } from './metodo-pago/metodo-pago.module';
-import { PagoCreditoModule } from './pago-credito/pago-credito.module';
 import { PagoSeparadoModule } from './pago-separado/pago-separado.module';
 import { PenalidadesModule } from './penalidades/penalidades.module';
 import { PermisoModule } from './permiso/permiso.module';
 import { PlanPagoModule } from './plan-pago/plan-pago.module';
 import { SeparadoModule } from './separado/separado.module';
-import { ServicioModule } from './servicio/servicio.module';
-import { TicketCreditoModule } from './ticket-credito/ticket-credito.module';
 import { TiendaModule } from './tienda/tienda.module';
-import { UsuarioPermisoModule } from './usuario-permiso/usuario-permiso.module';
-import { VentaModule } from './venta/venta.module';
 import { AuthModule } from './auth/auth.module';
 import { RolModule } from './rol/rol.module';
-import { UsuarioRolModule } from './usuario-rol/usuario-rol.module';
 import { ModuloModule } from './modulo/modulo.module';
 import { AccionModule } from './accion/accion.module';
 import { RolPermisoModule } from './rol-permiso/rol-permiso.module';
-import { UsuarioModule } from './usuario/usuario.module';
 import { UserModule } from './user/user.module';
 import { SubCategoriaModule } from './sub-categoria/sub-categoria.module';
 import { TipoProductoModule } from './tipo-producto/tipo-producto.module';
@@ -114,32 +100,18 @@ import { UbigeoModule } from './ubigeo/ubigeo.module';
     CategoriaModule,
     ClienteModule,
     ComprobanteModule,
-    CreditoModule,
-    DetalleCreditoModule,
     DetalleSeparadoModule,
-    DetalleVentaModule,
     DocumentoModule,
-    EgresoModule,
     EstadoClienteModule,
-    EstadoCreditoModule,
-    EstadoVentaModule,
     GarantiaModule,
-    IngresoModule,
     MetodoPagoModule,
-    PagoCreditoModule,
     PagoSeparadoModule,
     PenalidadesModule,
     PermisoModule,
     PlanPagoModule,
     SeparadoModule,
-    ServicioModule,
-    TicketCreditoModule,
     TiendaModule,
-    UsuarioModule,
-    UsuarioPermisoModule,
-    VentaModule,
     RolModule,
-    UsuarioRolModule,
     ModuloModule,
     AccionModule,
     RolPermisoModule,
