@@ -14,8 +14,8 @@ export const useRegisterForm = () => {
     nombre: '',
     email: '',
     telefono: '',
-    password: '',
-    confirmPassword: '',
+    clave: '',
+    confirmClave: '',
     acceptTerms: false
   });
 
@@ -49,16 +49,16 @@ export const useRegisterForm = () => {
       newErrors.telefono = 'Teléfono debe tener 9 dígitos';
     }
 
-    if (!formData.password) {
-      newErrors.password = 'La contraseña es requerida';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Debe contener mayúscula, minúscula y número';
+    if (!formData.clave) {
+      newErrors.clave = 'La contraseña es requerida';
+    } else if (formData.clave.length < 8) {
+      newErrors.clave = 'La contraseña debe tener al menos 8 caracteres';
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.clave)) {
+      newErrors.clave = 'Debe contener mayúscula, minúscula y número';
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    if (formData.clave !== formData.confirmClave) {
+      newErrors.confirmClave = 'Las contraseñas no coinciden';
     }
 
     if (!formData.acceptTerms) {
@@ -81,7 +81,7 @@ export const useRegisterForm = () => {
       nombre: formData.nombre,
       email: formData.email,
       telefono: formData.telefono || null,
-      password: formData.password
+      clave: formData.clave
     });
 
     if (result.success) {

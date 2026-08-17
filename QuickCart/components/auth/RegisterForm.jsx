@@ -21,7 +21,7 @@ export const RegisterForm = () => {
     email: '',
     telefono: '',
     clave: '',
-    confirmPassword: '',
+    confirmClave: '',
     numeroDocumento: '',
     acceptTerms: false
   });

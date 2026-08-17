@@ -1,9 +1,23 @@
-/*Endpoints centralizados de la API
+/*Endpoints
  */
 
 // import { productTypeProductService } from "../productTypeProduct.service";
 
 const endpoints = {
+
+  // ============================================
+  // AUTENTICACIÓN
+  // ============================================
+  auth: {
+    login: '/auth/login',
+    register: '/auth/register',
+    logout: '/auth/logout',
+    me: '/auth/profile', 
+    forgotPassword: '/auth/forgot-password',
+    resetPassword: '/auth/reset-password',
+    verifyEmail: '/auth/verify-email',
+  },
+
   // ============================================
   // PRODUCTOS
   // ============================================
@@ -149,18 +163,6 @@ const endpoints = {
     update: (detalleId) => `/pedido-detalle/${detalleId}`,
     delete: (detalleId) => `/pedido-detalle/${detalleId}`,
   },
-  // ============================================
-  // AUTENTICACIÓN
-  // ============================================
-  auth: {
-    login: '/auth/login',
-    register: '/auth/register',
-    logout: '/auth/logout',
-    me: '/auth/profile', 
-    forgotPassword: '/auth/forgot-password',
-    resetPassword: '/auth/reset-password',
-    verifyEmail: '/auth/verify-email',
-  },
 
   // ============================================
   // USUARIOS
@@ -245,7 +247,7 @@ const endpoints = {
   // ============================================
   analytics: {
     dashboard: '/analytics/dashboard',
-    sales: '/analytics/ventas',
+    sales: '/analytics/vuserfentas',
     products: '/analytics/productos',
     customers: '/analytics/clientes',
   },

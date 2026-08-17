@@ -16,7 +16,6 @@ export default function AddClientPage() {
     numeroDocumento: '',
     direccion: '',
     referencia: '',
-    direccionDni: '',
     telefono: '',
     email: '',
     idEstadoCliente: '',
@@ -74,7 +73,6 @@ export default function AddClientPage() {
       numeroDocumento: form.numeroDocumento || null,
       direccion: form.direccion || null,
       referencia: form.referencia || null,
-      direccionDni: form.direccionDni || null,
       telefono: form.telefono || null,
       email: form.email || null,
       idEstadoCliente: form.idEstadoCliente ? Number(form.idEstadoCliente) : undefined,
@@ -134,11 +132,6 @@ export default function AddClientPage() {
         <div>
           <label className="block text-sm text-gray-700">Referencia</label>
           <input value={form.referencia} onChange={e => handleChange('referencia', e.target.value)} className="w-full px-3 py-2 border rounded" />
-        </div>
-
-        <div>
-          <label className="block text-sm text-gray-700">Dirección DNI</label>
-          <input value={form.direccionDni} onChange={e => handleChange('direccionDni', e.target.value)} className="w-full px-3 py-2 border rounded" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

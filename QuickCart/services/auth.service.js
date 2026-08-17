@@ -3,26 +3,26 @@ import endpoints from './api/endpoints';
 import { getOrCreateSessionToken } from '@/utils/constants/session';
 
 export const authService = {
-  async login(identifier, password) {
+  async login(email, clave) {
     try {
       const res = await client.post(endpoints.auth.login, {
-        email: identifier, 
-        clave: password,   
+        email: email, 
+        clave: clave,   
         sessionToken: getOrCreateSessionToken(),
       });
       return { success: true, data: res.data };
     } catch (err) {
-      const message = err?.response?.data?.message || err.message || 'Error en login';
+      const message = 'Error en auth service login';
       return { success: false, error: message };
     }
   },
 
-  async register(userData) {
+  async register(clientData) {
     try {
-      const res = await client.post(endpoints.auth.register, userData);
+      const res = await client.post(endpoints.auth.register, clientData);
       return { success: true, data: res.data };
     } catch (err) {
-      const message = err?.response?.data?.message || err.message || 'Error en register';
+      const message = 'Error en auth service register';
       return { success: false, error: message };
     }
   },
@@ -32,7 +32,7 @@ export const authService = {
       const res = await client.post(endpoints.auth.logout);
       return { success: true, data: res.data };
     } catch (err) {
-      const message = err?.response?.data?.message || err.message || 'Error en logout';
+      const message = 'Error en auth service logout';
       return { success: false, error: message };
     }
   },
@@ -43,7 +43,7 @@ export const authService = {
       console.log("Datos recibidos del backend en getMe:", response.data);
       return response.data;
     } catch (err) {
-      console.error("Error al obtener los datos del usuario:", err);
+      console.error("Error al obtener los datos del usuario auth service getMe:", err);
       throw err;
     }
   },
@@ -64,11 +64,11 @@ export const authService = {
   },
 
   async forgotPassword(email) {
-    return client.post(endpoints.auth.forgotPassword, { email });
+    return client.post(endpoints.auth.forgotclave, { email });
   },
 
-  async resetPassword(token, newPassword) {
-    return client.post(endpoints.auth.resetPassword, { token, newPassword });
+  async resetPassword(token, nuevaClave) {
+    return client.post(endpoints.auth.resetclave, { token, nuevaClave });
   },
 
   async verifyEmail(token) {

@@ -10,7 +10,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
       }
       const result = await authService.getProfile(token);
       if (result.success) {
-        setUser(result.data.user);
+        setCliente(result.data.cliente);
         setIsAuthenticated(true);
       } else if (result.error === 'TokenExpiredError') {
         // Si el token ha expirado, intenta renovarlo 
@@ -36,9 +36,9 @@ export const AuthProvider = ({ children }) => {
         const refreshResult = await authService.refreshToken(token);
     
         if (refreshResult.success) {
-          const { token: newToken, user } = refreshResult.data;
+          const { token: newToken, cliente } = refreshResult.data;
           localStorage.setItem('auth-token', newToken);
-          setUser(user);
+          setCliente(cliente);
           setIsAuthenticated(true);
         } else {
           clearAuth();
@@ -53,18 +53,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password, rememberMe = false) => {
-    const result = await authService.login(email, password);
+  const login = async (email, clave, rememberMe = false) => {
+    const result = await authService.login(email, clave);
     
     if (result.success) {
-      const { token, user } = result.data;
+      const { token, cliente } = result.data;
       if (rememberMe) {
         localStorage.setItem('auth-token', token);
       } else {
         sessionStorage.setItem('auth-token', token);
       }
 
-      setUser(user);
+      setCliente(cliente);
 
       setIsAuthenticated(true);
 
@@ -76,8 +76,8 @@ export const AuthProvider = ({ children }) => {
     return result;
   };
 
-  const register = async (userData) => {
-    return await authService.register(userData);
+  const register = async (clienteData) => {
+    return await authService.register(clienteData);
   };
 
   const logout = async () => {
@@ -99,11 +99,11 @@ export const AuthProvider = ({ children }) => {
   const clearAuth = () => {
     localStorage.removeItem('auth-token');
     sessionStorage.removeItem('auth-token');
-    setUser(null);
+    setCliente(null);
     setIsAuthenticated(false);
   };
 
-  const updateUser = async (updatedData) => {
+  const updateCliente = async (updatedData) => {
     try {
       const token = localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token');
       
@@ -112,7 +112,7 @@ export const AuthProvider = ({ children }) => {
       const result = await authService.updateProfile(token, updatedData);
 
       if (result.success) {
-        setUser(prev => ({ ...prev, ...result.data }));
+        setCliente(prev => ({ ...prev, ...result.data }));
       }
 
       return result;
@@ -122,13 +122,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const value = {
-    user,
+    cliente,
     loading,
     isAuthenticated,
     login,
     register,
     logout,
-    updateUser,
+    updateCliente,
     checkAuth
   };
 

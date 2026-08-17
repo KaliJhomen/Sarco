@@ -53,6 +53,7 @@ pids
 *.pid.lock
 
 CONTEXT.md
+AUTH_PLAN.md
 graphify-out
 
 # Diagnostic reports (https://nodejs.org/api/report.html)

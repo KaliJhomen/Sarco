@@ -17,16 +17,15 @@ const Navbar = () => {
   const hideTimeout = useRef(null);
   const [open, setOpen] = useState(false);
 
-  const { user, isAuthenticated, logout } = useContext(AuthContext);
+  const { cliente, isAuthenticated, logout } = useContext(AuthContext);
   const handleToggle = () => setOpen((s) => !s);
-  console.log("Navbar use r:", user);
   const handleProfile = () => {
     setOpen(false);
-    router.push("/user/profile");
+    router.push("/cliente/profile");
   };
   /*
   // Verifica si el usuario es administrador o gerente
-  const isAdminOrManager = useMemo(() => ["Administrador", "Gerente"].includes(user?.role), [user]);
+  const isAdminOrManager = useMemo(() => ["Administrador", "Gerente"].includes(cliente?.role), [cliente]);
 
 
   const handleAdminPanel = () => {
@@ -118,12 +117,12 @@ const Navbar = () => {
             <button className="p-2 hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-sm">
               <Image className="w-5 h-5 brightness-0 invert" src={assets.search_icon} alt="search icon" width={20} height={20} />
             </button>
-            <Link href="/user/favorites" className="text-white hover:text-red-100 transition-colors duration-300 font-bold relative group">
+            <Link href="/cliente/favorites" className="text-white hover:text-red-100 transition-colors duration-300 font-bold relative group">
               Favoritos
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link
-              href="/user/cart"
+              href="/cliente/cart"
               aria-label="Carrito"
               title="Carrito"
               className="p-2 hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-sm"
@@ -150,13 +149,13 @@ const Navbar = () => {
                   >
                     <Image
                       className="w-5 h-5 brightness-100 invert"
-                      src={assets.user_icon}
-                      alt="user icon"
+                      src={assets.cliente_icon}
+                      alt="cliente icon"
                       width={20}
                       height={20}
                     />
                     
-                    <span className="hidden lg:inline font-bold">{user.name}</span>
+                    <span className="hidden lg:inline font-bold">{cliente?.nombre}</span>
                   </button>
 
                   {open && (
@@ -199,8 +198,8 @@ const Navbar = () => {
                 >
                   <Image
                     className="w-5 h-5 brightness-100 invert"
-                    src={assets.user_icon}
-                    alt="user icon"
+                    src={assets.cliente_icon}
+                    alt="cliente icon"
                     width={20}
                     height={20}
                   />
