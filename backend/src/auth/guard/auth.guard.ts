@@ -28,11 +28,13 @@ export class AuthGuard implements CanActivate {
     const token = cookieToken ?? headerToken;
     const bypass = this.configService.get<boolean>('DEV_BYPASS_AUTH') === true;
 
-    // Opción B: bypass solo si NO hay token 
+    // BYPASS DEVELOPMENT
     if (bypass && !token) {
       request.cliente = { id: 1, email: "dev@development.com", table: "cliente"};
       return true;
     }
+
+    
     if (!token) throw new UnauthorizedException("Token no proporcionado");
 
     try {

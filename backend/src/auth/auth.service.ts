@@ -12,6 +12,13 @@ export class AuthService {
     private readonly clienteService: ClienteService,
   ) {}
 
+  async verifyToken(token: string, options?: { ignoreExpiration?: boolean }) {
+  return this.jwtService.verifyAsync(token, options);
+  }
+
+  async signToken(payload: any) {
+  return this.jwtService.signAsync(payload);
+  }
   private mapCliente(cliente: Cliente) {
     return {
       idCliente: cliente.idCliente,

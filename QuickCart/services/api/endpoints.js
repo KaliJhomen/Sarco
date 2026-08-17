@@ -45,7 +45,7 @@ const endpoints = {
     base: '/producto',
     all: '/producto',
     byId: (id) => `/producto/${id}`,
-    search: (query) => `/producto/filtro?busqueda?=${encodeURIComponent(query)}`,
+    search: (query) => `/producto/filtro?busqueda=${encodeURIComponent(query)}`,
     byBrand: (idMarca) => `/producto/filtro?idMarca=${idMarca}`,
     byBrands: (marcas) => `/producto/filtro?marcas=${marcas.join(',')}`,
     byCategory: (idCategoria) => `/producto/filtro?idCategoria=${idCategoria}`,

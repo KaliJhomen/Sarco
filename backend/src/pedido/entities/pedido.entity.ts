@@ -4,15 +4,15 @@ import { PedidoDetalle } from '../../pedido-detalle/entities/pedido-detalle.enti
 import { Cliente } from '../../cliente/entities/cliente.entity';
 
 export enum EstadoPedido {
-  PENDIENTE = 'pendiente',
-  CONFIRMADO = 'confirmado',
-  ENVIADO = 'enviado',
-  ENTREGADO = 'entregado',
-  CANCELADO = 'cancelado',
+  PENDIENTE= 'PENDIENTE',
+  CONFIRMADO= 'CONFIRMADO',
+  ENVIADO= 'ENVIADO',
+  ENTREGADO= 'ENTREGADO',
+  CANCELADO= 'CANCELADO'
 }
 export enum TipoEntrega{
-  DELIVERY = 'delivery',
-  RECOJO = 'recojo',
+  DELIVERY= 'DELIVERY',
+  RECOJO= 'RECOJO',
 }
 @Entity('pedido')
 export class Pedido {

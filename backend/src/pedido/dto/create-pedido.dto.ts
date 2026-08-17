@@ -5,10 +5,7 @@ import {
   IsString, Matches, Min, ValidateIf, ValidateNested,
 } from 'class-validator';
 
-export enum TipoEntrega {
-  DELIVERY = 'delivery',
-  RECOJO = 'recojo',
-}
+import { TipoEntrega } from '../entities/pedido.entity'
 
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;

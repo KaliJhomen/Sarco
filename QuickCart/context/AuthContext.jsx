@@ -7,7 +7,7 @@ export const AuthContext = createContext(null);
 export function useAuth() {
   const context =useContext(AuthContext);
   if (!context){
-      throw new error("useAuth debe usarse dentro de AuthProvider");
+      throw new Error("useAuth debe usarse dentro de AuthProvider");
   }
   return context;
 }
@@ -66,6 +66,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
+      localStorage.removeItem('sessionToken');
       await authService.logout();
     } catch {
 

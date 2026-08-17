@@ -44,7 +44,6 @@ export class PedidoService {
       nombreCliente: dto.nombre,
       emailCliente: dto.email,
       telefonoCliente: dto.telefono,
-      tipoEntrega: dto.tipoEntrega,
       departamentoCliente: dto.departamento ?? null,
       provinciaCliente: dto.provincia ?? null,
       distritoCliente: dto.distrito ?? null,
@@ -54,6 +53,7 @@ export class PedidoService {
       ubigeoCodigo: dto.ubigeoCodigo ?? null,
       total: String(total),
       estadoPedido: EstadoPedido.PENDIENTE,
+      tipoEntrega: dto.tipoEntrega,
       pedidoDetalles: detalles,
     });
 

@@ -1,5 +1,4 @@
 import './globals.css';
-import '@/services/api/interceptors'; 
 import { QueryClientProvider } from '@/providers/QueryClientProvider';
 import { AppProvider } from '@/context/AppContext';
 import { AuthProvider } from '@/context/AuthContext';

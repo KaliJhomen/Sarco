@@ -24,7 +24,7 @@ export class GuestGuard implements CanActivate {
 
     const bypass = this.configService.get<boolean>('DEV_BYPASS_AUTH') === true;
 
-    // Opción B: bypass solo si NO hay token (respeta login real)
+    // BYPASS DEVELOPMENT
     if (bypass && !token) {
       request.cliente = { id: 1, email: "dev@development.com", table: "cliente"};      
       return true;
