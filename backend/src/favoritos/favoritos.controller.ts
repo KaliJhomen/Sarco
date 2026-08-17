@@ -52,6 +52,7 @@
       @Query('sessionToken') sessionToken?: string,
     ) {
       const idCliente = req.cliente?.id;
+    
       if (!idCliente && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
       return this.favoritosService.removeFromFavorites(
         { idCliente, sessionToken },

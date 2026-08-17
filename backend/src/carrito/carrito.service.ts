@@ -215,10 +215,12 @@ export class CarritoService {
       );
 
       if (existingItem) {
-        existingItem.cantidad += item.cantidad;
+        const newQty = existingItem.cantidad + item.cantidad;
+        existingItem.cantidad = Math.min(newQty, item.producto.stock);
         await this.cartItemRepository.save(existingItem);
       } else {
         item.carrito = clientCart;
+        item.cantidad = Math.min(item.cantidad, item.producto.stock);
         await this.cartItemRepository.save(item);
       }
     }

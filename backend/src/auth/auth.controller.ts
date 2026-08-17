@@ -13,6 +13,8 @@ import { CarritoService } from '../carrito/carrito.service';
 import { FavoritosService } from '../favoritos/favoritos.service';
 import { ConfigService } from '@nestjs/config'
 
+import { DataSource } from 'typeorm';
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -22,6 +24,7 @@ export class AuthController {
     private readonly carritoService: CarritoService,
     private readonly favoritosService: FavoritosService,
     private readonly configService: ConfigService, 
+    private readonly dataSource: DataSource,
   ) {}
 
   @Post('login')
@@ -31,9 +34,11 @@ export class AuthController {
   async login(@Body() body: LoginDto, @Res({passthrough: true}) res: Response) {
     const { token, cliente } = await this.authService.login(body);
     if (body.sessionToken) {
-      await this.carritoService.mergeGuestCart(cliente.id, body.sessionToken);
-      await this.favoritosService.mergeGuestFavorites(cliente.id, body.sessionToken);
-    }
+        const sessionToken: string =body.sessionToken;
+        await this.carritoService.mergeGuestCart(cliente.id, sessionToken);
+        await this.favoritosService.mergeGuestFavorites(cliente.id, sessionToken);
+      };
+    
     const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
 
     res.cookie('token', token, {

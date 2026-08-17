@@ -71,7 +71,6 @@ if (!product) {
     }
   };
 
-///
 
   const productId = idProducto;
   const productName = nombre || "Producto sin nombre";
@@ -124,10 +123,10 @@ if (!product) {
 
     try {
       // Si el usuario está autenticado, solo envía idProducto y quantity
-      // Si es guest, agrega sessionToken
+      // Si es guest, lanza un mensaje de aviso
       const payload = {
         idProducto: Number(idProducto),
-        quantity: 1,
+        cantidad: 1,
       };
 
       if (!cliente) {

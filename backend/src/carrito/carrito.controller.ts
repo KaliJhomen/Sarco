@@ -39,7 +39,7 @@ export class CarritoController {
   @ApiBody({ type: CreateCarritoDto })
   async addToCart(@Req() req: any, @Body() body: CreateCarritoDto) {
     const idCliente = req.cliente?.id;
-    const sessionToken = req.query.sessionToken ?? undefined;
+    const sessionToken = idCliente? undefined : (req.query.sessionToken ?? body.sessionToken ?? undefined);
     if (!idCliente && !sessionToken) throw new BadRequestException('Debe estar autenticado o enviar sessionToken');
     return this.carritoService.addToCart(
       { idCliente,   sessionToken },
