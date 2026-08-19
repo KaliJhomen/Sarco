@@ -15,6 +15,8 @@ import { PedidoService } from './pedido.service';
 import { AuthGuard } from '../auth/guard/auth.guard';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { UpdatePedidoDto} from './dto/update-pedido.dto'
+
+import { Identity } from 'src/auth/decorators/identity.decorator';
 @ApiTags('Pedido')
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
@@ -25,8 +27,7 @@ export class PedidoController {
   @Post()
   @ApiOperation({ summary: 'Crear un nuevo pedido (checkout)' })
   @ApiBody({ type: CreatePedidoDto })
-  async createPedido(@Req() req: any, @Body() body: CreatePedidoDto) {
-    const idCliente = req.cliente?.id;
+  async createPedido(@Identity('id') idCliente: number, @Body() body: CreatePedidoDto) {
     if (!idCliente) throw new BadRequestException('cliente no autenticado');
     return this.pedidoService.createPedido(idCliente, body);
   }
@@ -35,18 +36,16 @@ export class PedidoController {
   @ApiOperation({ summary: 'Actualizar pedido (cancelar o editar dirección)' })
   async updatePedido(
     @Param('idPedido', ParseIntPipe) idPedido: number,
-    @Req() req: any,
+    @Identity('id') idCliente: number,
     @Body() body: UpdatePedidoDto,
   ) {
-    const idCliente = req.cliente?.id;
     if (!idCliente) throw new BadRequestException('cliente no autenticado');
     return this.pedidoService.update(idPedido, body, idCliente);
   }
 
   @Get()
   @ApiOperation({ summary: 'Obtener todos los pedidos del cliente autenticado' })
-  async getPedidosByUser(@Req() req: any) {
-    const idCliente = req.cliente?.id;
+  async getPedidosByUser(@Identity('id') idCliente: number) {
     if (!idCliente) throw new BadRequestException('cliente no autenticado');
     return this.pedidoService.findByUserId(idCliente);
   }

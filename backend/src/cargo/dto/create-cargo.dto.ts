@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty } from "class-validator";
+import { IsString, IsNotEmpty, MaxLength } from "class-validator";
 
 export class CreateCargoDto {
     @ApiProperty({
@@ -7,6 +7,7 @@ export class CreateCargoDto {
         example: 'Gerente'
     })
     @IsNotEmpty()
+    @MaxLength(255)
     @IsString()
     nombre!: string;
 }

@@ -34,7 +34,7 @@ export class Cliente {
   email!: string | null;
 
   @Column("varchar", { name: "clave", length: 255, nullable:true })
-  clave!: string;
+  clave!: string | null;
 
   @Column("int", { name: "id_documento", nullable: true, default: null })
   idDocumento!: number | null;

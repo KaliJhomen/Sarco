@@ -5,11 +5,13 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreateProductoDto {
   @ApiProperty()
   @IsString()
+  @MaxLength(25)
   @IsNotEmpty()
   nombre!: string;
 
   @ApiProperty()
   @IsString()
+  @MaxLength(25)
   @IsNotEmpty()
   modelo!: string;
   
@@ -21,6 +23,7 @@ export class CreateProductoDto {
 
   @ApiPropertyOptional({ required: false })
   @IsString()
+  @MaxLength(1000)
   @IsOptional()
   descripcion!: string | null;
 
@@ -60,6 +63,7 @@ export class CreateProductoDto {
 
   @ApiPropertyOptional({ required: false, type: String })
   @IsString()
+  @MaxLength(10)
   @IsOptional()
   garantiaFabrica!: string | null; 
 

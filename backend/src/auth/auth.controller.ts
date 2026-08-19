@@ -15,6 +15,8 @@ import { ConfigService } from '@nestjs/config'
 
 import { DataSource } from 'typeorm';
 
+import { Identity } from './decorators/identity.decorator';
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -93,12 +95,11 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('profile')
   @ApiOperation({ summary: 'Perfil del cliente' })
-  async profile(@Request() req: { cliente?: JwtPayload }) {
-    const { id, table } = req.cliente ?? {};
-    if (!id) {
+  async profile(@Identity('id') idCliente: number) {
+    if (!idCliente) {
       return { cliente: null };
     }
-    const u = await this.clienteService.findOne(id);
+    const u = await this.clienteService.findOne(idCliente);
     return { cliente: { id: u.idCliente, name: u.nombre, email: u.email, table: 'cliente' } };
   }
 }

@@ -47,6 +47,7 @@ export class CreateUserDto {
 
   @ApiProperty()
   @IsString()
+  @MaxLength(255)
   @MinLength(6)
   clave!: string;
 
@@ -73,6 +74,7 @@ export class CreateUserDto {
   idTienda?: number | null;
 
   @ApiProperty()
+  @MaxLength(255)
   @IsString()
   rol!: string;
 }

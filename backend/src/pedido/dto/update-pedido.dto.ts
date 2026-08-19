@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { MaxLength, IsEnum, IsOptional, IsString } from 'class-validator';
 import { EstadoPedido } from '../entities/pedido.entity';
 import { Transform } from 'class-transformer'
 const trim = ({ value }: { value: unknown }) =>
@@ -17,12 +17,14 @@ export class UpdatePedidoDto {
   @ApiPropertyOptional({ description: 'Departamento (solo delivery)' })
   @IsOptional()
   @Transform(trim)
+  @MaxLength(60)
   @IsString()
   departamento?: string;
   
   @ApiPropertyOptional({ description: 'Referencia del domicilio' })
   @IsOptional()
   @Transform(optTrim)
+  @MaxLength(255)
   @IsString()
   referencia?: string | null;
 
@@ -30,24 +32,28 @@ export class UpdatePedidoDto {
   @ApiPropertyOptional({ description: 'Provincia (solo delivery)' })
     @IsOptional()
     @Transform(trim)
+    @MaxLength(60)
     @IsString()
     provincia?: string;
 
     @ApiPropertyOptional({ description: 'Distrito (solo delivery)' })
     @IsOptional()
     @Transform(trim)
+    @MaxLength(60)
     @IsString()
     distrito?: string;
 
     @ApiPropertyOptional({ description: 'Ciudad (solo delivery)' })
     @IsOptional()
     @Transform(trim)
+    @MaxLength(100)
     @IsString()
     ciudad?: string;
 
     @ApiPropertyOptional({ description: 'Dirección de entrega (solo delivery)' })
     @IsOptional()
     @Transform(trim)
+    @MaxLength(255)
     @IsString()
     direccion?: string;
 }
