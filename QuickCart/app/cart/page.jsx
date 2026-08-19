@@ -30,7 +30,7 @@ const Cart = () => {
     addToCartMutation.mutate({ 
       sessionToken: cliente ? undefined : sessionToken,
       idProducto, 
-      quantity: 1 
+      cantidad: 1 
     });
   };
 

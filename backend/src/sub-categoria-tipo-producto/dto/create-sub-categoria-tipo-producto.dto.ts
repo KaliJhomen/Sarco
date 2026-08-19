@@ -1,11 +1,11 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {IsInt } from 'class-validator';
-export class CreateProductoTipoProductoDto {
-    @ApiProperty()
-    @IsInt()
-    idProducto!: number;
-
+export class CreateSubCategoriaTipoProductoDto {
     @ApiProperty()
     @IsInt()
     idTipoProducto!: number;
+
+    @ApiProperty()
+    @IsInt()
+    idSubCategoria!: number;
 }

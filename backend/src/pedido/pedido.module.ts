@@ -4,11 +4,11 @@ import { PedidoService } from './pedido.service';
 import { PedidoController } from './pedido.controller';
 import { Pedido } from './entities/pedido.entity';
 import { PedidoDetalle } from '../pedido-detalle/entities/pedido-detalle.entity';
-import { Producto } from '../producto/entities/producto.entity';
+import { Carrito } from '../carrito/entities/carrito.entity';
 import { Cliente } from '../cliente/entities/cliente.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Pedido, PedidoDetalle, Producto, Cliente])],
+  imports: [TypeOrmModule.forFeature([Pedido, PedidoDetalle, Carrito, Cliente])],
   controllers: [PedidoController],
   providers: [PedidoService],
   exports: [PedidoService],

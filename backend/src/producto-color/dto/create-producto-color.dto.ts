@@ -1,22 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateProductoColorDto {
   @ApiProperty()
-  @IsNumber()
-  idProducto: number;
+  @IsInt()
+  idProducto!: number;
 
   @ApiProperty()
-  @IsNumber()
-  idColor: number;
+  @IsInt()
+  idColor!: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsNumber()
-  stock?: number;
+  @IsInt()
+  stock!: number | null;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  imagen?: string;
+  @MaxLength(255)
+  imagen!: string | null;
 }

@@ -1,8 +1,11 @@
-
-
 export interface JwtPayload {
   id: number;
   email: string;
-  //role: string;
   table: 'cliente';
 }
+// NUEVO: para guests
+export interface GuestPayload {
+  sessionToken: string;
+}
+
+export type IdentityPayload = JwtPayload | GuestPayload;

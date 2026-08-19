@@ -13,9 +13,10 @@ export const favoritesService = {
   /**
    * Agrega un producto a los favoritos del usuario 
    */
-  async add(payload) {
-    return client.post(endpoints.favorites.add,
-      payload);
+  async add({ sessionToken, ...body }) {
+    return client.post(endpoints.favorites.add, body, {
+      params: sessionToken ? { sessionToken } : undefined,
+    });
   },
 
   /**

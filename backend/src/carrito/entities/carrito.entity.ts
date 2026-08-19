@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Cliente } from '../../cliente/entities/cliente.entity';
 import { CarritoItem } from './carrito-item.entity';
+import { PedidoDetalle } from '../../pedido-detalle/entities/pedido-detalle.entity';
 
 @Entity('carrito')
 export class Carrito {
@@ -33,12 +34,14 @@ export class Carrito {
   updatedAt!: Date;
 
   @OneToOne(() => Cliente, (cliente) => cliente.carrito, { 
-    nullable: true, 
     onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_cliente' })
-  cliente?: Cliente | null;
+  cliente!: Cliente;
 
     //ITEMS
   @OneToMany(() => CarritoItem, (item) => item.carrito, {cascade: true})
   items!: CarritoItem[];
+
+  @OneToMany(() => PedidoDetalle, (pedidoDetalle) => pedidoDetalle.carrito)
+  pedidoDetalles!: PedidoDetalle[];
 }

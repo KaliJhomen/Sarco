@@ -1,14 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TipoProductoSubCategoriaService } from './tipo-producto-sub-categoria.service';
-import { CreateTipoProductoSubCategoriaDto } from './dto/create-tipo-producto-sub-categoria.dto';
-import { UpdateTipoProductoSubCategoriaDto } from './dto/update-tipo-producto-sub-categoria.dto';
+import { TipoProductoSubCategoriaService } from './sub-categoria-tipo-producto.service';
+import { CreateSubCategoriaTipoProductoDto } from './dto/create-sub-categoria-tipo-producto.dto';
+import { UpdateSubCategoriaTipoProductoDto } from './dto/update-sub-categoria-tipo-producto.dto';
 
 @Controller('tipo-producto-sub-categoria')
 export class TipoProductoSubCategoriaController {
   constructor(private readonly tipoProductoSubCategoriaService: TipoProductoSubCategoriaService) {}
 
   @Post()
-  create(@Body() createTipoProductoSubCategoriaDto: CreateTipoProductoSubCategoriaDto) {
+  create(@Body() createTipoProductoSubCategoriaDto: CreateSubCategoriaTipoProductoDto) {
     return this.tipoProductoSubCategoriaService.create(createTipoProductoSubCategoriaDto);
   }
 
@@ -23,7 +23,7 @@ export class TipoProductoSubCategoriaController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTipoProductoSubCategoriaDto: UpdateTipoProductoSubCategoriaDto) {
+  update(@Param('id') id: string, @Body() updateTipoProductoSubCategoriaDto: UpdateSubCategoriaTipoProductoDto) {
     return this.tipoProductoSubCategoriaService.update(+id, updateTipoProductoSubCategoriaDto);
   }
 

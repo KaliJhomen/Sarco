@@ -12,7 +12,6 @@ import {
 } from "typeorm";
 import { Documento } from "../../documento/entities/documento.entity";
 import { EstadoCliente } from "../../estado-cliente/entities/estado-cliente.entity";
-import { Garantia } from "../../garantia/entities/garantia.entity";
 
 import { Favoritos } from "../../favoritos/entities/favoritos.entity";
 import { Carrito } from "../../carrito/entities/carrito.entity";
@@ -34,13 +33,13 @@ export class Cliente {
   @Column("varchar", { name: "email", nullable: true, length: 255, default: null })
   email!: string | null;
 
-  @Column("varchar", { name: "clave", length: 255 })
+  @Column("varchar", { name: "clave", length: 255, nullable:true })
   clave!: string;
 
   @Column("int", { name: "id_documento", nullable: true, default: null })
   idDocumento!: number | null;
 
-  @Column("varchar", { name: "numero_documento", length: 255, unique: true })
+  @Column("varchar", { name: "numero_documento", nullable: true, length: 255, unique: true })
   numeroDocumento!: string | null;
 
   @Column("varchar", { name: "telefono", nullable: true, length: 255 })
@@ -76,9 +75,7 @@ export class Cliente {
   @OneToOne(() => Carrito, (carrito) => carrito.cliente)
   carrito!: Carrito;
 
-  
-  @OneToMany(() => Garantia, (garantia) => garantia.cliente)
-  garantias!: Garantia[];
+
 
   @ManyToOne(() => Documento, (documento) => documento.clientes, {
     onDelete: "NO ACTION",

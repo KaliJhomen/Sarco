@@ -87,7 +87,7 @@ export class ProductoService {
         .leftJoinAndSelect('producto.marca', 'm')
         .leftJoinAndSelect('producto.productoTipoProductos', 'ptp')
         .leftJoinAndSelect('ptp.tipoProducto', 'tp')
-        .leftJoinAndSelect('tp.tipoProductoSubCategorias', 'tpsc')
+        .leftJoinAndSelect('tp.subCategoriaTipoProductos', 'tpsc')
         .leftJoinAndSelect('tpsc.subCategoria', 'sc')
         .leftJoinAndSelect('sc.categoria', 'c')
         .leftJoinAndSelect('producto.productoTiendas', 'pt')
@@ -109,7 +109,7 @@ export class ProductoService {
         garantiaFabrica: p.garantiaFabrica,
         descuento: p.descuento,
         marca: p.marca?.nombre ?? null,
-        categoria: p.productoTipoProductos?.[0]?.tipoProducto?.tipoProductoSubCategorias?.[0]?.subCategoria?.categoria?.nombre ?? null,
+        categoria: p.productoTipoProductos?.[0]?.tipoProducto?.subCategoriaTipoProductos?.[0]?.subCategoria?.categoria?.nombre ?? null,
       }));
     } catch (error) {
       this.logger.error('Error en findAll:', error);
@@ -136,7 +136,7 @@ export class ProductoService {
       garantiaFabrica: p.garantiaFabrica,
       descuento: p.descuento,
       marca: p.marca?.nombre ?? null,
-      categoria: p.productoTipoProductos?.[0]?.tipoProducto?.tipoProductoSubCategorias?.[0]?.subCategoria?.categoria?.nombre ?? null,
+      categoria: p.productoTipoProductos?.[0]?.tipoProducto?.subCategoriaTipoProductos?.[0]?.subCategoria?.categoria?.nombre ?? null,
     }));
   } catch (error) {
     this.logger.error('Error en findProductosFiltros:', error);
@@ -150,7 +150,7 @@ export class ProductoService {
       .leftJoinAndSelect('producto.marca', 'marca')
       .leftJoinAndSelect('producto.productoTipoProductos', 'ptp')
       .leftJoinAndSelect('ptp.tipoProducto', 'tp')
-      .leftJoinAndSelect('tp.tipoProductoSubCategorias', 'tpsc')
+        .leftJoinAndSelect('tp.subCategoriaTipoProductos', 'tpsc')
       .leftJoinAndSelect('tpsc.subCategoria', 'sc')
       .leftJoinAndSelect('sc.categoria', 'categoria')
       .leftJoinAndSelect('producto.productoTiendas', 'pt')
@@ -260,9 +260,9 @@ export class ProductoService {
           'productoColores.color',
           'productoTipoProductos',
           'productoTipoProductos.tipoProducto',
-          'productoTipoProductos.tipoProducto.tipoProductoSubCategorias',
-          'productoTipoProductos.tipoProducto.tipoProductoSubCategorias.subCategoria',
-          'productoTipoProductos.tipoProducto.tipoProductoSubCategorias.subCategoria.categoria',
+          'productoTipoProductos.tipoProducto.subCategoriaTipoProductos',
+          'productoTipoProductos.tipoProducto.subCategoriaTipoProductos.subCategoria',
+          'productoTipoProductos.tipoProducto.subCategoriaTipoProductos.subCategoria.categoria',
           'productoTiendas',
           'productoTiendas.tienda',
         ],

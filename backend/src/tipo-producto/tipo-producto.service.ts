@@ -5,7 +5,7 @@ import { TipoProducto } from './entities/tipo-producto.entity';
 import { CreateTipoProductoDto } from './dto/create-tipo-producto.dto';
 import { UpdateTipoProductoDto } from './dto/update-tipo-producto.dto';
 
-import { TipoProductoSubCategoria } from '../tipo-producto-sub-categoria/entities/tipo-producto-sub-categoria.entity';
+import { SubCategoriaTipoProducto } from '../sub-categoria-tipo-producto/entities/sub-categoria-tipo-producto.entity';
 import { SubCategoria } from '../sub-categoria/entities/sub-categoria.entity';
 
 import { DeepPartial, Repository } from 'typeorm';
@@ -17,8 +17,8 @@ export class TipoProductoService {
   constructor(
     @InjectRepository(TipoProducto)
     private tipoProductoRepository: Repository<TipoProducto>,
-    @InjectRepository(TipoProductoSubCategoria)
-    private tipoProductoSubCategoriaRepository: Repository<TipoProductoSubCategoria>,
+    @InjectRepository(SubCategoriaTipoProducto)
+    private tipoProductoSubCategoriaRepository: Repository<SubCategoriaTipoProducto>,
     @InjectRepository(SubCategoria)
     private subCategoriaRepository: Repository<SubCategoria>,
   ) { }
@@ -34,9 +34,9 @@ export class TipoProductoService {
       // Crear las relaciones con las subcategorías
       if (idSubCategorias && Array.isArray(idSubCategorias) && idSubCategorias.length > 0) {
         const relaciones = idSubCategorias.map(id => ({
-          idTipoProducto: tipoProductoGuardado,
-          idSubCategoria: { idSubCategoria: id }
-        })) as DeepPartial<TipoProductoSubCategoria>[];
+          tipoProducto: tipoProductoGuardado,
+          subCategoria: { idSubCategoria: id }
+        })) as DeepPartial<SubCategoriaTipoProducto>[];
         
         await this.tipoProductoSubCategoriaRepository.save(relaciones);
       }
@@ -53,7 +53,7 @@ export class TipoProductoService {
   async findAll() {
     try {
       return await this.tipoProductoRepository.find({
-        relations: ['tipoProductoSubCategoria', 'tipoProductoSubCategoria.idSubCategoria']
+        relations: ['subCategoriaTipoProductos', 'subCategoriaTipoProductos.subCategoria']
       });
     } catch (error) {
       this.logger.error('Error al obtener tipos de producto:', error);
@@ -73,8 +73,8 @@ export class TipoProductoService {
       }
 
       const qb = this.tipoProductoRepository.createQueryBuilder('tipoProducto')
-        .leftJoinAndSelect('tipoProducto.tipoProductoSubCategoria', 'sctp')
-        .leftJoinAndSelect('sctp.idSubCategoria', 'subcat');
+        .leftJoinAndSelect('tipoProducto.subCategoriaTipoProductos', 'sctp')
+        .leftJoinAndSelect('sctp.subCategoria', 'subcat');
 
       if (idSubCategoria && Number(idSubCategoria) > 0) {
         qb.andWhere('sctp.idSubCategoria = :subId', { subId: Number(idSubCategoria) });
@@ -102,7 +102,7 @@ export class TipoProductoService {
     try {
       const tipoProductoFound = await this.tipoProductoRepository.findOne({
         where: { idTipoProducto: id },
-        relations: ['tipoProductoSubCategoria', 'tipoProductoSubCategoria.idSubCategoria']
+        relations: ['subCategoriaTipoProductos', 'subCategoriaTipoProductos.subCategoria']
       });
       
       if (!tipoProductoFound) {
@@ -146,9 +146,9 @@ export class TipoProductoService {
         // Crear nuevas relaciones
         if (idSubCategorias.length > 0) {
           const relaciones = idSubCategorias.map(subCatId => ({
-            idTipoProducto: tipoProductoFound,
-            idSubCategoria: { idSubCategoria: subCatId }
-          })) as DeepPartial<TipoProductoSubCategoria>[];
+            tipoProducto: tipoProductoFound,
+            subCategoria: { idSubCategoria: subCatId }
+          })) as DeepPartial<SubCategoriaTipoProducto>[];
 
           await this.tipoProductoSubCategoriaRepository.save(relaciones);
         }

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TipoProductoSubCategoriaService } from './tipo-producto-sub-categoria.service';
+import { TipoProductoSubCategoriaService } from './sub-categoria-tipo-producto.service';
 
 describe('TipoProductoSubCategoriaService', () => {
   let service: TipoProductoSubCategoriaService;

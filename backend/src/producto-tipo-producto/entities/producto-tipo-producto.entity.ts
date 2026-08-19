@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { TipoProducto } from "src/tipo-producto/entities/tipo-producto.entity";
 import { Producto } from "src/producto/entities/producto.entity";
 
@@ -7,7 +7,7 @@ export class ProductoTipoProducto {
   @PrimaryGeneratedColumn({ type: "int", name: "id_producto_tipo_producto" })
   idProductoTipoProducto!: number;
 
-  
+  @Index("uk_producto_un_tipo", { unique: true })
   @ManyToOne(() => Producto, producto => producto.productoTipoProductos, { 
     onDelete: 'CASCADE',
     onUpdate: 'NO ACTION' 

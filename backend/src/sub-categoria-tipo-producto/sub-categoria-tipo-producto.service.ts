@@ -1,8 +1,8 @@
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { CreateTipoProductoSubCategoriaDto } from './dto/create-tipo-producto-sub-categoria.dto';
-import { UpdateTipoProductoSubCategoriaDto } from './dto/update-tipo-producto-sub-categoria.dto';
+import { CreateSubCategoriaTipoProductoDto } from './dto/create-sub-categoria-tipo-producto.dto';
+import { UpdateSubCategoriaTipoProductoDto } from './dto/update-sub-categoria-tipo-producto.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TipoProductoSubCategoria } from './entities/tipo-producto-sub-categoria.entity';
+import { SubCategoriaTipoProducto } from './entities/sub-categoria-tipo-producto.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -10,10 +10,10 @@ export class TipoProductoSubCategoriaService {
   private readonly logger = new Logger(TipoProductoSubCategoriaService.name);
 
   constructor(
-      @InjectRepository(TipoProductoSubCategoria)
-      private tipoProductoSubCategoriaRepository: Repository<TipoProductoSubCategoria>,
+      @InjectRepository(SubCategoriaTipoProducto)
+      private tipoProductoSubCategoriaRepository: Repository<SubCategoriaTipoProducto>,
     ) { }
-    async create(createTipoProductoSubCategoriaDto: CreateTipoProductoSubCategoriaDto) {
+    async create(createTipoProductoSubCategoriaDto: CreateSubCategoriaTipoProductoDto) {
       try {
         const entity = this.tipoProductoSubCategoriaRepository.create({
           tipoProducto: { idTipoProducto: createTipoProductoSubCategoriaDto.idTipoProducto },
@@ -49,7 +49,7 @@ export class TipoProductoSubCategoriaService {
   async findOne(id: number) {
     try {
       const entity = await this.tipoProductoSubCategoriaRepository.findOne({
-        where: { idTipoProductoSubCategoria: id },
+        where: { idSubCategoriaTipoProducto: id },
         relations: ['idTipoProducto', 'idSubCategoria'], 
       });
       if (!entity) {
@@ -63,10 +63,10 @@ export class TipoProductoSubCategoriaService {
       );
     }  }
 
-  async update(id: number, updateTipoProductoSubCategoriaDto: UpdateTipoProductoSubCategoriaDto) {
+  async update(id: number, updateTipoProductoSubCategoriaDto: UpdateSubCategoriaTipoProductoDto) {
     try {
       const entity = await this.tipoProductoSubCategoriaRepository.preload({
-        idTipoProductoSubCategoria: id,
+        idSubCategoriaTipoProducto: id,
         tipoProducto: updateTipoProductoSubCategoriaDto.idTipoProducto
           ? { idTipoProducto: updateTipoProductoSubCategoriaDto.idTipoProducto }
           : undefined,
@@ -87,7 +87,7 @@ export class TipoProductoSubCategoriaService {
 
   async remove(id: number) {
     try {
-      const entity = await this.tipoProductoSubCategoriaRepository.findOne({ where: { idTipoProductoSubCategoria: id } });
+      const entity = await this.tipoProductoSubCategoriaRepository.findOne({ where: { idSubCategoriaTipoProducto: id } });
       if (!entity) {
         throw new NotFoundException(`No se encontró el tipo-producto-sub-categoria con ID ${id}`);
       }

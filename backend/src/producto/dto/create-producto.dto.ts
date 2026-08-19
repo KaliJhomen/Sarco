@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { Matches, IsString, IsOptional, IsBoolean, IsDateString, IsArray, ArrayNotEmpty, IsInt, Min, IsNotEmpty } from 'class-validator';
+import { Matches, IsString, IsOptional, IsBoolean, IsDateString, IsArray, ArrayNotEmpty, IsInt, Min, IsNotEmpty, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateProductoDto {
@@ -33,6 +33,7 @@ export class CreateProductoDto {
   @ApiPropertyOptional({ required:false })
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   imagen!: string | null; 
 
   @ApiPropertyOptional({ required:false })
@@ -57,12 +58,10 @@ export class CreateProductoDto {
   @IsDateString()
   fechaIngreso!: string | null;
 
-  @ApiPropertyOptional({ required: false, type: Number })
-  @Type(() => Number)
+  @ApiPropertyOptional({ required: false, type: String })
+  @IsString()
   @IsOptional()
-  @IsInt()
-  @Min(0)
-  garantiaFabrica!: number | null; 
+  garantiaFabrica!: string | null; 
 
   @ApiPropertyOptional({required:false})
   @Type(() => Number)

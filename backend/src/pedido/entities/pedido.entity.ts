@@ -22,9 +22,6 @@ export class Pedido {
   @Column( "int",{ name: 'id_cliente' })
   idCliente!: number;
 
-  @Column("char", { name: "ubigeo_codigo", nullable: true, length: 6, default: null })
-  ubigeoCodigo!: string | null;
-
   @Column("enum", { name: 'tipo_entrega',enum: TipoEntrega})
   tipoEntrega!: TipoEntrega;
   
@@ -55,16 +52,16 @@ export class Pedido {
   @Column("varchar", { name: 'referencia_cliente', nullable: true, length: 255 })
   referenciaCliente!: string | null;
 
-  @Column("decimal", { name: 'total', precision: 10, scale: 2, default: 0 })
+  @Column("decimal", { name: 'total', precision: 10, scale: 2})
   total!: string;
 
   @Column("enum", { name: 'estado_pedido',enum: EstadoPedido, default: EstadoPedido.PENDIENTE })
   estadoPedido!: EstadoPedido;
 
-  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt!: Date;
 
 //Relaciones 

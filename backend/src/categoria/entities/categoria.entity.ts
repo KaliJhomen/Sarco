@@ -6,11 +6,11 @@ export class Categoria {
   @PrimaryGeneratedColumn({ type: "int", name: "id_categoria" })
   idCategoria!: number;
 
-  @Column("varchar", { name: "nombre", nullable: true, length: 25 })
-  nombre!: string | null;
+  @Column("varchar", { name: "nombre", length: 25 })
+  nombre!: string;
 
-  @Column("boolean", { name: "estado", default: () => "'1'" })
-  estado!: boolean | null;
+  @Column("boolean", { name: "estado", default: '1'})
+  estado!: boolean;
 
   @OneToMany(() => SubCategoria, (subCategoria) => subCategoria.categoria)
   subCategorias!: SubCategoria[];

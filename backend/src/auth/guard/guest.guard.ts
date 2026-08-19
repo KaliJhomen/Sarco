@@ -2,10 +2,10 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { JwtPayload } from './jwt-payload'
+import { JwtPayload, GuestPayload, IdentityPayload } from './jwt-payload'
 declare module 'express' {
   interface Request {
-    cliente?: JwtPayload;
+    cliente?: IdentityPayload;
   }
 }
 @Injectable()
@@ -19,8 +19,8 @@ export class GuestGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
 
     const cookieToken = request.cookies?.['token'];
-    const [type, headerToken] = request.headers.authorization?.split(' ') ?? [];
-    const token = cookieToken ?? (type === 'Bearer' ? headerToken : undefined);
+    const headerToken = request.headers.authorization?.split(' ') [1];
+    const token = cookieToken ?? headerToken;
 
     const bypass = this.configService.get<boolean>('DEV_BYPASS_AUTH') === true;
 
@@ -31,26 +31,40 @@ export class GuestGuard implements CanActivate {
     }
 
     // Invitado sin token: pasa, req.cliente queda undefined
-    if (!token) return true;
-
-    try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get<string>('JWT_SECRET')!,   
-      });
-      if (
-        typeof payload !== 'object' ||
-        typeof payload.id !== 'number' ||
-        typeof payload.email !== 'string' ||
-        typeof payload.table !== 'string'
-      ) {
-        throw new UnauthorizedException('Token con estructura inválida');
+    if (token) {
+      try {
+        const payload = await this.jwtService.verifyAsync(token, {
+          secret: this.configService.get<string>('JWT_SECRET')!,
+        });
+        if (this.isValidPayload(payload)) {
+          request.cliente = { 
+            id: payload.id, 
+            email: payload.email, 
+            table: 'cliente'  // forzar table
+          };
+        } else {
+          request.cliente = undefined;
+        }
+      } catch {
+        request.cliente = undefined;
       }
-      request.cliente = payload;
-    } catch {
-      // Token inválido en ruta guest: tratar como invitado, NO setear usuario
+      return true;
+    }
+    const sessionToken = request.query?.sessionToken;
+    if (sessionToken && typeof sessionToken === 'string') {
+      request.cliente = { sessionToken };
+    } else {
       request.cliente = undefined;
     }
 
     return true;
+  }
+  private isValidPayload(payload: any): payload is JwtPayload {
+    return (
+      typeof payload === 'object' &&
+      typeof payload.id === 'number' &&
+      typeof payload.email === 'string' &&
+      typeof payload.table === 'string'
+    );
   }
 }

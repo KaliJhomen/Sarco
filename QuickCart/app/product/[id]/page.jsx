@@ -215,7 +215,7 @@ const Product = () => {
 
       const payload = {
         idProducto: Number(idProducto),
-        quantity: cantidad,
+        cantidad,
         sessionToken: !cliente ? token : undefined,
       };
       await addToCartMutation.mutateAsync(payload);

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TipoProductoSubCategoriaController } from './tipo-producto-sub-categoria.controller';
-import { TipoProductoSubCategoriaService } from './tipo-producto-sub-categoria.service';
+import { TipoProductoSubCategoriaController } from './sub-categoria-tipo-producto.controller';
+import { TipoProductoSubCategoriaService } from './sub-categoria-tipo-producto.service';
 
 describe('TipoProductoSubCategoriaController', () => {
   let controller: TipoProductoSubCategoriaController;

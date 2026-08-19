@@ -1,5 +1,3 @@
-import { Agenda } from '../../agenda/entities/agenda.entity';
-import { Garantia } from '../../garantia/entities/garantia.entity';
 import { Cargo } from '../../cargo/entities/cargo.entity';
 import { Documento } from '../../documento/entities/documento.entity';
 import { Tienda } from '../../tienda/entities/tienda.entity';
@@ -49,17 +47,11 @@ export class User {
   @Column("int", { name: "id_tienda", nullable: true })
   idTienda!: number | null;
 
-  @Column("varchar", {name: 'rol', length: 255 })
+  @Column("varchar", {name: 'rol', length: 255, default: 'user' })
   rol!: string;
 
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt!: Date | null;  
-
-  @OneToMany(() => Agenda, (agenda) => agenda.user)
-  agendas!: Agenda[];
-
-  @OneToMany(() => Garantia, (garantia) => garantia.user)
-  garantias!: Garantia[];
 
   @ManyToOne(() => Cargo, (cargo) => cargo.users, {
     onDelete: "NO ACTION",

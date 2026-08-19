@@ -5,15 +5,10 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Marca } from "../../marca/entities/marca.entity";
 import { ProductoTienda } from "../../producto-tienda/entities/producto-tienda.entity";
-import { DetalleSeparado } from "../../detalle-separado/entities/detalle-separado.entity";
-import { PedidoDetalle } from "../../pedido-detalle/entities/pedido-detalle.entity";
-
-import { Garantia } from "../../garantia/entities/garantia.entity";
 import { ProductoTipoProducto } from "../../producto-tipo-producto/entities/producto-tipo-producto.entity";
 import { ProductoColor } from "../../producto-color/entities/producto-color.entity";
 import { CarritoItem } from "../../carrito/entities/carrito-item.entity"; 
@@ -25,10 +20,10 @@ export class Producto {
   @PrimaryGeneratedColumn({ type: "int", name: "id_producto" })
   idProducto!: number;
 
-  @Column("varchar", { name: "nombre", length: 255 })
+  @Column("varchar", { name: "nombre", length: 25 })
   nombre!: string ;
   
-  @Column("varchar", { name: "modelo", length: 255 })
+  @Column("varchar", { name: "modelo", length: 25 })
   modelo!: string ;
 
   @Column("int", { name: "id_marca" })
@@ -38,7 +33,7 @@ export class Producto {
     name: "descripcion",
     nullable: true,
     comment: " ",
-    length: 1024,
+    length: 1000,
   })
   descripcion!: string | null;
 
@@ -51,7 +46,7 @@ export class Producto {
   @Column("decimal", {
     name: "precio_tope",
     nullable: true,
-    precision: 20,
+    precision: 10,
     scale: 2,
   })
   precioTope!: string | null;
@@ -59,12 +54,12 @@ export class Producto {
   @Column("decimal", {
     name: "precio_venta",
     nullable: true,
-    precision: 20,
+    precision: 10,
     scale: 2,
   })
   precioVenta!: string | null;
 
-  @Column("tinyint", { name: "estado", nullable: true, default: 1, transformer: {
+  @Column("tinyint", { name: "estado", nullable: true, default: null, transformer: {
     to: (value: boolean | null): number | null => value === null ? null : value ? 1 : 0,
     from: (value: number | null): boolean | null => value === null ? null : Boolean(value),},})
   estado!: boolean;
@@ -72,16 +67,13 @@ export class Producto {
   @Column("date", { name: "fecha_ingreso", nullable: true })
   fechaIngreso!: string | null;
 
-  @Column("int", { name: "garantia_fabrica", nullable: true })
-  garantiaFabrica!: number | null;
+  @Column("varchar", { name: "garantia_fabrica", nullable: true, length: 10 })
+  garantiaFabrica!: string | null;
 
   @Column("int", { name: "descuento", nullable: true })
   descuento!: number | null;
 
 
-
-  @OneToOne(() => Garantia, (garantia) => garantia.producto)
-  garantia!: Garantia;
 
   @OneToMany(() => CarritoItem, (carritoItem) => carritoItem.producto)
   carritoItems!: CarritoItem[];
@@ -100,12 +92,6 @@ export class Producto {
 
   @OneToMany(() => ProductoTienda, (productoTienda) => productoTienda.producto)
   productoTiendas!: ProductoTienda[];
-
-  @OneToMany(() => PedidoDetalle, (pedidoDetalle) => pedidoDetalle.producto)
-  pedidoDetalles!: PedidoDetalle[];
-
-  @OneToMany(() => DetalleSeparado, (detalleSeparado) => detalleSeparado.producto)
-  detalleSeparados!: DetalleSeparado[];
 
   @ManyToOne(() => Marca, (marca) => marca.productos, {
     onDelete: "RESTRICT",

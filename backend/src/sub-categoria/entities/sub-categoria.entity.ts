@@ -1,5 +1,5 @@
 import { Categoria } from "src/categoria/entities/categoria.entity";
-import { TipoProductoSubCategoria } from "src/tipo-producto-sub-categoria/entities/tipo-producto-sub-categoria.entity";
+import { SubCategoriaTipoProducto } from "src/sub-categoria-tipo-producto/entities/sub-categoria-tipo-producto.entity";
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Index("fk_sub_categoria_categoria_1", ["idCategoria"], {})
@@ -8,14 +8,14 @@ export class SubCategoria {
     @PrimaryGeneratedColumn({ type: "int", name: "id_sub_categoria" })
     idSubCategoria!: number;
 
-    @Column("varchar", { name: "nombre", nullable: true, length: 25 })
+    @Column("varchar", { name: "nombre", length: 25 })
     nombre!: string | null;
 
-    @Column("int", { name: "id_categoria", nullable: true })
-    idCategoria!: number | null;
+    @Column("int", { name: "id_categoria" })
+    idCategoria!: number;
 
-    @Column("boolean", { name: "estado", default: 1})
-    estado!: boolean | null;
+    @Column("boolean", { name: "estado", default: 0})
+    estado!: boolean;
 
     @ManyToOne(() => Categoria, (categoria) => categoria.subCategorias, {
         onDelete: "NO ACTION",
@@ -24,6 +24,6 @@ export class SubCategoria {
     @JoinColumn([{ name: "id_categoria", referencedColumnName: "idCategoria" }])
     categoria!: Categoria;
 
-    @OneToMany(() => TipoProductoSubCategoria, (tipoProductoSubCategoria) => tipoProductoSubCategoria.subCategoria)
-    tipoProductoSubCategorias!: TipoProductoSubCategoria[];
+    @OneToMany(() => SubCategoriaTipoProducto, (subCategoriaTipoProducto) => subCategoriaTipoProducto.subCategoria)
+    subCategoriaTipoProductos!: SubCategoriaTipoProducto[];
 }

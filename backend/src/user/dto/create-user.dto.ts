@@ -1,9 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsInt, IsBoolean, IsOptional, IsEmail, MinLength } from 'class-validator';
+import { IsString, IsInt, IsBoolean, IsOptional, IsEmail, MinLength, MaxLength } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty()
   @IsString()
+  @MaxLength(255)
   nombre!: string;
 
   @ApiPropertyOptional()
@@ -14,6 +15,7 @@ export class CreateUserDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   numeroDocumento?: string | null;
   
   @ApiPropertyOptional()
@@ -24,19 +26,23 @@ export class CreateUserDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   direccion?: string | null;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   telefono?: string | null;
 
   @ApiProperty()
   @IsEmail()
+  @MaxLength(255)
   email!: string;
 
   @ApiProperty()
   @IsString()
+  @MaxLength(255)
   login!: string;
 
   @ApiProperty()
@@ -47,11 +53,13 @@ export class CreateUserDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   imagen?: string | null;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   fondo?: string | null;
 
   @ApiPropertyOptional()

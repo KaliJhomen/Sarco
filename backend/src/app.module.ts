@@ -14,15 +14,12 @@ import type { JwtModuleOptions } from '@nestjs/jwt';
 import type { StringValue } from 'ms';
 import { MarcaModule } from './marca/marca.module';
 import { AnuncioModule } from './anuncio/anuncio.module';
-import { AgendaModule } from './agenda/agenda.module';
 import { CargoModule } from './cargo/cargo.module';
 import { CategoriaModule } from './categoria/categoria.module';
 import { ClienteModule } from './cliente/cliente.module';
 import { ComprobanteModule } from './comprobante/comprobante.module';
-import { DetalleSeparadoModule } from './detalle-separado/detalle-separado.module';
 import { DocumentoModule } from './documento/documento.module';
 import { EstadoClienteModule } from './estado-cliente/estado-cliente.module';
-import { GarantiaModule } from './garantia/garantia.module';
 import { MetodoPagoModule } from './metodo-pago/metodo-pago.module';
 import { PermisoModule } from './permiso/permiso.module';
 import { TiendaModule } from './tienda/tienda.module';
@@ -35,7 +32,7 @@ import { UserModule } from './user/user.module';
 import { SubCategoriaModule } from './sub-categoria/sub-categoria.module';
 import { TipoProductoModule } from './tipo-producto/tipo-producto.module';
 import { ProductoTipoProductoModule } from './producto-tipo-producto/producto-tipo-producto.module';
-import { TipoProductoSubCategoriaModule } from './tipo-producto-sub-categoria/tipo-producto-sub-categoria.module';
+import { TipoProductoSubCategoriaModule } from './sub-categoria-tipo-producto/sub-categoria-tipo-producto.module';
 import { ProductoModule } from './producto/producto.module';
 import { ProductoTiendaModule } from './producto-tienda/producto-tienda.module';
 import { UploadModule } from './upload/upload.module';
@@ -90,16 +87,13 @@ import { UbigeoModule } from './ubigeo/ubigeo.module';
     }),
 
     MarcaModule,
-    AgendaModule,
     AnuncioModule,
     CargoModule,
     CategoriaModule,
     ClienteModule,
     ComprobanteModule,
-    DetalleSeparadoModule,
     DocumentoModule,
     EstadoClienteModule,
-    GarantiaModule,
     MetodoPagoModule,
     PermisoModule,
     TiendaModule,

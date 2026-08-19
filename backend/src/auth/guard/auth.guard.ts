@@ -7,10 +7,10 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { JwtPayload } from './jwt-payload';
+import { IdentityPayload } from './jwt-payload';
 declare module 'express' {
   interface Request {
-    cliente?: JwtPayload;
+    cliente?: IdentityPayload;
   }
 }
 

@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, Matches } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { EstadoPedido } from '../entities/pedido.entity';
-import { Transform, Type } from 'class-transformer'
+import { Transform } from 'class-transformer'
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;
 const optTrim = ({ value }: { value: unknown }) =>
@@ -50,11 +50,4 @@ export class UpdatePedidoDto {
     @Transform(trim)
     @IsString()
     direccion?: string;
-  
-
-  @ApiPropertyOptional({ description: 'Código UBIGEO del distrito' })
-  @IsOptional()
-  @Transform(optTrim)
-  @Matches(/^\d{6}$/)
-  ubigeoCodigo?: string | null;
 }

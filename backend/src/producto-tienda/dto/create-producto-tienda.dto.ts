@@ -1,16 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional } from "class-validator";
+import { IsInt, IsOptional } from "class-validator";
 export class CreateProductoTiendaDto {
     @ApiProperty()
-    @IsNumber()
+    @IsInt()
     idProducto?: number | null;
 
     @ApiProperty( {required:false})
-    @IsNumber()
+    @IsInt()
     idTienda?: number | null;
 
     @ApiProperty({ required: false })
-    @IsNumber()
+    @IsInt()
     @IsOptional()
     cantidad?: number | null;
 

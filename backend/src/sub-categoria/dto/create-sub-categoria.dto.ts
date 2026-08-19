@@ -1,16 +1,17 @@
-import { IsString, IsBoolean, IsNumber} from 'class-validator';
+import { IsString, IsBoolean, IsInt, MaxLength} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateSubCategoriaDto {
   @ApiProperty()
   @IsString()
-  nombre: string;
+  @MaxLength(25)
+  nombre!: string;
 
   @ApiProperty()
-  @IsNumber()   
-  idCategoria: number;
+  @IsInt()   
+  idCategoria!: number;
 
   @ApiProperty({ type: Boolean, description: 'Estado' })
   @IsBoolean()
-  estado: boolean;
+  estado!: boolean;
 }

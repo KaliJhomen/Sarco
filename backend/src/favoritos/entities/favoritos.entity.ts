@@ -10,15 +10,13 @@ export class Favoritos {
   @Column("varchar",{ 
     name: 'session_token', 
     length: 36, 
-    nullable: true, 
-    unique: true })
+    nullable: true })
   sessionToken!: string | null;
 
   @Column( "varchar", {
     name: 'share_token',
     length: 36,
-    nullable: true, 
-    unique: true})
+    nullable: true })
   shareToken!: string | null;
   
   @Column( "timestamp",{
@@ -37,9 +35,8 @@ export class Favoritos {
   items!: FavoritosItem[];
   //
   
-  @OneToOne(() => Cliente, (cliente) => cliente.favoritos, { 
-    nullable: true, 
+  @OneToOne(() => Cliente, (cliente) => cliente.favoritos, {  
     onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_cliente' })
-  cliente?: Cliente;
+  cliente!: Cliente;
 }

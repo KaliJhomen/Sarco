@@ -18,11 +18,10 @@ export const cartService = {
    * Agrega un producto al carrito.
    * Valida el stock disponible antes de enviar la petición.
    */
-  async add(data) {
-    if (data.quantity > data.stockDisponible) {
-      throw new Error(`Solo hay ${data.stockDisponible} unidades disponibles`);
-    }
-    return client.post(endpoints.cart.add, data);
+  async add({ sessionToken, ...body }) {
+    return client.post(endpoints.cart.add, body, {
+      params: sessionToken ? { sessionToken } : undefined,
+    });
   },
 
   /**

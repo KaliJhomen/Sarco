@@ -1,14 +1,18 @@
-import { IsString} from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 
 export class CreateColorDto {
   @ApiProperty()
+  @IsNotEmpty()
   @IsString()
-  nombre: string;
+  @MaxLength(100)
+  nombre!: string;
 
-  @ApiProperty()  
+  @ApiProperty()
+  @IsNotEmpty()  
   @IsString()
-  codigoHex: string;
+  @MaxLength(7)
+  codigoHex!: string;
 
 }

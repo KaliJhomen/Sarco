@@ -297,12 +297,7 @@ export const RegisterForm = () => {
             {/* Google SVG */}
             Google
           </button>
-          <button type="button" className="flex items-center justify-center gap-2 py-3 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 active:scale-95">
-            {/* Facebook SVG */}
-            Facebook
-          </button>
         </div>
-
         <p className="text-center text-sm text-gray-600 mt-6 animate-slide-up animation-delay-1100">
           ¿Ya tienes cuenta? <Link href="/auth/login" className="text-purple-600 font-semibold hover:underline transition-all">Inicia sesión</Link>
         </p>

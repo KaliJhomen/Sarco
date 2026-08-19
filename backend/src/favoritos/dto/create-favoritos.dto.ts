@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsInt, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsInt } from "class-validator";
 
 import {Type} from "class-transformer";
 
@@ -8,9 +8,4 @@ export class CreateFavoritosDto {
   @Type(() => Number)
   @IsInt()
   idProducto!: number;
-
-  @ApiPropertyOptional({description: 'Token de sesión para carritos de invitados' })
-  @IsString()
-  @IsOptional()
-  sessionToken!: string | null;
 }
